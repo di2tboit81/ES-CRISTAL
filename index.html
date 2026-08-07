@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GlasirEs — Sistem Distribusi Es Kristal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+
+<!-- Tailwind (Play CDN — fine for a standalone file like this, not a Claude.ai artifact) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Sora', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+          mono: ['JetBrains Mono', 'monospace'],
+        },
+        colors: {
+          glacier: { 950:'#050B14', 900:'#0A1B2E', 800:'#0F2A45', 700:'#153A5C', 600:'#1C4A73' },
+          frost:   { 400:'#7FE0F0', 300:'#A6ECF6', 200:'#CFF6FB' },
+          ice:     { 50:'#F3FBFD' },
+        },
+        boxShadow: {
+          glass: '0 8px 32px rgba(10,27,46,0.10)',
+        }
+      }
+    }
+  }
+</script>
+
+<!-- React + Babel -->
+<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"></script>
+
+<!-- Firebase (compat SDK — Realtime Database only) -->
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-app-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-database-compat.js"></script>
+
+<style>
+  body{ font-family:'Inter', sans-serif; background:
+    radial-gradient(ellipse 900px 500px at 90% -10%, rgba(127,224,240,0.16), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 0% 100%, rgba(28,74,115,0.12), transparent 55%),
+    #F3FBFD;
+  }
+  .glass{ background:rgba(255,255,255,0.72); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.6); }
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb{ background:#CFF6FB; border-radius:8px; }
+  .icebar-shell{ background:linear-gradient(180deg,#0A1B2E,#153A5C); border-radius:14px; padding:3px; box-shadow:inset 0 2px 6px rgba(0,0,0,0.35); }
+  .icebar-fill{ background:linear-gradient(180deg,#CFF6FB,#7FE0F0 55%,#3FB6D1); border-radius:11px; position:relative; overflow:hidden; transition:height .6s cubic-bezier(.4,0,.2,1); }
+  .icebar-fill::after{ content:''; position:absolute; inset:0; background:repeating-linear-gradient(-45deg, rgba(255,255,255,0.35) 0 6px, transparent 6px 14px); opacity:.35; }
+  .fade-in{ animation:fadeIn .35s ease both; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+</style>
+</head>
+<body class="text-glacier-900">
+<div id="root"></div>
+<script>
+  // Jaring pengaman: kalau setelah beberapa detik #root masih kosong (CDN gagal
+  // dimuat / error skrip lain), tampilkan pesan diagnostik alih-alih layar putih.
+  window.__appErrors = [];
+  window.addEventListener('error', function(e){
+    window.__appErrors.push((e.message||'Error') + ' — ' + (e.filename ? e.filename.split('/').pop() : '') + ':' + (e.lineno||''));
+  });
+  window.addEventListener('unhandledrejection', function(e){
+    window.__appErrors.push('Promise error: ' + (e.reason && e.reason.message ? e.reason.message : e.reason));
+  });
+  setTimeout(function(){
+    var root = document.getElementById('root');
+    if (root && root.innerHTML.trim() === '') {
+      var errList = window.__appErrors.length
+        ? window.__appErrors.join('\n')
+        : 'Tidak ada error JavaScript tertangkap — kemungkinan besar salah satu file dari CDN (React/Babel/Firebase) gagal dimuat karena koneksi internet bermasalah atau diblokir jaringan.';
+      root.innerHTML =
+        '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:#F3FBFD;">' +
+          '<div style="max-width:580px;background:#fff;border:1px solid #e5eef2;border-radius:16px;padding:28px;box-shadow:0 8px 24px rgba(10,27,46,0.10);">' +
+            '<div style="font-size:11px;letter-spacing:0.12em;color:#e11d48;font-weight:700;margin-bottom:10px;">HALAMAN GAGAL DIMUAT</div>' +
+            '<div style="font-size:14px;color:#334155;margin-bottom:14px;line-height:1.6;">Aplikasi tidak berhasil tampil. Ini biasanya karena koneksi internet ke server CDN (React/Firebase) lambat, terputus, atau diblokir jaringan tempatmu. Detail teknis yang tertangkap:</div>' +
+            '<pre style="font-size:12px;background:#f8fafc;padding:14px;border-radius:10px;overflow:auto;white-space:pre-wrap;color:#475569;border:1px solid #eef2f6;">' + errList.replace(/</g,'&lt;') + '</pre>' +
+            '<div style="font-size:13px;color:#64748b;margin-top:14px;line-height:1.6;">Coba: (1) pastikan koneksi internet aktif lalu klik dua kali file ini lagi, (2) coba jaringan lain (mis. hotspot HP) untuk memastikan bukan WiFi yang memblokir, (3) kirim tulisan di kotak abu-abu di atas ini ke Claude untuk dicek lebih lanjut.</div>' +
+          '</div>' +
+        '</div>';
+    }
+  }, 5000);
+</script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useRef } = React;
+
+/* =========================================================================
+   SETUP WAJIB SEBELUM DIPAKAI
+   1. Buat project di https://console.firebase.google.com
+   2. Aktifkan "Realtime Database" (bukan Firestore) — mode boleh "test mode" dulu.
+   3. Copy config project kamu (Project settings > General > Your apps > SDK config)
+      lalu tempel di FIREBASE_CONFIG di bawah ini, ganti semua nilai "GANTI_...".
+   4. Sarankan set Rules Realtime Database supaya tidak publik-terbuka setelah testing:
+      lihat catatan keamanan di akhir percakapan.
+   ========================================================================= */
+const FIREBASE_CONFIG = {
+
+  apiKey: "AIzaSyD8LEwi8fIqOkkLJ-6LSehMbWkDDdN8tR8",
+
+  authDomain: "ice-cristal.firebaseapp.com",
+
+  databaseURL: "https://ice-cristal-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+  projectId: "ice-cristal",
+
+  storageBucket: "ice-cristal.firebasestorage.app",
+
+  messagingSenderId: "478336549607",
+
+  appId: "1:478336549607:web:136e276d0babd09f35d842"
+
+};
+
+let FIREBASE_INIT_ERROR = null;
+let db = null;
+try {
+  const hasPlaceholder = Object.values(FIREBASE_CONFIG).some(v => String(v).includes('GANTI_'));
+  if (hasPlaceholder) { FIREBASE_INIT_ERROR = 'PLACEHOLDER'; }
+  else {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.database();
+  }
+} catch (e) {
+  FIREBASE_INIT_ERROR = e.message;
+}
+
+/* ---------------------------- util ---------------------------- */
+async function sha256(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function rupiah(n){ return 'Rp' + Math.round(n||0).toLocaleString('id-ID'); }
+function waktu(ts){ return ts ? new Date(ts).toLocaleString('id-ID', {dateStyle:'medium', timeStyle:'short'}) : '-'; }
+function useDbList(path){
+  const [data, setData] = useState({});
+  useEffect(() => {
+    const ref = db.ref(path);
+    const cb = snap => setData(snap.val() || {});
+    ref.on('value', cb);
+    return () => ref.off('value', cb);
+  }, [path]);
+  return data;
+}
+function useDbValue(path, fallback){
+  const [data, setData] = useState(fallback);
+  useEffect(() => {
+    const ref = db.ref(path);
+    const cb = snap => setData(snap.val() === null ? fallback : snap.val());
+    ref.on('value', cb);
+    return () => ref.off('value', cb);
+  }, [path]);
+  return data;
+}
+function toList(obj){ return Object.entries(obj||{}).map(([id,v]) => ({ id, ...v })); }
+
+function useNotifications(user){
+
+    const all = useDbList("notifications");
+
+    return useMemo(()=>{
+
+        return Object.entries(all||{})
+
+        .map(([id,v])=>({
+
+            id,
+
+            ...v
+
+        }))
+
+        .filter(n=>{
+
+            if(n.toUser && n.toUser===user.id) return true;
+
+            if(n.toRole && n.toRole===user.role) return true;
+
+            if(!n.toUser && !n.toRole) return true;
+
+            return false;
+
+        })
+
+        .sort((a,b)=>b.createdAt-a.createdAt);
+
+    },[all,user]);
+
+}
+
+function unreadCount(list){
+
+    return list.filter(i=>!i.read).length;
+
+}
+
+async function markNotificationRead(id){
+
+    await db.ref("notifications/"+id+"/read").set(true);
+
+}
+
+/* ===========================================================
+   CREATE NOTIFICATION
+=========================================================== */
+
+async function createNotification({
+
+    title="",
+
+    message="",
+
+    type="info",
+
+    toRole=null,
+
+    toUser=null,
+
+    fromUser=null,
+
+    data={}
+
+}){
+
+    await db.ref("notifications").push({
+
+        title,
+
+        message,
+
+        type,
+
+        toRole,
+
+        toUser,
+
+        fromUser,
+
+        data,
+
+        read:false,
+
+        createdAt:Date.now()
+
+    });
+
+}
+
+window.testNotification = async function(){
+
+    await createNotification({
+
+        title:"Test",
+
+        message:"Notifikasi berhasil",
+
+        type:"system",
+
+        toRole:"admin"
+
+    });
+
+    alert("Notifikasi berhasil dibuat");
+
+}
+
+const ROLE_LABEL = { superadmin:'Super Admin', admin:'Admin', driver:'Driver', gudang:'Gudang' };
+const ROLE_BADGE = { superadmin:'bg-glacier-900 text-frost-200', admin:'bg-glacier-700 text-frost-200', driver:'bg-frost-400/30 text-glacier-800', gudang:'bg-frost-300/40 text-glacier-800' };
+
+/* ---------------------------- Ice stock gauge (signature element) ---------------------------- */
+function IceGauge({ label, value, max, unit='kantong', big }){
+  const pct = Math.max(0, Math.min(100, max > 0 ? (value/max)*100 : 0));
+  return (
+    <div className={"flex items-end gap-4 " + (big ? "" : "")}>
+      <div className="icebar-shell" style={{ width: big?54:38, height: big?140:96 }}>
+        <div className="icebar-fill w-full" style={{ height: pct + '%' }}></div>
+      </div>
+      <div>
+        <div className={"font-display font-bold text-glacier-900 " + (big?"text-3xl":"text-xl")}>{Math.round(value).toLocaleString('id-ID')}</div>
+        <div className="text-xs text-glacier-600 font-medium">{unit}</div>
+        <div className="text-[11px] text-glacier-500 mt-1">{label}</div>
+      </div>
+    </div>
+  );
+}
+
+function Card({ children, className='' }){
+  return <div className={"glass rounded-2xl shadow-glass p-5 " + className}>{children}</div>;
+}
+function Pill({ children, tone='default' }){
+  const tones = {
+    default:'bg-glacier-100 text-glacier-700',
+    pending:'bg-amber-100 text-amber-700',
+    approved:'bg-sky-100 text-sky-700',
+    done:'bg-emerald-100 text-emerald-700',
+    rejected:'bg-rose-100 text-rose-700',
+  };
+  return <span className={"px-2.5 py-1 rounded-full text-xs font-semibold " + (tones[tone]||tones.default)}>{children}</span>;
+}
+function Btn({ children, onClick, tone='primary', disabled, className='', type='button' }){
+  const tones = {
+    primary:'bg-glacier-900 text-white hover:bg-glacier-800',
+    accent:'bg-frost-400 text-glacier-900 hover:bg-frost-300 font-semibold',
+    ghost:'bg-white text-glacier-700 border border-glacier-200 hover:border-glacier-400',
+    danger:'bg-rose-600 text-white hover:bg-rose-700',
+  };
+  return (
+    <button type={type} onClick={onClick} disabled={disabled}
+      className={"px-4 py-2.5 rounded-xl text-sm transition disabled:opacity-40 disabled:cursor-not-allowed " + (tones[tone]||tones.primary) + " " + className}>
+      {children}
+    </button>
+  );
+}
+function Field({ label, children }){
+  return <label className="block mb-4"><span className="block text-xs font-semibold text-glacier-600 mb-1.5">{label}</span>{children}</label>;
+}
+const inputCls = "w-full px-3.5 py-2.5 rounded-xl border border-glacier-200 bg-white focus:outline-none focus:ring-2 focus:ring-frost-400 text-sm";
+
+/* ---------------------------- Toast ---------------------------- */
+function useToast(){
+  const [toast, setToast] = useState(null);
+  const show = (msg, tone='ok') => { setToast({msg, tone}); setTimeout(()=>setToast(null), 3200); };
+  const el = toast && (
+    <div className={"fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-medium fade-in " + (toast.tone==='err' ? "bg-rose-600 text-white" : "bg-glacier-900 text-white")}>
+      {toast.msg}
+    </div>
+  );
+  return [el, show];
+}
+
+
+/* =========================================================================
+   AUTH
+   ========================================================================= */
+function SetupScreen({ onDone }){
+  const [name, setName] = useState(''); const [username, setUsername] = useState(''); const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false); const [err, setErr] = useState('');
+  const submit = async () => {
+    if (!name || !username || !password) { setErr('Semua kolom wajib diisi.'); return; }
+    setBusy(true); setErr('');
+    try {
+      const passwordHash = await sha256(password);
+      const ref = db.ref('users').push();
+      await ref.set({ name, username, passwordHash, role:'superadmin', active:true, createdAt: Date.now() });
+      await db.ref('config/pricePerBag').set(15000);
+      await db.ref('warehouse/stock').set(0);
+      onDone();
+    } catch(e){ setErr('Gagal menyimpan: ' + e.message); }
+    setBusy(false);
+  };
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <Card className="w-full max-w-md fade-in">
+        <div className="text-xs font-mono tracking-widest text-frost-400 mb-1">SETUP AWAL</div>
+        <h1 className="font-display font-bold text-2xl text-glacier-900 mb-1">Buat Akun Super Admin</h1>
+        <p className="text-sm text-glacier-500 mb-5">Belum ada pengguna di sistem ini. Buat akun Super Admin pertama untuk mulai.</p>
+        <Field label="Nama Lengkap"><input className={inputCls} value={name} onChange={e=>setName(e.target.value)} placeholder="Nama kamu" /></Field>
+        <Field label="Username"><input className={inputCls} value={username} onChange={e=>setUsername(e.target.value.trim())} placeholder="mis. admin1" /></Field>
+        <Field label="Password"><input type="password" className={inputCls} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Minimal 6 karakter" /></Field>
+        {err && <div className="text-rose-600 text-sm mb-3">{err}</div>}
+        <Btn tone="accent" className="w-full" onClick={submit} disabled={busy}>{busy ? 'Menyimpan…' : 'Buat Super Admin & Masuk'}</Btn>
+      </Card>
+    </div>
+  );
+}
+
+function LoginScreen({ onLogin }){
+  const [username, setUsername] = useState(''); const [password, setPassword] = useState('');
+  const [err, setErr] = useState(''); const [busy, setBusy] = useState(false);
+  const submit = async () => {
+    setErr(''); setBusy(true);
+    try {
+      const snap = await db.ref('users').once('value');
+      const users = toList(snap.val());
+      const found = users.find(u => u.username === username.trim());
+      if (!found || found.active === false) { setErr('Username tidak ditemukan atau nonaktif.'); setBusy(false); return; }
+      const hash = await sha256(password);
+      if (hash !== found.passwordHash) { setErr('Password salah.'); setBusy(false); return; }
+      localStorage.setItem('glasires_uid', found.id);
+      onLogin(found);
+    } catch(e){ setErr('Gagal login: ' + e.message); }
+    setBusy(false);
+  };
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-md fade-in">
+        <div className="text-center mb-7">
+          <div className="inline-flex items-center gap-2 justify-center mb-3">
+            <div className="icebar-shell" style={{width:28,height:36}}><div className="icebar-fill w-full" style={{height:'70%'}}></div></div>
+            <span className="font-display font-extrabold text-2xl text-glacier-900 tracking-tight">GlasirEs</span>
+          </div>
+          <p className="text-sm text-glacier-500">Sistem distribusi & stok es kristal</p>
+        </div>
+        <Card>
+          <Field label="Username"><input className={inputCls} value={username} onChange={e=>setUsername(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()} /></Field>
+          <Field label="Password"><input type="password" className={inputCls} value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()} /></Field>
+          {err && <div className="text-rose-600 text-sm mb-3">{err}</div>}
+          <Btn tone="accent" className="w-full" onClick={submit} disabled={busy}>{busy ? 'Memeriksa…' : 'Masuk'}</Btn>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// ======================================================
+// NOTIFICATION PANEL
+// ======================================================
+
+function NotificationPanel({ user, onClose }) {
+
+    const notifications = useNotifications(user);
+
+    return (
+
+        <div className="absolute right-0 top-14 w-96 max-h-[500px] overflow-hidden rounded-2xl shadow-2xl bg-white border border-gray-200 z-50">
+
+            <div className="flex justify-between items-center p-4 border-b">
+
+                <div className="font-bold">
+
+                    🔔 Notifikasi
+
+                </div>
+
+                <button
+                    onClick={onClose}
+                    className="text-gray-500 hover:text-red-500">
+
+                    ✕
+
+                </button>
+
+            </div>
+
+            <div className="overflow-y-auto max-h-[420px]">
+
+                {
+
+                    notifications.length===0 ?
+
+                    <div className="p-6 text-center text-gray-400">
+
+                        Tidak ada notifikasi
+
+                    </div>
+
+                    :
+
+                    notifications.map(item=>(
+
+                        <div
+
+                            key={item.id}
+
+                            onClick={()=>markNotificationRead(item.id)}
+
+                            className={
+
+                                "border-b p-4 cursor-pointer hover:bg-sky-50 " +
+
+                                (!item.read ? "bg-blue-50" : "")
+
+                            }
+
+                        >
+
+                            <div className="font-semibold">
+
+                                {item.title}
+
+                            </div>
+
+                            <div className="text-sm mt-1">
+
+                                {item.message}
+
+                            </div>
+
+                            <div className="text-xs text-gray-400 mt-2">
+
+                                {waktu(item.createdAt)}
+
+                            </div>
+
+                        </div>
+
+                    ))
+
+                }
+
+            </div>
+
+        </div>
+
+    );
+
+}
+
+/* =========================================================================
+   SHELL (sidebar + topbar)
+   ========================================================================= */
+function Shell({ user, tabs, active, setActive, onLogout, children }){
+  const [mobileOpen, setMobileOpen] = useState(false);
+  
+  const [showNotification,setShowNotification]=useState(false);
+
+const notifications = useNotifications(user);
+
+const unread = unreadCount(notifications);
+  
+  return (
+    <div className="min-h-screen flex">
+      {/* Sidebar */}
+      <div className={"fixed lg:static z-40 inset-y-0 left-0 w-64 bg-glacier-900 text-frost-200 flex flex-col transition-transform " + (mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0")}>
+        <div className="px-5 py-5 flex items-center gap-2 border-b border-white/10">
+          <div className="icebar-shell" style={{width:20,height:26}}><div className="icebar-fill w-full" style={{height:'70%'}}></div></div>
+          <span className="font-display font-extrabold text-lg text-white">GlasirEs</span>
+        </div>
+        <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+          {tabs.map(t => (
+            <button key={t.key} onClick={()=>{setActive(t.key); setMobileOpen(false);}}
+              className={"w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium transition flex items-center gap-2.5 " +
+                (active===t.key ? "bg-frost-400 text-glacier-900" : "text-frost-200/80 hover:bg-white/5")}>
+              <span>{t.icon}</span>{t.label}
+            </button>
+          ))}
+        </nav>
+        <div className="p-4 border-t border-white/10">
+          <div className="text-xs text-frost-200/60 mb-1">Masuk sebagai</div>
+          <div className="text-sm font-semibold text-white mb-0.5">{user.name}</div>
+          <div className={"inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mb-3 " + ROLE_BADGE[user.role]}>{ROLE_LABEL[user.role]}</div>
+          <Btn tone="ghost" className="w-full !bg-white/5 !text-white !border-white/15" onClick={onLogout}>Keluar</Btn>
+        </div>
+      </div>
+      {mobileOpen && <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={()=>setMobileOpen(false)}></div>}
+
+      {/* Main */}
+      <div className="flex-1 min-w-0">
+        <div className="lg:hidden sticky top-0 z-20 glass flex items-center justify-between px-4 py-3">
+          <button onClick={()=>setMobileOpen(true)} className="text-glacier-800 font-bold text-lg">☰</button>
+          <span className="font-display font-bold text-glacier-900">GlasirEs</span>
+          <span></span>
+        </div>
+        <div className="p-5 lg:p-8 max-w-6xl mx-auto">
+
+  {/* ===== ICON LONCENG ===== */}
+
+  <div className="flex justify-end mb-4 relative">
+
+    <button
+      onClick={() => setShowNotification(!showNotification)}
+      className="relative bg-white border border-glacier-200 rounded-full w-11 h-11 shadow hover:bg-frost-200 transition">
+
+      🔔
+
+      {unread > 0 && (
+        <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full text-[10px] min-w-[18px] h-[18px] flex items-center justify-center">
+          {unread}
+        </span>
+      )}
+
+    </button>
+
+    {showNotification && (
+      <NotificationPanel
+        user={user}
+        onClose={() => setShowNotification(false)}
+      />
+    )}
+
+  </div>
+
+  {children}
+
+</div>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+   MANAGE USERS (shared by Admin / SuperAdmin, role scope differs)
+   ========================================================================= */
+function ManageUsers({ me, allowedRoles, title }){
+  const users = toList(useDbList('users'));
+  const [name, setName] = useState(''); const [username, setUsername] = useState('');
+  const [password, setPassword] = useState(''); const [role, setRole] = useState(allowedRoles[0]);
+  const [busy, setBusy] = useState(false);
+  const [toast, showToast] = useToast();
+
+  const visibleUsers = users.filter(u => allowedRoles.includes(u.role));
+
+  const addUser = async () => {
+    if (!name || !username || !password) { showToast('Nama, username, dan password wajib diisi.', 'err'); return; }
+    if (users.some(u => u.username === username.trim())) { showToast('Username sudah dipakai.', 'err'); return; }
+    setBusy(true);
+    try {
+      const passwordHash = await sha256(password);
+      await db.ref('users').push({ name, username: username.trim(), passwordHash, role, active:true, createdAt: Date.now() });
+      if (role === 'driver') await db.ref('driverStock/' + username.trim()).set(0);
+      setName(''); setUsername(''); setPassword('');
+      showToast('Pengguna ' + name + ' berhasil ditambahkan.');
+    } catch(e){ showToast('Gagal: ' + e.message, 'err'); }
+    setBusy(false);
+  };
+
+  const toggleActive = async (u) => {
+    await db.ref('users/' + u.id + '/active').set(!(u.active !== false));
+  };
+
+  return (
+    <div className="fade-in">
+      {toast}
+      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">{title}</h2>
+      <div className="grid lg:grid-cols-5 gap-5">
+        <Card className="lg:col-span-2 h-fit">
+          <div className="text-sm font-semibold text-glacier-800 mb-4">Tambah Pengguna Baru</div>
+          <Field label="Nama"><input className={inputCls} value={name} onChange={e=>setName(e.target.value)} /></Field>
+          <Field label="Username"><input className={inputCls} value={username} onChange={e=>setUsername(e.target.value)} /></Field>
+          <Field label="Password"><input type="password" className={inputCls} value={password} onChange={e=>setPassword(e.target.value)} /></Field>
+          {allowedRoles.length > 1 && (
+            <Field label="Peran">
+              <select className={inputCls} value={role} onChange={e=>setRole(e.target.value)}>
+                {allowedRoles.map(r => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}
+              </select>
+            </Field>
+          )}
+          <Btn tone="accent" className="w-full" onClick={addUser} disabled={busy}>{busy?'Menyimpan…':'Tambah Pengguna'}</Btn>
+        </Card>
+        <Card className="lg:col-span-3">
+          <div className="text-sm font-semibold text-glacier-800 mb-4">Daftar Pengguna ({visibleUsers.length})</div>
+          <div className="space-y-2 max-h-[480px] overflow-y-auto">
+            {visibleUsers.length === 0 && <div className="text-sm text-glacier-400 py-6 text-center">Belum ada pengguna di peran ini.</div>}
+            {visibleUsers.map(u => (
+              <div key={u.id} className="flex items-center justify-between px-3.5 py-3 rounded-xl border border-glacier-100 bg-white/60">
+                <div>
+                  <div className="text-sm font-semibold text-glacier-900">{u.name}</div>
+                  <div className="text-xs text-glacier-500">@{u.username}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={"px-2 py-0.5 rounded-full text-[10px] font-bold " + ROLE_BADGE[u.role]}>{ROLE_LABEL[u.role]}</span>
+                  <Pill tone={u.active===false ? 'rejected' : 'done'}>{u.active===false ? 'Nonaktif' : 'Aktif'}</Pill>
+                  {u.id !== me.id && <Btn tone="ghost" className="!px-2.5 !py-1 text-xs" onClick={()=>toggleActive(u)}>{u.active===false?'Aktifkan':'Nonaktifkan'}</Btn>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+   STOCK OVERVIEW (shared)
+   ========================================================================= */
+function StockOverview(){
+  const warehouseStock = useDbValue('warehouse/stock', 0);
+  const driverStock = useDbList('driverStock');
+  const users = toList(useDbList('users'));
+  const drivers = users.filter(u => u.role === 'driver');
+  const totalCarried = Object.values(driverStock).reduce((a,b)=>a+(b||0), 0);
+
+  return (
+    <div className="grid md:grid-cols-2 gap-5 mb-6">
+      <Card>
+        <div className="text-xs font-mono tracking-widest text-glacier-400 mb-3">STOK GUDANG</div>
+        <IceGauge label="Sisa es di gudang" value={warehouseStock} max={Math.max(warehouseStock, totalCarried, 100)} big />
+      </Card>
+      <Card>
+        <div className="text-xs font-mono tracking-widest text-glacier-400 mb-3">DIBAWA SEMUA DRIVER</div>
+        <IceGauge label="Total sedang di jalan" value={totalCarried} max={Math.max(warehouseStock, totalCarried, 100)} big />
+        <div className="mt-4 space-y-1.5">
+          {drivers.map(d => (
+            <div key={d.id} className="flex items-center justify-between text-sm">
+              <span className="text-glacier-700">{d.name}</span>
+              <span className="font-mono font-semibold text-glacier-900">{driverStock[d.username] || 0} kantong</span>
+            </div>
+          ))}
+          {drivers.length===0 && <div className="text-sm text-glacier-400">Belum ada driver.</div>}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+/* =========================================================================
+   ALL DELIVERIES TABLE (shared, admin view)
+   ========================================================================= */
+function DeliveriesTable(){
+  const deliveries = toList(useDbList('deliveries')).sort((a,b)=>b.timestamp-a.timestamp);
+  return (
+    <Card>
+      <div className="text-sm font-semibold text-glacier-800 mb-4">Riwayat Pengantaran ke Pelanggan ({deliveries.length})</div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead><tr className="text-left text-glacier-400 text-xs border-b border-glacier-100">
+            <th className="pb-2 pr-4">Waktu</th><th className="pb-2 pr-4">Driver</th><th className="pb-2 pr-4">Pelanggan</th>
+            <th className="pb-2 pr-4">Qty</th><th className="pb-2">Total</th>
+          </tr></thead>
+          <tbody>
+            {deliveries.map(d => (
+              <tr key={d.id} className="border-b border-glacier-50">
+                <td className="py-2.5 pr-4 text-glacier-500 text-xs">{waktu(d.timestamp)}</td>
+                <td className="py-2.5 pr-4 font-medium text-glacier-800">{d.driverName}</td>
+                <td className="py-2.5 pr-4">{d.customerName}</td>
+                <td className="py-2.5 pr-4 font-mono">{d.qty}</td>
+                <td className="py-2.5 font-mono font-semibold text-glacier-900">{rupiah(d.total)}</td>
+              </tr>
+            ))}
+            {deliveries.length===0 && <tr><td colSpan="5" className="py-8 text-center text-glacier-400">Belum ada pengantaran tercatat.</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  );
+}
+
+/* =========================================================================
+   STOCK REQUESTS APPROVAL (Admin/SuperAdmin ACC)
+   ========================================================================= */
+function ApproveRequests({ me }){
+  const requests = toList(useDbList('stockRequests')).sort((a,b)=>b.requestedAt-a.requestedAt);
+  const [toast, showToast] = useToast();
+  const pending = requests.filter(r=>r.status==='pending');
+  const others = requests.filter(r=>r.status!=='pending');
+
+  const approve = async (r) => {
+    await db.ref('stockRequests/'+r.id).update({ status:'approved', approvedBy: me.id, approvedByName: me.name, approvedAt: Date.now() });
+    showToast('Permintaan ' + r.driverName + ' disetujui. Gudang bisa keluarkan stok sekarang.');
+  };
+  const reject = async (r) => {
+    await db.ref('stockRequests/'+r.id).update({ status:'rejected', approvedBy: me.id, approvedByName: me.name, approvedAt: Date.now() });
+    showToast('Permintaan ditolak.', 'err');
+  };
+
+  return (
+    <div className="fade-in">
+      {toast}
+      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Persetujuan Permintaan Stok</h2>
+      <Card className="mb-5">
+        <div className="text-sm font-semibold text-glacier-800 mb-4">Menunggu Persetujuan ({pending.length})</div>
+        <div className="space-y-2.5">
+          {pending.map(r => (
+            <div key={r.id} className="flex items-center justify-between px-4 py-3 rounded-xl border border-amber-200 bg-amber-50/60">
+              <div>
+                <div className="text-sm font-semibold text-glacier-900">{r.driverName}</div>
+                <div className="text-xs text-glacier-500">minta {r.qtyRequested} kantong · {waktu(r.requestedAt)}</div>
+              </div>
+              <div className="flex gap-2">
+                <Btn tone="accent" className="!px-3 !py-1.5 text-xs" onClick={()=>approve(r)}>✓ ACC</Btn>
+                <Btn tone="danger" className="!px-3 !py-1.5 text-xs" onClick={()=>reject(r)}>Tolak</Btn>
+              </div>
+            </div>
+          ))}
+          {pending.length===0 && <div className="text-sm text-glacier-400 py-4 text-center">Tidak ada permintaan yang menunggu.</div>}
+        </div>
+      </Card>
+      <Card>
+        <div className="text-sm font-semibold text-glacier-800 mb-4">Riwayat Permintaan</div>
+        <div className="space-y-2 max-h-96 overflow-y-auto">
+          {others.map(r => (
+            <div key={r.id} className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-glacier-100">
+              <div className="text-sm"><span className="font-medium text-glacier-800">{r.driverName}</span><span className="text-glacier-400"> · {r.qtyRequested} kantong</span></div>
+              <Pill tone={r.status==='approved'?'approved':r.status==='fulfilled'?'done':'rejected'}>{r.status}</Pill>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+/* =========================================================================
+   DRIVER APP
+   ========================================================================= */
+function DriverHome({ me }){
+  const myStock = useDbValue('driverStock/' + me.username, 0);
+  const price = useDbValue('config/pricePerBag', 15000);
+  const myDeliveries = toList(useDbList('deliveries')).filter(d=>d.driverId===me.id).sort((a,b)=>b.timestamp-a.timestamp);
+  const todayTotal = myDeliveries.filter(d => new Date(d.timestamp).toDateString() === new Date().toDateString()).reduce((a,b)=>a+b.qty,0);
+
+  const [customerName, setCustomerName] = useState(''); const [qty, setQty] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [toast, showToast] = useToast();
+
+  const submitDelivery = async () => {
+    const q = parseInt(qty, 10);
+    if (!customerName.trim()) { showToast('Nama pelanggan wajib diisi.', 'err'); return; }
+    if (!q || q <= 0) { showToast('Jumlah kantong tidak valid.', 'err'); return; }
+    if (q > myStock) { showToast('Stok yang kamu bawa cuma ' + myStock + ' kantong.', 'err'); return; }
+    setBusy(true);
+    try {
+      await db.ref('deliveries').push({
+        driverId: me.id, driverName: me.name, customerName: customerName.trim(),
+        qty: q, pricePerUnit: price, total: q*price, timestamp: Date.now()
+      });
+      await db.ref('driverStock/' + me.username).transaction(cur => (cur||0) - q);
+      setCustomerName(''); setQty('');
+      showToast('Pengantaran ke ' + customerName + ' tercatat.');
+    } catch(e){ showToast('Gagal: ' + e.message, 'err'); }
+    setBusy(false);
+  };
+
+  return (
+    <div className="fade-in">
+      {toast}
+      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Halo, {me.name.split(' ')[0]} 👋</h2>
+      <div className="grid md:grid-cols-2 gap-5 mb-6">
+        <Card><IceGauge label="Es yang sedang kamu bawa" value={myStock} max={Math.max(myStock,50)} big /></Card>
+        <Card>
+          <div className="text-xs font-mono tracking-widest text-glacier-400 mb-2">HARI INI</div>
+          <div className="font-display font-bold text-3xl text-glacier-900">{todayTotal} <span className="text-base font-normal text-glacier-500">kantong terjual</span></div>
+          <div className="text-sm text-glacier-500 mt-1">{rupiah(todayTotal*price)} · {myDeliveries.filter(d=>new Date(d.timestamp).toDateString()===new Date().toDateString()).length} pelanggan</div>
+        </Card>
+      </div>
+
+      <Card className="mb-6">
+        <div className="text-sm font-semibold text-glacier-800 mb-4">Input Pengantaran</div>
+        <div className="grid sm:grid-cols-3 gap-3 items-end">
+          <Field label="Nama Pelanggan / Toko"><input className={inputCls} value={customerName} onChange={e=>setCustomerName(e.target.value)} placeholder="mis. Toko Sumber Rejeki" /></Field>
+          <Field label="Jumlah Kantong"><input type="number" min="1" className={inputCls} value={qty} onChange={e=>setQty(e.target.value)} /></Field>
+          <div className="mb-4">
+            <div className="text-xs text-glacier-500 mb-1.5">Total harga</div>
+            <div className="font-mono font-bold text-lg text-glacier-900">{rupiah((parseInt(qty,10)||0)*price)}</div>
+          </div>
+        </div>
+        <Btn tone="accent" onClick={submitDelivery} disabled={busy}>{busy?'Menyimpan…':'Catat Pengantaran'}</Btn>
+      </Card>
+
+      <Card>
+        <div className="text-sm font-semibold text-glacier-800 mb-4">Riwayat Pengantaran Kamu</div>
+        <div className="space-y-2 max-h-80 overflow-y-auto">
+          {myDeliveries.map(d => (
+            <div key={d.id} className="flex justify-between text-sm px-3.5 py-2.5 rounded-xl border border-glacier-100">
+              <div><div className="font-medium text-glacier-800">{d.customerName}</div><div className="text-xs text-glacier-400">{waktu(d.timestamp)}</div></div>
+              <div className="text-right"><div className="font-mono">{d.qty} kantong</div><div className="text-xs text-glacier-500">{rupiah(d.total)}</div></div>
+            </div>
+          ))}
+          {myDeliveries.length===0 && <div className="text-sm text-glacier-400 py-4 text-center">Belum ada pengantaran.</div>}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function DriverStockRequest({ me }){
+  const myStock = useDbValue('driverStock/' + me.username, 0);
+  const requests = toList(useDbList('stockRequests')).filter(r=>r.driverId===me.id).sort((a,b)=>b.requestedAt-a.requestedAt);
+  const [qty, setQty] = useState(''); const [busy, setBusy] = useState(false);
+  const [toast, showToast] = useToast();
+
+  const send = async () => {
+    const q = parseInt(qty,10);
+    if (!q || q<=0) { showToast('Jumlah tidak valid.', 'err'); return; }
+    setBusy(true);
+    await db.ref('stockRequests').push({ driverId: me.id, driverName: me.name, qtyRequested: q, status:'pending', requestedAt: Date.now() });
+    setQty(''); showToast('Permintaan ' + q + ' kantong terkirim ke Admin.');
+    setBusy(false);
+  };
+
+  return (
+    <div className="fade-in">
+      {toast}
+      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Minta Stok Es</h2>
+      <Card className="mb-5">
+        <IceGauge label="Sedang kamu bawa" value={myStock} max={Math.max(myStock,50)} />
+      </Card>
+      <Card className="mb-5">
+        <div className="text-sm font-semibold text-glacier-800 mb-4">Ajukan Permintaan Baru</div>
+        <div className="flex gap-3 items-end">
+          <Field label="Jumlah Kantong"><input type="number" min="1" className={inputCls} value={qty} onChange={e=>setQty(e.target.value)} /></Field>
+          <Btn tone="accent" onClick={send} disabled={busy} className="mb-4">{busy?'Mengirim…':'Kirim Permintaan'}</Btn>
+        </div>
+        <p className="text-xs text-glacier-500">Permintaan perlu di-ACC Admin, lalu Gudang akan mengeluarkan stoknya untukmu.</p>
+      </Card>
+      <Card>
+        <div className="text-sm font-semibold text-glacier-800 mb-4">Riwayat Permintaan Kamu</div>
+        <div className="space-y-2">
+          {requests.map(r => (
+            <div key={r.id} className="flex justify-between items-center px-3.5 py-2.5 rounded-xl border border-glacier-100 text-sm">
+              <span>{r.qtyRequested} kantong · {waktu(r.requestedAt)}</span>
+              <Pill tone={r.status==='pending'?'pending':r.status==='approved'?'approved':r.status==='fulfilled'?'done':'rejected'}>{r.status}</Pill>
+            </div>
+          ))}
+          {requests.length===0 && <div className="text-sm text-glacier-400 py-4 text-center">Belum pernah minta stok.</div>}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function DriverReturn({ me }){
+  const myStock = useDbValue('driverStock/' + me.username, 0);
+  const returns = toList(useDbList('returnRequests')).filter(r=>r.driverId===me.id).sort((a,b)=>b.requestedAt-a.requestedAt);
+  const [qty, setQty] = useState(''); const [busy, setBusy] = useState(false);
+  const [toast, showToast] = useToast();
+
+  const send = async () => {
+    const q = parseInt(qty,10);
+    if (!q || q<=0) { showToast('Jumlah tidak valid.', 'err'); return; }
+    if (q > myStock) { showToast('Sisa yang kamu bawa cuma ' + myStock + ' kantong.', 'err'); return; }
+    setBusy(true);
+    await db.ref('returnRequests').push({ driverId: me.id, driverName: me.name, qty: q, status:'pending', requestedAt: Date.now() });
+    setQty(''); showToast('Pengembalian ' + q + ' kantong terkirim ke Gudang.');
+    setBusy(false);
+  };
+
+  return (
+    <div className="fade-in">
+      {toast}
+      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Kembalikan Sisa Es</h2>
+      <Card className="mb-5"><IceGauge label="Sisa yang masih kamu bawa" value={myStock} max={Math.max(myStock,50)} /></Card>
+      <Card className="mb-5">
+        <div className="text-sm font-semibold text-glacier-800 mb-4">Kirim Sisa ke Gudang</div>
+        <div className="flex gap-3 items-end">
+          <Field label="Jumlah Kantong Sisa"><input type="number" min="1" className={inputCls} value={qty} onChange={e=>setQty(e.target.value)} /></Field>
+          <Btn tone="accent" onClick={send} disabled={busy} className="mb-4">{busy?'Mengirim…':'Kirim ke Gudang'}</Btn>
+        </div>
+        <p className="text-xs text-glacier-500">Stokmu baru berkurang setelah Gudang menekan "Terima" di sisi mereka.</p>
+      </Card>
+      <Card>
+        <div className="text-sm font-semibold text-glacier-800 mb-4">Riwayat Pengembalian</div>
+        <div className="space-y-2">
+          {returns.map(r => (
+            <div key={r.id} className="flex justify-between items-center px-3.5 py-2.5 rounded-xl border border-glacier-100 text-sm">
+              <span>{r.qty} kantong · {waktu(r.requestedAt)}</span>
+              <Pill tone={r.status==='pending'?'pending':'done'}>{r.status==='pending'?'menunggu diterima':'diterima gudang'}</Pill>
+            </div>
+          ))}
+          {returns.length===0 && <div className="text-sm text-glacier-400 py-4 text-center">Belum pernah mengembalikan stok.</div>}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+/* =========================================================================
+   GUDANG APP
+   ========================================================================= */
+function GudangHome({ me }){
+  const stock = useDbValue('warehouse/stock', 0);
+  const [qty, setQty] = useState(''); const [note, setNote] = useState(''); const [busy, setBusy] = useState(false);
+  const [toast, showToast] = useToast();
+
+  const addStock = async () => {
+    const q = parseInt(qty,10);
+    if (!q || q<=0) { showToast('Jumlah tidak valid.', 'err'); return; }
+    setBusy(true);
+    await db.ref('warehouse/stock').transaction(cur => (cur||0) + q);
+    await db.ref('warehouse/history').push({ type:'masuk', qty:q, by: me.id, byName: me.name, note, timestamp: Date.now() });
+    setQty(''); setNote(''); showToast(q + ' kantong stok masuk dicatat.');
+    setBusy(false);
+  };
+
+  return (
+    <div className="fade-in">
+      {toast}
+      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Stok Gudang</h2>
+      <Card className="mb-6"><IceGauge label="Total sisa di gudang" value={stock} max={Math.max(stock,100)} big /></Card>
+      <Card>
+        <div className="text-sm font-semibold text-glacier-800 mb-4">Catat Stok Masuk (produksi baru)</div>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <Field label="Jumlah Kantong"><input type="number" min="1" className={inputCls} value={qty} onChange={e=>setQty(e.target.value)} /></Field>
+          <Field label="Catatan (opsional)"><input className={inputCls} value={note} onChange={e=>setNote(e.target.value)} placeholder="mis. produksi hari ini" /></Field>
+        </div>
+        <Btn tone="accent" onClick={addStock} disabled={busy}>{busy?'Menyimpan…':'Tambah Stok'}</Btn>
+      </Card>
+    </div>
+  );
+}
+
+function GudangRelease({ me }){
+  const requests = toList(useDbList('stockRequests')).filter(r=>r.status==='approved').sort((a,b)=>a.approvedAt-b.approvedAt);
+  const stock = useDbValue('warehouse/stock', 0);
+  const [toast, showToast] = useToast();
+
+  const release = async (r) => {
+    if (r.qtyRequested > stock) { showToast('Stok gudang tidak cukup (sisa ' + stock + ').', 'err'); return; }
+    const usersSnap = await db.ref('users/' + r.driverId).once('value');
+    const driverUsername = (usersSnap.val()||{}).username;
+    if (!driverUsername) { showToast('Data driver tidak ditemukan.', 'err'); return; }
+    await db.ref('warehouse/stock').transaction(cur => (cur||0) - r.qtyRequested);
+    await db.ref('driverStock/' + driverUsername).transaction(cur => (cur||0) + r.qtyRequested);
+    await db.ref('stockRequests/'+r.id).update({ status:'fulfilled', fulfilledBy: me.id, fulfilledByName: me.name, fulfilledAt: Date.now() });
+    await db.ref('warehouse/history').push({ type:'keluar', qty:r.qtyRequested, driverId:r.driverId, driverName:r.driverName, by: me.id, byName: me.name, timestamp: Date.now() });
+    showToast('Stok dikeluarkan untuk ' + r.driverName + '.');
+  };
+
+  return (
+    <div className="fade-in">
+      {toast}
+      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Keluarkan Stok ke Driver</h2>
+      <Card>
+        <div className="text-sm font-semibold text-glacier-800 mb-4">Sudah Disetujui Admin, Menunggu Dikeluarkan ({requests.length})</div>
+        <div className="space-y-2.5">
+          {requests.map(r => (
+            <div key={r.id} className="flex items-center justify-between px-4 py-3 rounded-xl border border-sky-200 bg-sky-50/60">
+              <div>
+                <div className="text-sm font-semibold text-glacier-900">{r.driverName}</div>
+                <div className="text-xs text-glacier-500">{r.qtyRequested} kantong · disetujui {r.approvedByName} · {waktu(r.approvedAt)}</div>
+              </div>
+              <Btn tone="accent" className="!px-3 !py-1.5 text-xs" onClick={()=>release(r)}>Keluarkan Stok</Btn>
+            </div>
+          ))}
+          {requests.length===0 && <div className="text-sm text-glacier-400 py-6 text-center">Tidak ada permintaan yang menunggu dikeluarkan.</div>}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function GudangReceiveReturns({ me }){
+  const returns = toList(useDbList('returnRequests')).filter(r=>r.status==='pending').sort((a,b)=>a.requestedAt-b.requestedAt);
+  const [toast, showToast] = useToast();
+
+  const receive = async (r) => {
+    await db.ref('warehouse/stock').transaction(cur => (cur||0) + r.qty);
+    const usersSnap = await db.ref('users/' + r.driverId).once('value');
+    const driverUsername = (usersSnap.val()||{}).username;
+    if (driverUsername) {
+      await db.ref('driverStock/' + driverUsername).transaction(cur => Math.max(0, (cur||0) - r.qty));
+    }
+    await db.ref('returnRequests/'+r.id).update({ status:'received', receivedBy: me.id, receivedByName: me.name, receivedAt: Date.now() });
+    await db.ref('warehouse/history').push({ type:'kembali', qty:r.qty, driverId:r.driverId, driverName:r.driverName, by: me.id, byName: me.name, timestamp: Date.now() });
+    showToast('Sisa es dari ' + r.driverName + ' diterima kembali.');
+  };
+
+  return (
+    <div className="fade-in">
+      {toast}
+      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Terima Sisa Es dari Driver</h2>
+      <Card>
+        <div className="text-sm font-semibold text-glacier-800 mb-4">Menunggu Diterima ({returns.length})</div>
+        <div className="space-y-2.5">
+          {returns.map(r => (
+            <div key={r.id} className="flex items-center justify-between px-4 py-3 rounded-xl border border-amber-200 bg-amber-50/60">
+              <div>
+                <div className="text-sm font-semibold text-glacier-900">{r.driverName}</div>
+                <div className="text-xs text-glacier-500">{r.qty} kantong · dikirim {waktu(r.requestedAt)}</div>
+              </div>
+              <Btn tone="accent" className="!px-3 !py-1.5 text-xs" onClick={()=>receive(r)}>Terima</Btn>
+            </div>
+          ))}
+          {returns.length===0 && <div className="text-sm text-glacier-400 py-6 text-center">Tidak ada pengembalian yang menunggu.</div>}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+/* =========================================================================
+   ROLE ROOT APPS
+   ========================================================================= */
+function AdminApp({ me, isSuper }){
+  const tabs = [
+    { key:'overview', label:'Ringkasan', icon:'📊' },
+    { key:'approve', label:'Persetujuan Stok', icon:'✅' },
+    { key:'deliveries', label:'Pengantaran', icon:'🧊' },
+    { key:'drivers', label:'Driver & Gudang', icon:'👥' },
+    ...(isSuper ? [{ key:'admins', label:'Kelola Admin', icon:'🛡️' }] : []),
+  ];
+  const [active, setActive] = useState('overview');
+  return (
+    <Shell user={me} tabs={tabs} active={active} setActive={setActive} onLogout={()=>{ localStorage.removeItem('glasires_uid'); location.reload(); }}>
+      {active==='overview' && <div className="fade-in"><h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Ringkasan {isSuper?'(Super Admin)':''}</h2><StockOverview /><DeliveriesTable /></div>}
+      {active==='approve' && <ApproveRequests me={me} />}
+      {active==='deliveries' && <div className="fade-in"><StockOverview /><DeliveriesTable /></div>}
+      {active==='drivers' && <ManageUsers me={me} allowedRoles={['driver','gudang']} title="Kelola Driver & Petugas Gudang" />}
+      {active==='admins' && isSuper && <ManageUsers me={me} allowedRoles={['admin']} title="Kelola Akun Admin" />}
+    </Shell>
+  );
+}
+
+function DriverApp({ me }){
+  const tabs = [
+    { key:'home', label:'Beranda', icon:'🏠' },
+    { key:'request', label:'Minta Stok', icon:'📦' },
+    { key:'return', label:'Kembalikan Sisa', icon:'↩️' },
+  ];
+  const [active, setActive] = useState('home');
+  return (
+    <Shell user={me} tabs={tabs} active={active} setActive={setActive} onLogout={()=>{ localStorage.removeItem('glasires_uid'); location.reload(); }}>
+      {active==='home' && <DriverHome me={me} />}
+      {active==='request' && <DriverStockRequest me={me} />}
+      {active==='return' && <DriverReturn me={me} />}
+    </Shell>
+  );
+}
+
+function GudangApp({ me }){
+  const tabs = [
+    { key:'home', label:'Stok Gudang', icon:'🏔️' },
+    { key:'release', label:'Keluarkan ke Driver', icon:'🚚' },
+    { key:'returns', label:'Terima Kembalian', icon:'↩️' },
+  ];
+  const [active, setActive] = useState('home');
+  return (
+    <Shell user={me} tabs={tabs} active={active} setActive={setActive} onLogout={()=>{ localStorage.removeItem('glasires_uid'); location.reload(); }}>
+      {active==='home' && <GudangHome me={me} />}
+      {active==='release' && <GudangRelease me={me} />}
+      {active==='returns' && <GudangReceiveReturns me={me} />}
+    </Shell>
+  );
+}
+
+function ConfigErrorScreen({ reason }){
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <Card className="max-w-lg fade-in">
+        <div className="text-xs font-mono tracking-widest text-rose-500 mb-2">BELUM TERHUBUNG KE FIREBASE</div>
+        <h1 className="font-display font-bold text-xl text-glacier-900 mb-3">
+          {reason === 'PLACEHOLDER' ? 'Config Firebase belum diisi' : 'Gagal terhubung ke Firebase'}
+        </h1>
+        <p className="text-sm text-glacier-600 mb-4">
+          {reason === 'PLACEHOLDER'
+            ? 'Buka file HTML ini dengan editor teks (Notepad, VS Code, dsb), cari tulisan FIREBASE_CONFIG di bagian atas kode, lalu ganti semua nilai yang bertuliskan "GANTI_..." dengan config asli dari project Firebase kamu. Simpan file, lalu muat ulang halaman ini.'
+            : 'Detail teknis: ' + reason}
+        </p>
+        <div className="text-sm font-semibold text-glacier-800 mb-2">Cara ambil config Firebase:</div>
+        <ol className="text-sm text-glacier-700 list-decimal pl-5 space-y-1.5 mb-4">
+          <li>Buka <span className="font-mono text-xs">console.firebase.google.com</span> → buat project baru (atau pakai yang sudah ada)</li>
+          <li>Klik ⚙️ (Project Settings) → scroll ke "Your apps" → tambah app Web (ikon &lt;/&gt;) kalau belum ada → copy objek <span className="font-mono text-xs">firebaseConfig</span></li>
+          <li>Di menu kiri, klik "Build" → "Realtime Database" → "Create Database" (bukan Firestore)</li>
+          <li>Tempel config yang tadi dicopy ke <span className="font-mono text-xs">FIREBASE_CONFIG</span> di file ini, simpan, muat ulang halaman</li>
+        </ol>
+        <p className="text-xs text-glacier-400">Kalau sudah diganti tapi masih muncul pesan ini, cek lagi apakah ada tanda kutip atau koma yang salah ketik.</p>
+      </Card>
+    </div>
+  );
+}
+
+/* =========================================================================
+   ROOT
+   ========================================================================= */
+function App(){
+  const [loading, setLoading] = useState(true);
+  const [hasUsers, setHasUsers] = useState(true);
+  const [me, setMe] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const snap = await db.ref('users').once('value');
+      const usersExist = snap.exists();
+      setHasUsers(usersExist);
+      const uid = localStorage.getItem('glasires_uid');
+      if (usersExist && uid) {
+        const uSnap = await db.ref('users/' + uid).once('value');
+        if (uSnap.exists() && uSnap.val().active !== false) setMe({ id: uid, ...uSnap.val() });
+        else localStorage.removeItem('glasires_uid');
+      }
+      setLoading(false);
+    })();
+  }, []);
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-glacier-400 font-mono text-sm">Memuat…</div>;
+  if (!hasUsers) return <SetupScreen onDone={()=>location.reload()} />;
+  if (!me) return <LoginScreen onLogin={(u)=>setMe(u)} />;
+
+  if (me.role === 'superadmin') return <AdminApp me={me} isSuper={true} />;
+  if (me.role === 'admin') return <AdminApp me={me} isSuper={false} />;
+  if (me.role === 'driver') return <DriverApp me={me} />;
+  if (me.role === 'gudang') return <GudangApp me={me} />;
+  return <div className="p-8">Peran tidak dikenal.</div>;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  FIREBASE_INIT_ERROR ? <ConfigErrorScreen reason={FIREBASE_INIT_ERROR} /> : <App />
+);
+</script>
+</body>
+</html>
