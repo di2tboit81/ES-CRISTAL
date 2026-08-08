@@ -566,6 +566,249 @@ opacity:0;
 }
 
 }
+
+```css
+/* =========================================================
+   B@-IT PREMIUM DEVELOPER BRANDING
+   Glassmorphism + Ice Blue Glow
+   ========================================================= */
+
+.bait-developer-footer{
+  position:relative;
+  margin:12px;
+  padding:10px 14px;
+  border-radius:16px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.10),
+      rgba(83,211,255,.06)
+    );
+
+  border:1px solid rgba(180,240,255,.18);
+
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 0 18px rgba(0,190,255,.08);
+
+  overflow:hidden;
+}
+
+/* Cahaya biru-es bergerak */
+.bait-developer-footer::before{
+  content:"";
+  position:absolute;
+  top:-80%;
+  left:-40%;
+  width:50%;
+  height:260%;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(130,235,255,.20),
+      transparent
+    );
+
+  transform:rotate(18deg);
+  animation:baitIceShine 5s linear infinite;
+}
+
+/* Glow bawah */
+.bait-developer-footer::after{
+  content:"";
+  position:absolute;
+  left:15%;
+  right:15%;
+  bottom:-8px;
+  height:18px;
+
+  background:rgba(35,210,255,.25);
+  filter:blur(14px);
+
+  animation:baitIceGlow 3s ease-in-out infinite;
+}
+
+.bait-developer-content{
+  position:relative;
+  z-index:2;
+  text-align:center;
+}
+
+.bait-powered{
+  font-size:9px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:rgba(210,245,255,.50);
+}
+
+.bait-name{
+  margin-top:2px;
+
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.08em;
+
+  background:
+    linear-gradient(
+      90deg,
+      #dffaff,
+      #71e8ff,
+      #ffffff,
+      #55d9ff,
+      #dffaff
+    );
+
+  background-size:250% auto;
+
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+
+  animation:baitTextShine 4s linear infinite;
+
+  text-shadow:
+    0 0 12px rgba(74,220,255,.35);
+}
+
+.bait-copyright{
+  margin-top:2px;
+
+  font-size:8px;
+  letter-spacing:.12em;
+
+  color:rgba(190,235,250,.30);
+}
+
+/* titik cahaya kecil */
+.bait-light{
+  display:inline-block;
+  width:5px;
+  height:5px;
+  margin-right:5px;
+
+  border-radius:50%;
+
+  background:#72eaff;
+
+  box-shadow:
+    0 0 5px #72eaff,
+    0 0 12px rgba(72,220,255,.8);
+
+  animation:baitPulse 2s ease-in-out infinite;
+}
+
+@keyframes baitIceShine{
+  0%{
+    transform:translateX(-180%) rotate(18deg);
+  }
+
+  100%{
+    transform:translateX(420%) rotate(18deg);
+  }
+}
+
+@keyframes baitIceGlow{
+  0%,100%{
+    opacity:.35;
+    transform:scaleX(.85);
+  }
+
+  50%{
+    opacity:.85;
+    transform:scaleX(1);
+  }
+}
+
+@keyframes baitTextShine{
+  0%{
+    background-position:250% center;
+  }
+
+  100%{
+    background-position:-250% center;
+  }
+}
+
+@keyframes baitPulse{
+  0%,100%{
+    opacity:.45;
+    transform:scale(.85);
+  }
+
+  50%{
+    opacity:1;
+    transform:scale(1.15);
+  }
+}
+
+/* =========================================
+   LOGIN COPYRIGHT - FIXED BOTTOM
+   ========================================= */
+
+.login-copyright{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:14px;
+
+  width:100%;
+
+  text-align:center;
+
+  font-size:10px;
+  line-height:1.5;
+  letter-spacing:.08em;
+
+  color:rgba(30,90,120,.45);
+
+  z-index:9999;
+
+  pointer-events:none;
+
+  user-select:none;
+}
+
+.login-copyright .bait-brand{
+  font-weight:800;
+
+  background:
+    linear-gradient(
+      90deg,
+      #5ecde8,
+      #1689b5,
+      #72e8ff,
+      #1689b5
+    );
+
+  background-size:200% auto;
+
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+
+  animation:loginCopyrightShine 4s linear infinite;
+}
+
+@keyframes loginCopyrightShine{
+  0%{
+    background-position:200% center;
+  }
+
+  100%{
+    background-position:-200% center;
+  }
+}
+
+
+
+
+
   
 </style>
 </head>
@@ -910,7 +1153,7 @@ function LoginScreen({ onLogin }){
     setBusy(false);
   };
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
+    <div className="min-h-screen flex items-center justify-center p-6 relative">
       <div className="w-full max-w-md fade-in">
         <div className="text-center mb-7">
           <div className="inline-flex items-center gap-2 justify-center mb-3">
@@ -926,6 +1169,7 @@ function LoginScreen({ onLogin }){
           <Btn tone="accent" className="w-full" onClick={submit} disabled={busy}>{busy ? 'Memeriksa…' : 'Masuk'}</Btn>
         </Card>
       </div>
+	  {/* COPYRIGHT LOGIN */} <div className="login-copyright"> Copyright © 2026 <span className="mx-1">|</span> Power by <span className="bait-brand">Syech B@-it</span> </div>
     </div>
   );
 }
@@ -1059,6 +1303,25 @@ const unread = unreadCount(notifications);
           <div className={"inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mb-3 " + ROLE_BADGE[user.role]}>{ROLE_LABEL[user.role]}</div>
           <Btn tone="ghost" className="w-full !bg-white/5 !text-white !border-white/15" onClick={onLogout}>Keluar</Btn>
         </div>
+		<footer className="bait-developer-footer">
+  <div className="bait-developer-content">
+
+    <div className="bait-powered">
+      <span className="bait-light"></span>
+      Power by
+    </div>
+
+    <div className="bait-name">
+      Syech B@-it
+    </div>
+
+    <div className="bait-copyright">
+      Copyright © 2026
+    </div>
+
+  </div>
+</footer>
+				
       </div>
       {mobileOpen && <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={()=>setMobileOpen(false)}></div>}
 
