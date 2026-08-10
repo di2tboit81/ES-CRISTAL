@@ -2,2055 +2,276 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>GlasirEs — Sistem Distribusi Es Kristal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-
-<!-- Tailwind (Play CDN — fine for a standalone file like this, not a Claude.ai artifact) -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: {
-          display: ['Sora', 'sans-serif'],
-          body: ['Inter', 'sans-serif'],
-          mono: ['JetBrains Mono', 'monospace'],
-        },
-        colors: {
-          glacier: { 950:'#050B14', 900:'#0A1B2E', 800:'#0F2A45', 700:'#153A5C', 600:'#1C4A73' },
-          frost:   { 400:'#7FE0F0', 300:'#A6ECF6', 200:'#CFF6FB' },
-          ice:     { 50:'#F3FBFD' },
-        },
-        boxShadow: {
-          glass: '0 8px 32px rgba(10,27,46,0.10)',
-        }
-      }
-    }
-  }
+tailwind.config={theme:{extend:{fontFamily:{display:['Sora','sans-serif'],body:['Inter','sans-serif'],mono:['JetBrains Mono','monospace']},colors:{glacier:{950:'#050B14',900:'#0A1B2E',800:'#0F2A45',700:'#153A5C',600:'#1C4A73'},frost:{400:'#7FE0F0',300:'#A6ECF6',200:'#CFF6FB'},ice:{50:'#F3FBFD'}}}}};
 </script>
-
-<!-- React + Babel -->
 <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"></script>
-
-<!-- Firebase (compat SDK — Realtime Database only) -->
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-app-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-database-compat.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
-
-*{
-    box-sizing:border-box;
-}
-
-
-body{
-
-font-family:'Inter',sans-serif;
-
-background:
-
-radial-gradient(
-circle at 20% 10%,
-rgba(127,224,240,.55),
-transparent 35%
-),
-
-radial-gradient(
-circle at 80% 0%,
-rgba(255,255,255,.9),
-transparent 30%
-),
-
-linear-gradient(
-135deg,
-#e9fbff,
-#c5eff8,
-#f8fdff
-);
-
-overflow-x:hidden;
-
-}
-
-
-/* =================================
-   CRYSTAL WATER PARTICLE EFFECT
-================================= */
-
-body::before{
-
-content:"";
-
-position:fixed;
-
-inset:-200px;
-
-background:
-
-radial-gradient(
-circle,
-rgba(255,255,255,.9) 2px,
-transparent 3px
-);
-
-background-size:
-90px 90px;
-
-animation:
-waterMove 35s linear infinite;
-
-opacity:.35;
-
-pointer-events:none;
-
-z-index:-1;
-
-}
-
-
-
-@keyframes waterMove{
-
-from{
-
-transform:
-translateY(0);
-
-}
-
-to{
-
-transform:
-translateY(-250px);
-
-}
-
-}
-
-
-
-/* =================================
- PREMIUM GLASS ICE CARD
-================================= */
-
-
-.glass{
-
-
-background:
-
-linear-gradient(
-135deg,
-rgba(255,255,255,.85),
-rgba(220,250,255,.55)
-);
-
-
-backdrop-filter:
-
-blur(25px);
-
-
-border:
-
-1px solid
-rgba(255,255,255,.8);
-
-
-
-box-shadow:
-
-
-0 25px 60px
-rgba(0,120,180,.18),
-
-
-inset
-0 0 40px
-rgba(255,255,255,.8);
-
-
-
-position:relative;
-
-overflow:hidden;
-
-}
-
-
-
-.glass::before{
-
-
-content:"";
-
-position:absolute;
-
-width:250%;
-
-height:250%;
-
-top:-120%;
-
-left:-100%;
-
-
-background:
-
-linear-gradient(
-120deg,
-transparent,
-rgba(255,255,255,.8),
-transparent
-);
-
-
-transform:
-rotate(25deg);
-
-
-animation:
-
-iceShine 9s infinite;
-
-
-}
-
-
-
-@keyframes iceShine{
-
-
-0%{
-
-transform:
-translateX(-100%)
-rotate(25deg);
-
-}
-
-
-50%{
-
-transform:
-translateX(100%)
-rotate(25deg);
-
-}
-
-
-100%{
-
-transform:
-translateX(100%)
-rotate(25deg);
-
-}
-
-
-}
-
-
-
-
-/* =================================
- BUTTON ICE EFFECT
-================================= */
-
-
-button{
-
-position:relative;
-
-overflow:hidden;
-
-transition:.3s;
-
-}
-
-
-
-button:hover{
-
-
-transform:
-
-translateY(-4px)
-scale(1.02);
-
-
-box-shadow:
-
-
-0 15px 35px
-rgba(0,180,220,.35);
-
-
-}
-
-
-
-button::after{
-
-
-content:"";
-
-
-position:absolute;
-
-top:0;
-
-left:-120%;
-
-width:80%;
-
-height:100%;
-
-
-background:
-
-linear-gradient(
-120deg,
-transparent,
-rgba(255,255,255,.7),
-transparent
-);
-
-
-
-transition:.5s;
-
-
-}
-
-
-
-button:hover::after{
-
-
-left:130%;
-
-
-}
-
-
-
-
-
-/* =================================
- SIDEBAR FREEZER GLASS
-================================= */
-
-
-.bg-glacier-900{
-
-
-background:
-
-
-linear-gradient(
-180deg,
-#031522,
-#075572,
-#021522
-);
-
-
-
-box-shadow:
-
-
-10px 0 50px
-rgba(0,150,200,.45);
-
-
-}
-
-
-
-/* =================================
- ICE GAUGE PREMIUM
-================================= */
-
-
-.icebar-shell{
-
-
-background:
-
-
-linear-gradient(
-180deg,
-#001522,
-#06324b
-);
-
-
-border-radius:18px;
-
-
-padding:4px;
-
-
-box-shadow:
-
-inset
-0 0 20px
-rgba(0,0,0,.4);
-
-
-}
-
-
-
-
-.icebar-fill{
-
-
-background:
-
-
-linear-gradient(
-
-180deg,
-
-#ffffff,
-
-#b9f5ff,
-
-#37bddd
-
-);
-
-
-box-shadow:
-
-
-0 0 30px
-rgba(80,220,255,.9);
-
-
-}
-
-
-
-
-
-/* =================================
- ANIMATION
-================================= */
-
-
-.fade-in{
-
-animation:
-
-fadeCrystal .45s ease;
-
-}
-
-
-
-@keyframes fadeCrystal{
-
-
-from{
-
-opacity:0;
-
-transform:
-
-translateY(20px)
-scale(.98);
-
-}
-
-
-to{
-
-opacity:1;
-
-transform:
-
-translateY(0)
-scale(1);
-
-}
-
-
-}
-
-
-
-/* scrollbar */
-
-::-webkit-scrollbar{
-
-width:10px;
-
-}
-
-
-::-webkit-scrollbar-track{
-
-background:#e8faff;
-
-}
-
-
-::-webkit-scrollbar-thumb{
-
-background:
-
-linear-gradient(
-180deg,
-#7fe0f0,
-#1c4a73
-);
-
-
-border-radius:20px;
-
-
-}
-
-.bubble{
-
-position:absolute;
-
-border-radius:50%;
-
-background:
-rgba(255,255,255,.45);
-
-filter:blur(.5px);
-
-animation:
-bubbleFloat 12s infinite;
-
-
-}
-
-
-@keyframes bubbleFloat{
-
-
-0%{
-
-transform:
-translateY(0);
-
-opacity:0;
-
-}
-
-
-30%{
-
-opacity:1;
-
-}
-
-
-100%{
-
-transform:
-translateY(-300px);
-
-opacity:0;
-
-}
-
-}
-
-```css
-/* =========================================================
-   B@-IT PREMIUM DEVELOPER BRANDING
-   Glassmorphism + Ice Blue Glow
-   ========================================================= */
-
-.bait-developer-footer{
-  position:relative;
-  margin:12px;
-  padding:10px 14px;
-  border-radius:16px;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255,255,255,.10),
-      rgba(83,211,255,.06)
-    );
-
-  border:1px solid rgba(180,240,255,.18);
-
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.10),
-    0 0 18px rgba(0,190,255,.08);
-
-  overflow:hidden;
-}
-
-/* Cahaya biru-es bergerak */
-.bait-developer-footer::before{
-  content:"";
-  position:absolute;
-  top:-80%;
-  left:-40%;
-  width:50%;
-  height:260%;
-
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(130,235,255,.20),
-      transparent
-    );
-
-  transform:rotate(18deg);
-  animation:baitIceShine 5s linear infinite;
-}
-
-/* Glow bawah */
-.bait-developer-footer::after{
-  content:"";
-  position:absolute;
-  left:15%;
-  right:15%;
-  bottom:-8px;
-  height:18px;
-
-  background:rgba(35,210,255,.25);
-  filter:blur(14px);
-
-  animation:baitIceGlow 3s ease-in-out infinite;
-}
-
-.bait-developer-content{
-  position:relative;
-  z-index:2;
-  text-align:center;
-}
-
-.bait-powered{
-  font-size:9px;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  color:rgba(210,245,255,.50);
-}
-
-.bait-name{
-  margin-top:2px;
-
-  font-size:12px;
-  font-weight:800;
-  letter-spacing:.08em;
-
-  background:
-    linear-gradient(
-      90deg,
-      #dffaff,
-      #71e8ff,
-      #ffffff,
-      #55d9ff,
-      #dffaff
-    );
-
-  background-size:250% auto;
-
-  -webkit-background-clip:text;
-  background-clip:text;
-  -webkit-text-fill-color:transparent;
-
-  animation:baitTextShine 4s linear infinite;
-
-  text-shadow:
-    0 0 12px rgba(74,220,255,.35);
-}
-
-.bait-copyright{
-  margin-top:2px;
-
-  font-size:8px;
-  letter-spacing:.12em;
-
-  color:rgba(190,235,250,.30);
-}
-
-/* titik cahaya kecil */
-.bait-light{
-  display:inline-block;
-  width:5px;
-  height:5px;
-  margin-right:5px;
-
-  border-radius:50%;
-
-  background:#72eaff;
-
-  box-shadow:
-    0 0 5px #72eaff,
-    0 0 12px rgba(72,220,255,.8);
-
-  animation:baitPulse 2s ease-in-out infinite;
-}
-
-@keyframes baitIceShine{
-  0%{
-    transform:translateX(-180%) rotate(18deg);
-  }
-
-  100%{
-    transform:translateX(420%) rotate(18deg);
-  }
-}
-
-@keyframes baitIceGlow{
-  0%,100%{
-    opacity:.35;
-    transform:scaleX(.85);
-  }
-
-  50%{
-    opacity:.85;
-    transform:scaleX(1);
-  }
-}
-
-@keyframes baitTextShine{
-  0%{
-    background-position:250% center;
-  }
-
-  100%{
-    background-position:-250% center;
-  }
-}
-
-@keyframes baitPulse{
-  0%,100%{
-    opacity:.45;
-    transform:scale(.85);
-  }
-
-  50%{
-    opacity:1;
-    transform:scale(1.15);
-  }
-}
-
-/* =========================================
-   LOGIN COPYRIGHT - FIXED BOTTOM
-   ========================================= */
-
-.login-copyright{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:14px;
-
-  width:100%;
-
-  text-align:center;
-
-  font-size:10px;
-  line-height:1.5;
-  letter-spacing:.08em;
-
-  color:rgba(30,90,120,.45);
-
-  z-index:9999;
-
-  pointer-events:none;
-
-  user-select:none;
-}
-
-.login-copyright .bait-brand{
-  font-weight:800;
-
-  background:
-    linear-gradient(
-      90deg,
-      #5ecde8,
-      #1689b5,
-      #72e8ff,
-      #1689b5
-    );
-
-  background-size:200% auto;
-
-  -webkit-background-clip:text;
-  background-clip:text;
-  -webkit-text-fill-color:transparent;
-
-  animation:loginCopyrightShine 4s linear infinite;
-}
-
-@keyframes loginCopyrightShine{
-  0%{
-    background-position:200% center;
-  }
-
-  100%{
-    background-position:-200% center;
-  }
-}
-
-
-
-
-
-  
+*{box-sizing:border-box}body{font-family:Inter,sans-serif;background:radial-gradient(circle at 20% 10%,rgba(127,224,240,.55),transparent 35%),radial-gradient(circle at 80% 0%,rgba(255,255,255,.9),transparent 30%),linear-gradient(135deg,#e9fbff,#c5eff8,#f8fdff);overflow-x:hidden}body:before{content:"";position:fixed;inset:-200px;background:radial-gradient(circle,rgba(255,255,255,.9) 2px,transparent 3px);background-size:90px 90px;animation:waterMove 35s linear infinite;opacity:.35;pointer-events:none;z-index:-1}@keyframes waterMove{to{transform:translateY(-250px)}}.glass{background:linear-gradient(135deg,rgba(255,255,255,.85),rgba(220,250,255,.55));backdrop-filter:blur(25px);border:1px solid rgba(255,255,255,.8);box-shadow:0 25px 60px rgba(0,120,180,.18),inset 0 0 40px rgba(255,255,255,.8);position:relative;overflow:hidden}.glass:before{content:"";position:absolute;width:250%;height:250%;top:-120%;left:-100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.8),transparent);transform:rotate(25deg);animation:iceShine 9s infinite;pointer-events:none}@keyframes iceShine{0%{transform:translateX(-100%) rotate(25deg)}50%,100%{transform:translateX(100%) rotate(25deg)}}button{position:relative;overflow:hidden;transition:.3s}button:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(0,180,220,.25)}.bg-glacier-900{background:linear-gradient(180deg,#031522,#075572,#021522);box-shadow:10px 0 50px rgba(0,150,200,.45)}.icebar-shell{background:linear-gradient(180deg,#001522,#06324b);border-radius:18px;padding:4px;box-shadow:inset 0 0 20px rgba(0,0,0,.4)}.icebar-fill{background:linear-gradient(180deg,#fff,#b9f5ff,#37bddd);box-shadow:0 0 30px rgba(80,220,255,.9);border-radius:14px;min-height:3px}.fade-in{animation:fadeCrystal .45s ease}@keyframes fadeCrystal{from{opacity:0;transform:translateY(15px) scale(.98)}to{opacity:1;transform:none}}::-webkit-scrollbar{width:10px}::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#7fe0f0,#1c4a73);border-radius:20px}.bait-developer-footer{position:relative;margin:12px;padding:10px 14px;border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(83,211,255,.06));border:1px solid rgba(180,240,255,.18);backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 18px rgba(0,190,255,.08);overflow:hidden}.bait-developer-content{position:relative;z-index:2;text-align:center}.bait-powered{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(210,245,255,.5)}.bait-name{margin-top:2px;font-size:12px;font-weight:800;letter-spacing:.08em;background:linear-gradient(90deg,#dffaff,#71e8ff,#fff,#55d9ff,#dffaff);background-size:250% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:baitTextShine 4s linear infinite}.bait-copyright{margin-top:2px;font-size:8px;letter-spacing:.12em;color:rgba(190,235,250,.3)}@keyframes baitTextShine{to{background-position:-250% center}}.login-copyright{position:fixed;left:0;right:0;bottom:14px;text-align:center;font-size:10px;letter-spacing:.08em;color:rgba(30,90,120,.45);z-index:9999}.login-copyright .bait-brand{font-weight:800;color:#1689b5}.report-page{background:#fff;color:#0a1b2e;padding:28px;border-radius:16px}.report-head{display:flex;align-items:center;gap:18px;border-bottom:3px solid var(--report-color,#1c4a73);padding-bottom:14px}.report-logo{width:72px;height:72px;object-fit:contain;border-radius:10px}.report-title{font-family:Sora,sans-serif}.sig{margin-top:35px;display:grid;grid-template-columns:1fr 1fr;gap:80px;text-align:center}.sigline{border-bottom:1px solid #334155;margin:45px 15px 8px}.print-only{display:none}@media print{body{background:#fff!important}.no-print{display:none!important}.print-only{display:block}.report-page{box-shadow:none!important;border-radius:0!important}.glass{box-shadow:none!important;background:#fff!important;border:0!important}.report-print-area{display:block!important;position:static!important}.report-page table{font-size:10px!important}@page{size:A4;margin:10mm}} 
 </style>
 </head>
 <body class="text-glacier-900">
 <div id="root"></div>
 <script>
-  // Jaring pengaman: kalau setelah beberapa detik #root masih kosong (CDN gagal
-  // dimuat / error skrip lain), tampilkan pesan diagnostik alih-alih layar putih.
-  window.__appErrors = [];
-  window.addEventListener('error', function(e){
-    window.__appErrors.push((e.message||'Error') + ' — ' + (e.filename ? e.filename.split('/').pop() : '') + ':' + (e.lineno||''));
-  });
-  window.addEventListener('unhandledrejection', function(e){
-    window.__appErrors.push('Promise error: ' + (e.reason && e.reason.message ? e.reason.message : e.reason));
-  });
-  setTimeout(function(){
-    var root = document.getElementById('root');
-    if (root && root.innerHTML.trim() === '') {
-      var errList = window.__appErrors.length
-        ? window.__appErrors.join('\n')
-        : 'Tidak ada error JavaScript tertangkap — kemungkinan besar salah satu file dari CDN (React/Babel/Firebase) gagal dimuat karena koneksi internet bermasalah atau diblokir jaringan.';
-      root.innerHTML =
-        '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:#F3FBFD;">' +
-          '<div style="max-width:580px;background:#fff;border:1px solid #e5eef2;border-radius:16px;padding:28px;box-shadow:0 8px 24px rgba(10,27,46,0.10);">' +
-            '<div style="font-size:11px;letter-spacing:0.12em;color:#e11d48;font-weight:700;margin-bottom:10px;">HALAMAN GAGAL DIMUAT</div>' +
-            '<div style="font-size:14px;color:#334155;margin-bottom:14px;line-height:1.6;">Aplikasi tidak berhasil tampil. Ini biasanya karena koneksi internet ke server CDN (React/Firebase) lambat, terputus, atau diblokir jaringan tempatmu. Detail teknis yang tertangkap:</div>' +
-            '<pre style="font-size:12px;background:#f8fafc;padding:14px;border-radius:10px;overflow:auto;white-space:pre-wrap;color:#475569;border:1px solid #eef2f6;">' + errList.replace(/</g,'&lt;') + '</pre>' +
-            '<div style="font-size:13px;color:#64748b;margin-top:14px;line-height:1.6;">Coba: (1) pastikan koneksi internet aktif lalu klik dua kali file ini lagi, (2) coba jaringan lain (mis. hotspot HP) untuk memastikan bukan WiFi yang memblokir, (3) kirim tulisan di kotak abu-abu di atas ini ke Claude untuk dicek lebih lanjut.</div>' +
-          '</div>' +
-        '</div>';
-    }
-  }, 5000);
+window.__appErrors=[];
+addEventListener('error',e=>window.__appErrors.push((e.message||'Error')+' — '+(e.filename||'')+':'+(e.lineno||'')));
+addEventListener('unhandledrejection',e=>window.__appErrors.push('Promise error: '+(e.reason?.message||e.reason)));
+setTimeout(()=>{const r=document.getElementById('root');if(r&&!r.innerHTML.trim())r.innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui;background:#F3FBFD"><div style="max-width:650px;background:white;border:1px solid #e5eef2;border-radius:16px;padding:28px"><b style="color:#e11d48">HALAMAN GAGAL DIMUAT</b><p>Aplikasi tidak berhasil tampil. Periksa koneksi CDN/Internet.</p><pre style="white-space:pre-wrap;background:#f8fafc;padding:14px">'+(window.__appErrors.join('\\n')||'Tidak ada error JavaScript tertangkap.')+'</pre></div></div>'}},6000);
 </script>
 
-<script type="text/babel" data-presets="react">
-const { useState, useEffect, useMemo, useRef } = React;
+<script type="text/babel">
+const {useState,useEffect,useMemo}=React;
 
-/* =========================================================================
-   SETUP WAJIB SEBELUM DIPAKAI
-   1. Buat project di https://console.firebase.google.com
-   2. Aktifkan "Realtime Database" (bukan Firestore) — mode boleh "test mode" dulu.
-   3. Copy config project kamu (Project settings > General > Your apps > SDK config)
-      lalu tempel di FIREBASE_CONFIG di bawah ini, ganti semua nilai "GANTI_...".
-   4. Sarankan set Rules Realtime Database supaya tidak publik-terbuka setelah testing:
-      lihat catatan keamanan di akhir percakapan.
-   ========================================================================= */
-const FIREBASE_CONFIG = {
-
-  apiKey: "AIzaSyD8LEwi8fIqOkkLJ-6LSehMbWkDDdN8tR8",
-
-  authDomain: "ice-cristal.firebaseapp.com",
-
-  databaseURL: "https://ice-cristal-default-rtdb.asia-southeast1.firebasedatabase.app",
-
-  projectId: "ice-cristal",
-
-  storageBucket: "ice-cristal.firebasestorage.app",
-
-  messagingSenderId: "478336549607",
-
-  appId: "1:478336549607:web:136e276d0babd09f35d842"
-
+const FIREBASE_CONFIG={
+ apiKey:"AIzaSyD8LEwi8fIqOkkLJ-6LSehMbWkDDdN8tR8",
+ authDomain:"ice-cristal.firebaseapp.com",
+ databaseURL:"https://ice-cristal-default-rtdb.asia-southeast1.firebasedatabase.app",
+ projectId:"ice-cristal",
+ storageBucket:"ice-cristal.firebasestorage.app",
+ messagingSenderId:"478336549607",
+ appId:"1:478336549607:web:136e276d0babd09f35d842"
 };
+let db=null,FIREBASE_INIT_ERROR=null;
+try{firebase.initializeApp(FIREBASE_CONFIG);db=firebase.database()}catch(e){FIREBASE_INIT_ERROR=e.message}
 
-let FIREBASE_INIT_ERROR = null;
-let db = null;
-try {
-  const hasPlaceholder = Object.values(FIREBASE_CONFIG).some(v => String(v).includes('GANTI_'));
-  if (hasPlaceholder) { FIREBASE_INIT_ERROR = 'PLACEHOLDER'; }
-  else {
-    firebase.initializeApp(FIREBASE_CONFIG);
-    db = firebase.database();
-  }
-} catch (e) {
-  FIREBASE_INIT_ERROR = e.message;
-}
+async function sha256(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+const rupiah=n=>'Rp '+Math.round(n||0).toLocaleString('id-ID');
+const waktu=t=>t?new Date(t).toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'}):'-';
+const toList=o=>Object.entries(o||{}).map(([id,v])=>({id,...v}));
+function useDbList(path){const[d,setD]=useState({});useEffect(()=>{if(!db)return;const r=db.ref(path),cb=s=>setD(s.val()||{});r.on('value',cb);return()=>r.off('value',cb)},[path]);return d}
+function useDbValue(path,fb){const[d,setD]=useState(fb);useEffect(()=>{if(!db)return;const r=db.ref(path),cb=s=>setD(s.val()===null?fb:s.val());r.on('value',cb);return()=>r.off('value',cb)},[path]);return d}
+const ROLES={bigsuperadmin:'BIG SUPER ADMIN',superadmin:'Super Admin',admin:'Admin',driver:'Driver',gudang:'Gudang'};
+const BADGE={bigsuperadmin:'bg-amber-300 text-amber-950',superadmin:'bg-white/20 text-white',admin:'bg-blue-100 text-blue-800',driver:'bg-cyan-100 text-cyan-800',gudang:'bg-teal-100 text-teal-800'};
 
-/* ---------------------------- util ---------------------------- */
-async function sha256(text){
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+async function notify({title,message,type='info',toRole=null,toUser=null,fromUser=null,data={}}){
+ try{await db.ref('notifications').push({title,message,type,toRole,toUser,fromUser,data,read:false,createdAt:Date.now()})}catch(e){console.error(e)}
 }
-function rupiah(n){ return 'Rp' + Math.round(n||0).toLocaleString('id-ID'); }
-function waktu(ts){ return ts ? new Date(ts).toLocaleString('id-ID', {dateStyle:'medium', timeStyle:'short'}) : '-'; }
-function useDbList(path){
-  const [data, setData] = useState({});
-  useEffect(() => {
-    const ref = db.ref(path);
-    const cb = snap => setData(snap.val() || {});
-    ref.on('value', cb);
-    return () => ref.off('value', cb);
-  }, [path]);
-  return data;
-}
-function useDbValue(path, fallback){
-  const [data, setData] = useState(fallback);
-  useEffect(() => {
-    const ref = db.ref(path);
-    const cb = snap => setData(snap.val() === null ? fallback : snap.val());
-    ref.on('value', cb);
-    return () => ref.off('value', cb);
-  }, [path]);
-  return data;
-}
-function toList(obj){ return Object.entries(obj||{}).map(([id,v]) => ({ id, ...v })); }
-
 function useNotifications(user){
-
-    const all = useDbList("notifications");
-
-    return useMemo(()=>{
-
-        return Object.entries(all||{})
-
-        .map(([id,v])=>({
-
-            id,
-
-            ...v
-
-        }))
-
-        .filter(n=>{
-
-            if(n.toUser && n.toUser===user.id) return true;
-
-            if(n.toRole && n.toRole===user.role) return true;
-
-            if(!n.toUser && !n.toRole) return true;
-
-            return false;
-
-        })
-
-        .sort((a,b)=>b.createdAt-a.createdAt);
-
-    },[all,user]);
-
+ const all=useDbList('notifications');
+ return useMemo(()=>toList(all).filter(n=>(n.toUser&&n.toUser===user.id)||(n.toRole&&n.toRole===user.role)||(!n.toUser&&!n.toRole)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)),[all,user.id,user.role]);
 }
-
-function unreadCount(list){
-
-    return list.filter(i=>!i.read).length;
-
+async function markRead(id){await db.ref('notifications/'+id+'/read').set(true)}
+function playBell(){
+ try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const c=new A(),o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.setValueAtTime(880,c.currentTime);o.frequency.exponentialRampToValueAtTime(1320,c.currentTime+.12);g.gain.setValueAtTime(.0001,c.currentTime);g.gain.exponentialRampToValueAtTime(.18,c.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.45);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.5)}catch(e){}
 }
-
-async function markNotificationRead(id){
-
-    await db.ref("notifications/"+id+"/read").set(true);
-
+function useNewNotificationSound(list){
+ const[ready,setReady]=useState(false);useEffect(()=>{const f=()=>setReady(true);window.addEventListener('click',f,{once:true});return()=>window.removeEventListener('click',f)},[]);
+ useEffect(()=>{if(!list.length)return;const newest=list[0];const k='glasires_last_notification';const old=localStorage.getItem(k);if(old&&old!==newest.id&&ready)playBell();localStorage.setItem(k,newest.id)},[list,ready])
 }
-
-/* ===========================================================
-   CREATE NOTIFICATION
-=========================================================== */
-
-async function createNotification({
-
-    title="",
-
-    message="",
-
-    type="info",
-
-    toRole=null,
-
-    toUser=null,
-
-    fromUser=null,
-
-    data={}
-
-}){
-
-    await db.ref("notifications").push({
-
-        title,
-
-        message,
-
-        type,
-
-        toRole,
-
-        toUser,
-
-        fromUser,
-
-        data,
-
-        read:false,
-
-        createdAt:Date.now()
-
-    });
-
-}
-
-window.testNotification = async function(){
-
-    await createNotification({
-
-        title:"Test",
-
-        message:"Notifikasi berhasil",
-
-        type:"system",
-
-        toRole:"admin"
-
-    });
-
-    alert("Notifikasi berhasil dibuat");
-
-}
-
-const ROLE_LABEL = { superadmin:'Super Admin', admin:'Admin', driver:'Driver', gudang:'Gudang' };
-const ROLE_BADGE = { superadmin:'bg-glacier-900 text-frost-200', admin:'bg-glacier-700 text-frost-200', driver:'bg-frost-400/30 text-glacier-800', gudang:'bg-frost-300/40 text-glacier-800' };
-
-/* ---------------------------- Ice stock gauge (signature element) ---------------------------- */
-function IceGauge({ label, value, max, unit='kantong', big }){
-  const pct = Math.max(0, Math.min(100, max > 0 ? (value/max)*100 : 0));
-  return (
-    <div className={"flex items-end gap-4 " + (big ? "" : "")}>
-      <div className="icebar-shell" style={{ width: big?54:38, height: big?140:96 }}>
-        <div className="icebar-fill w-full" style={{ height: pct + '%' }}></div>
-      </div>
-      <div>
-        <div className={"font-display font-bold text-glacier-900 " + (big?"text-3xl":"text-xl")}>{Math.round(value).toLocaleString('id-ID')}</div>
-        <div className="text-xs text-glacier-600 font-medium">{unit}</div>
-        <div className="text-[11px] text-glacier-500 mt-1">{label}</div>
-      </div>
-    </div>
-  );
-}
-
-function Card({ children, className='' }){
-  return (
-    <div 
-    className={
-    "glass rounded-3xl shadow-2xl p-6 hover:scale-[1.01] transition-all duration-300 "
-    + className
-    }>
-    
-    {children}
-
-    </div>
-  );
-}
-function Pill({ children, tone='default' }){
-  const tones = {
-    default:'bg-glacier-100 text-glacier-700',
-    pending:'bg-amber-100 text-amber-700',
-    approved:'bg-sky-100 text-sky-700',
-    done:'bg-emerald-100 text-emerald-700',
-    rejected:'bg-rose-100 text-rose-700',
-  };
-  return <span className={"px-2.5 py-1 rounded-full text-xs font-semibold " + (tones[tone]||tones.default)}>{children}</span>;
-}
-function Btn({ children, onClick, tone='primary', disabled, className='', type='button' }){
-  const tones = {
-    primary:'bg-glacier-900 text-white hover:bg-glacier-800',
-    accent:'bg-frost-400 text-glacier-900 hover:bg-frost-300 font-semibold',
-    ghost:'bg-white text-glacier-700 border border-glacier-200 hover:border-glacier-400',
-    danger:'bg-rose-600 text-white hover:bg-rose-700',
-  };
-  return (
-    <button type={type} onClick={onClick} disabled={disabled}
-      className={"px-5 py-3 rounded-2xl text-sm font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed " + (tones[tone]||tones.primary) + " " + className}>
-      {children}
-    </button>
-  );
-}
-function Field({ label, children }){
-  return <label className="block mb-4"><span className="block text-xs font-semibold text-glacier-600 mb-1.5">{label}</span>{children}</label>;
-}
-const inputCls = "w-full px-3.5 py-2.5 rounded-xl border border-glacier-200 bg-white focus:outline-none focus:ring-2 focus:ring-frost-400 text-sm";
-
-/* ---------------------------- Toast ---------------------------- */
-function useToast(){
-  const [toast, setToast] = useState(null);
-  const show = (msg, tone='ok') => { setToast({msg, tone}); setTimeout(()=>setToast(null), 3200); };
-  const el = toast && (
-    <div className={"fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-medium fade-in " + (toast.tone==='err' ? "bg-rose-600 text-white" : "bg-glacier-900 text-white")}>
-      {toast.msg}
-    </div>
-  );
-  return [el, show];
-}
-
-
-/* =========================================================================
-   AUTH
-   ========================================================================= */
-function SetupScreen({ onDone }){
-  const [name, setName] = useState(''); const [username, setUsername] = useState(''); const [password, setPassword] = useState('');
-  const [busy, setBusy] = useState(false); const [err, setErr] = useState('');
-  const submit = async () => {
-    if (!name || !username || !password) { setErr('Semua kolom wajib diisi.'); return; }
-    setBusy(true); setErr('');
-    try {
-      const passwordHash = await sha256(password);
-      const ref = db.ref('users').push();
-      await ref.set({ name, username, passwordHash, role:'superadmin', active:true, createdAt: Date.now() });
-      await db.ref('config/pricePerBag').set(15000);
-      await db.ref('warehouse/stock').set(0);
-      onDone();
-    } catch(e){ setErr('Gagal menyimpan: ' + e.message); }
-    setBusy(false);
-  };
-  return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <Card className="w-full max-w-md fade-in">
-        <div className="text-xs font-mono tracking-widest text-frost-400 mb-1">SETUP AWAL</div>
-        <h1 className="font-display font-bold text-2xl text-glacier-900 mb-1">Buat Akun Super Admin</h1>
-        <p className="text-sm text-glacier-500 mb-5">Belum ada pengguna di sistem ini. Buat akun Super Admin pertama untuk mulai.</p>
-        <Field label="Nama Lengkap"><input className={inputCls} value={name} onChange={e=>setName(e.target.value)} placeholder="Nama kamu" /></Field>
-        <Field label="Username"><input className={inputCls} value={username} onChange={e=>setUsername(e.target.value.trim())} placeholder="mis. admin1" /></Field>
-        <Field label="Password"><input type="password" className={inputCls} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Minimal 6 karakter" /></Field>
-        {err && <div className="text-rose-600 text-sm mb-3">{err}</div>}
-        <Btn tone="accent" className="w-full" onClick={submit} disabled={busy}>{busy ? 'Menyimpan…' : 'Buat Super Admin & Masuk'}</Btn>
-      </Card>
-    </div>
-  );
-}
-
-function LoginScreen({ onLogin }){
-  const [username, setUsername] = useState(''); const [password, setPassword] = useState('');
-  const [err, setErr] = useState(''); const [busy, setBusy] = useState(false);
-  const submit = async () => {
-    setErr(''); setBusy(true);
-    try {
-      const snap = await db.ref('users').once('value');
-      const users = toList(snap.val());
-      const found = users.find(u => u.username === username.trim());
-      if (!found || found.active === false) { setErr('Username tidak ditemukan atau nonaktif.'); setBusy(false); return; }
-      const hash = await sha256(password);
-      if (hash !== found.passwordHash) { setErr('Password salah.'); setBusy(false); return; }
-      localStorage.setItem('glasires_uid', found.id);
-      onLogin(found);
-    } catch(e){ setErr('Gagal login: ' + e.message); }
-    setBusy(false);
-  };
-  return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative">
-      <div className="w-full max-w-md fade-in">
-        <div className="text-center mb-7">
-          <div className="inline-flex items-center gap-2 justify-center mb-3">
-            <div className="icebar-shell" style={{width:28,height:36}}><div className="icebar-fill w-full" style={{height:'70%'}}></div></div>
-            <span className="font-display font-extrabold text-2xl text-glacier-900 tracking-tight">GlasirEs</span>
-          </div>
-          <p className="text-sm text-glacier-500">Sistem distribusi & stok es kristal</p>
-        </div>
-        <Card>
-          <Field label="Username"><input className={inputCls} value={username} onChange={e=>setUsername(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()} /></Field>
-          <Field label="Password"><input type="password" className={inputCls} value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()} /></Field>
-          {err && <div className="text-rose-600 text-sm mb-3">{err}</div>}
-          <Btn tone="accent" className="w-full" onClick={submit} disabled={busy}>{busy ? 'Memeriksa…' : 'Masuk'}</Btn>
-        </Card>
-      </div>
-	  {/* COPYRIGHT LOGIN */} <div className="login-copyright"> Copyright © 2026 <span className="mx-1">|</span> Power by <span className="bait-brand">Syech B@-it</span> </div>
-    </div>
-  );
-}
-
-// ======================================================
-// NOTIFICATION PANEL
-// ======================================================
-
-function NotificationPanel({ user, onClose }) {
-
-    const notifications = useNotifications(user);
-
-    return (
-
-        <div className="absolute right-0 top-14 w-96 max-h-[500px] overflow-hidden rounded-2xl shadow-2xl bg-white border border-gray-200 z-50">
-
-            <div className="flex justify-between items-center p-4 border-b">
-
-                <div className="font-bold">
-
-                    🔔 Notifikasi
-
-                </div>
-
-                <button
-                    onClick={onClose}
-                    className="text-gray-500 hover:text-red-500">
-
-                    ✕
-
-                </button>
-
-            </div>
-
-            <div className="overflow-y-auto max-h-[420px]">
-
-                {
-
-                    notifications.length===0 ?
-
-                    <div className="p-6 text-center text-gray-400">
-
-                        Tidak ada notifikasi
-
-                    </div>
-
-                    :
-
-                    notifications.map(item=>(
-
-                        <div
-
-                            key={item.id}
-
-                            onClick={()=>markNotificationRead(item.id)}
-
-                            className={
-
-                                "border-b p-4 cursor-pointer hover:bg-sky-50 " +
-
-                                (!item.read ? "bg-blue-50" : "")
-
-                            }
-
-                        >
-
-                            <div className="font-semibold">
-
-                                {item.title}
-
-                            </div>
-
-                            <div className="text-sm mt-1">
-
-                                {item.message}
-
-                            </div>
-
-                            <div className="text-xs text-gray-400 mt-2">
-
-                                {waktu(item.createdAt)}
-
-                            </div>
-
-                        </div>
-
-                    ))
-
-                }
-
-            </div>
-
-        </div>
-
-    );
-
-}
-
-/* =========================================================================
-   SHELL (sidebar + topbar)
-   ========================================================================= */
-function Shell({ user, tabs, active, setActive, onLogout, children }){
-  const [mobileOpen, setMobileOpen] = useState(false);
-  
-  const [showNotification,setShowNotification]=useState(false);
-
-const notifications = useNotifications(user);
-
-const unread = unreadCount(notifications);
-  
-  return (
-    <div className="min-h-screen flex">
-      {/* Sidebar */}
-      <div className={"fixed lg:static z-40 inset-y-0 left-0 w-64 bg-glacier-900 text-frost-200 flex flex-col transition-transform " + (mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0")}>
-        <div className="px-5 py-5 flex items-center gap-2 border-b border-white/10">
-          <div className="icebar-shell" style={{width:20,height:26}}><div className="icebar-fill w-full" style={{height:'70%'}}></div></div>
-          <span className="font-display font-extrabold text-lg text-white">GlasirEs</span>
-        </div>
-        <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-          {tabs.map(t => (
-            <button key={t.key} onClick={()=>{setActive(t.key); setMobileOpen(false);}}
-              className={"w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium transition flex items-center gap-2.5 " +
-                (active===t.key ? "bg-frost-400 text-glacier-900" : "text-frost-200/80 hover:bg-white/5")}>
-              <span>{t.icon}</span>{t.label}
-            </button>
-          ))}
-        </nav>
-        <div className="p-4 border-t border-white/10">
-          <div className="text-xs text-frost-200/60 mb-1">Masuk sebagai</div>
-          <div className="text-sm font-semibold text-white mb-0.5">{user.name}</div>
-          <div className={"inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mb-3 " + ROLE_BADGE[user.role]}>{ROLE_LABEL[user.role]}</div>
-          <Btn tone="ghost" className="w-full !bg-white/5 !text-white !border-white/15" onClick={onLogout}>Keluar</Btn>
-        </div>
-		<footer className="bait-developer-footer">
-  <div className="bait-developer-content">
-
-    <div className="bait-powered">
-      <span className="bait-light"></span>
-      Power by
-    </div>
-
-    <div className="bait-name">
-      Syech B@-it
-    </div>
-
-    <div className="bait-copyright">
-      Copyright © 2026
-    </div>
-
-  </div>
-</footer>
-				
-      </div>
-      {mobileOpen && <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={()=>setMobileOpen(false)}></div>}
-
-      {/* Main */}
-      <div className="flex-1 min-w-0">
-        <div className="lg:hidden sticky top-0 z-20 glass flex items-center justify-between px-4 py-3">
-          <button onClick={()=>setMobileOpen(true)} className="text-glacier-800 font-bold text-lg">☰</button>
-          <span className="font-display font-bold text-glacier-900">GlasirEs</span>
-          <span></span>
-        </div>
-        <div className="p-5 lg:p-8 max-w-6xl mx-auto">
-
-  {/* ===== ICON LONCENG ===== */}
-
-  <div className="flex justify-end mb-4 relative">
-
-    <button
-      onClick={() => setShowNotification(!showNotification)}
-      className="relative bg-white border border-glacier-200 rounded-full w-11 h-11 shadow hover:bg-frost-200 transition">
-
-      🔔
-
-      {unread > 0 && (
-        <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full text-[10px] min-w-[18px] h-[18px] flex items-center justify-center">
-          {unread}
-        </span>
-      )}
-
-    </button>
-
-    {showNotification && (
-      <NotificationPanel
-        user={user}
-        onClose={() => setShowNotification(false)}
-      />
-    )}
-
-  </div>
-
-  {children}
-
-</div>
-      </div>
-    </div>
-  );
-}
-
-/* =========================================================================
-   MANAGE USERS (shared by Admin / SuperAdmin, role scope differs)
-   ========================================================================= */
-function ManageUsers({ me, allowedRoles, title }){
-  const users = toList(useDbList('users'));
-  const [name, setName] = useState(''); const [username, setUsername] = useState('');
-  const [password, setPassword] = useState(''); const [role, setRole] = useState(allowedRoles[0]);
-  const [busy, setBusy] = useState(false);
-  const [toast, showToast] = useToast();
-
-  const visibleUsers = users.filter(u => allowedRoles.includes(u.role));
-
-  const addUser = async () => {
-    if (!name || !username || !password) { showToast('Nama, username, dan password wajib diisi.', 'err'); return; }
-    if (users.some(u => u.username === username.trim())) { showToast('Username sudah dipakai.', 'err'); return; }
-    setBusy(true);
-    try {
-      const passwordHash = await sha256(password);
-      await db.ref('users').push({ name, username: username.trim(), passwordHash, role, active:true, createdAt: Date.now() });
-      if (role === 'driver') await db.ref('driverStock/' + username.trim()).set(0);
-      setName(''); setUsername(''); setPassword('');
-      showToast('Pengguna ' + name + ' berhasil ditambahkan.');
-    } catch(e){ showToast('Gagal: ' + e.message, 'err'); }
-    setBusy(false);
+function createAudit(type,detail,user){return db.ref('logs').push({type,detail,by:user?.id||'',byName:user?.name||'',byRole:user?.role||'',timestamp:Date.now()})}
+
+function Card({children,className=''}){return <div className={'glass rounded-3xl shadow-2xl p-6 '+className}>{children}</div>}
+function Btn({children,onClick,tone='primary',disabled=false,className='',type='button'}){const c={primary:'bg-glacier-900 text-white',accent:'bg-frost-400 text-glacier-900',ghost:'bg-white text-glacier-700 border border-slate-200',danger:'bg-rose-600 text-white'};return <button type={type} disabled={disabled} onClick={onClick} className={'px-4 py-2.5 rounded-2xl text-sm font-semibold disabled:opacity-40 '+c[tone]+' '+className}>{children}</button>}
+function Field({label,children}){return <label className="block mb-3"><span className="block text-xs font-semibold text-glacier-600 mb-1.5">{label}</span>{children}</label>}
+const inputCls='w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-300 text-sm';
+function Pill({children,tone='default'}){const c={default:'bg-slate-100 text-slate-700',pending:'bg-amber-100 text-amber-700',approved:'bg-sky-100 text-sky-700',done:'bg-emerald-100 text-emerald-700',rejected:'bg-rose-100 text-rose-700'};return <span className={'px-2.5 py-1 rounded-full text-xs font-semibold '+c[tone]}>{children}</span>}
+function useToast(){const[t,setT]=useState(null);const show=(msg,tone='ok')=>{setT({msg,tone});setTimeout(()=>setT(null),3000)};return[ t&&<div className={'fixed bottom-5 right-5 z-[100] px-4 py-3 rounded-xl shadow-lg text-sm text-white '+(t.tone==='err'?'bg-rose-600':'bg-glacier-900')}>{t.msg}</div>,show]}
+function IceGauge({label,value,max,big}){const p=Math.max(0,Math.min(100,max?(value/max)*100:0));return <div className="flex items-end gap-4"><div className="icebar-shell" style={{width:big?54:38,height:big?140:96}}><div className="icebar-fill w-full" style={{height:p+'%'}}/></div><div><div className={'font-display font-bold text-glacier-900 '+(big?'text-3xl':'text-xl')}>{Math.round(value||0).toLocaleString('id-ID')}</div><div className="text-xs text-slate-500">kantong</div><div className="text-[11px] text-slate-500 mt-1">{label}</div></div></div>}
+
+function SetupScreen({onDone}){const[n,setN]=useState(''),[u,setU]=useState(''),[p,setP]=useState(''),[e,setE]=useState(''),[busy,setBusy]=useState(false);const go=async()=>{if(!n||!u||!p)return setE('Semua kolom wajib diisi.');setBusy(true);try{const r=db.ref('users').push();await r.set({name:n,username:u.trim(),passwordHash:await sha256(p),role:'superadmin',active:true,createdAt:Date.now()});await db.ref('config/pricePerBag').set(15000);await db.ref('warehouse/stock').set(0);await db.ref('config/company').set({name:'GlasirEs',address:'',phone:'',logo:'',reportColor:'#1c4a73'});onDone()}catch(x){setE(x.message)}setBusy(false)};return <div className="min-h-screen flex items-center justify-center p-6"><Card className="w-full max-w-md"><h1 className="font-display text-2xl font-bold mb-2">Setup Super Admin</h1><p className="text-sm text-slate-500 mb-5">Buat akun pertama GlasirEs.</p><Field label="Nama"><input className={inputCls} value={n} onChange={e=>setN(e.target.value)}/></Field><Field label="Username"><input className={inputCls} value={u} onChange={e=>setU(e.target.value)}/></Field><Field label="Password"><input type="password" className={inputCls} value={p} onChange={e=>setP(e.target.value)}/></Field>{e&&<p className="text-rose-600 text-sm mb-3">{e}</p>}<Btn tone="accent" className="w-full" onClick={go} disabled={busy}>{busy?'Menyimpan…':'Buat Super Admin'}</Btn></Card></div>}
+function LoginScreen({onLogin}){
+  const[u,setU]=useState(''),[p,setP]=useState(''),[e,setE]=useState(''),[busy,setB]=useState(false);
+  const[recover,setRecover]=useState(false);
+  const[ru,setRU]=useState(''),[rp,setRP]=useState('');
+  const[rn,setRN]=useState('BIG SUPER ADMIN'),[rbu,setRBU]=useState(''),[rbp,setRBP]=useState('');
+  const[re,setRE]=useState(''),[rbusy,setRBusy]=useState(false);
+
+  const go=async()=>{
+    setB(true);setE('');
+    try{
+      const s=await db.ref('users').once('value'),a=toList(s.val()),x=a.find(z=>z.username===u.trim());
+      if(!x||x.active===false)throw Error('Username tidak ditemukan atau nonaktif.');
+      if(await sha256(p)!==x.passwordHash)throw Error('Password salah.');
+      localStorage.setItem('glasires_uid',x.id);
+      onLogin({id:x.id,...x});
+    }catch(z){setE(z.message)}
+    setB(false)
   };
 
-  const toggleActive = async (u) => {
-    await db.ref('users/' + u.id + '/active').set(!(u.active !== false));
-  };
-
-  return (
-    <div className="fade-in">
-      {toast}
-      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">{title}</h2>
-      <div className="grid lg:grid-cols-5 gap-5">
-        <Card className="lg:col-span-2 h-fit">
-          <div className="text-sm font-semibold text-glacier-800 mb-4">Tambah Pengguna Baru</div>
-          <Field label="Nama"><input className={inputCls} value={name} onChange={e=>setName(e.target.value)} /></Field>
-          <Field label="Username"><input className={inputCls} value={username} onChange={e=>setUsername(e.target.value)} /></Field>
-          <Field label="Password"><input type="password" className={inputCls} value={password} onChange={e=>setPassword(e.target.value)} /></Field>
-          {allowedRoles.length > 1 && (
-            <Field label="Peran">
-              <select className={inputCls} value={role} onChange={e=>setRole(e.target.value)}>
-                {allowedRoles.map(r => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}
-              </select>
-            </Field>
-          )}
-          <Btn tone="accent" className="w-full" onClick={addUser} disabled={busy}>{busy?'Menyimpan…':'Tambah Pengguna'}</Btn>
-        </Card>
-        <Card className="lg:col-span-3">
-          <div className="text-sm font-semibold text-glacier-800 mb-4">Daftar Pengguna ({visibleUsers.length})</div>
-          <div className="space-y-2 max-h-[480px] overflow-y-auto">
-            {visibleUsers.length === 0 && <div className="text-sm text-glacier-400 py-6 text-center">Belum ada pengguna di peran ini.</div>}
-            {visibleUsers.map(u => (
-              <div key={u.id} className="flex items-center justify-between px-3.5 py-3 rounded-xl border border-glacier-100 bg-white/60">
-                <div>
-                  <div className="text-sm font-semibold text-glacier-900">{u.name}</div>
-                  <div className="text-xs text-glacier-500">@{u.username}</div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={"px-2 py-0.5 rounded-full text-[10px] font-bold " + ROLE_BADGE[u.role]}>{ROLE_LABEL[u.role]}</span>
-                  <Pill tone={u.active===false ? 'rejected' : 'done'}>{u.active===false ? 'Nonaktif' : 'Aktif'}</Pill>
-                  {u.id !== me.id && <Btn tone="ghost" className="!px-2.5 !py-1 text-xs" onClick={()=>toggleActive(u)}>{u.active===false?'Aktifkan':'Nonaktifkan'}</Btn>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
-    </div>
-  );
-}
-
-/* =========================================================================
-   STOCK OVERVIEW (shared)
-   ========================================================================= */
-function StockOverview(){
-  const warehouseStock = useDbValue('warehouse/stock', 0);
-  const driverStock = useDbList('driverStock');
-  const users = toList(useDbList('users'));
-  const drivers = users.filter(u => u.role === 'driver');
-  const totalCarried = Object.values(driverStock).reduce((a,b)=>a+(b||0), 0);
-
-  return (
-    <div className="grid md:grid-cols-2 gap-5 mb-6">
-      <Card>
-        <div className="text-xs font-mono tracking-widest text-glacier-400 mb-3">STOK GUDANG</div>
-        <IceGauge label="Sisa es di gudang" value={warehouseStock} max={Math.max(warehouseStock, totalCarried, 100)} big />
-      </Card>
-      <Card>
-        <div className="text-xs font-mono tracking-widest text-glacier-400 mb-3">DIBAWA SEMUA DRIVER</div>
-        <IceGauge label="Total sedang di jalan" value={totalCarried} max={Math.max(warehouseStock, totalCarried, 100)} big />
-        <div className="mt-4 space-y-1.5">
-          {drivers.map(d => (
-            <div key={d.id} className="flex items-center justify-between text-sm">
-              <span className="text-glacier-700">{d.name}</span>
-              <span className="font-mono font-semibold text-glacier-900">{driverStock[d.username] || 0} kantong</span>
-            </div>
-          ))}
-          {drivers.length===0 && <div className="text-sm text-glacier-400">Belum ada driver.</div>}
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-/* =========================================================================
-   ALL DELIVERIES TABLE (shared, admin view)
-   ========================================================================= */
-function DeliveriesTable(){
-  const deliveries = toList(useDbList('deliveries')).sort((a,b)=>b.timestamp-a.timestamp);
-  return (
-    <Card>
-      <div className="text-sm font-semibold text-glacier-800 mb-4">Riwayat Pengantaran ke Pelanggan ({deliveries.length})</div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead><tr className="text-left text-glacier-400 text-xs border-b border-glacier-100">
-            <th className="pb-2 pr-4">Waktu</th><th className="pb-2 pr-4">Driver</th><th className="pb-2 pr-4">Pelanggan</th>
-            <th className="pb-2 pr-4">Qty</th><th className="pb-2">Total</th>
-          </tr></thead>
-          <tbody>
-            {deliveries.map(d => (
-              <tr key={d.id} className="border-b border-glacier-50">
-                <td className="py-2.5 pr-4 text-glacier-500 text-xs">{waktu(d.timestamp)}</td>
-                <td className="py-2.5 pr-4 font-medium text-glacier-800">{d.driverName}</td>
-                <td className="py-2.5 pr-4">{d.customerName}</td>
-                <td className="py-2.5 pr-4 font-mono">{d.qty}</td>
-                <td className="py-2.5 font-mono font-semibold text-glacier-900">{rupiah(d.total)}</td>
-              </tr>
-            ))}
-            {deliveries.length===0 && <tr><td colSpan="5" className="py-8 text-center text-glacier-400">Belum ada pengantaran tercatat.</td></tr>}
-          </tbody>
-        </table>
-      </div>
-    </Card>
-  );
-}
-
-/* =========================================================================
-   STOCK REQUESTS APPROVAL (Admin/SuperAdmin ACC)
-   ========================================================================= */
-function ApproveRequests({ me }){
-  const requests = toList(useDbList('stockRequests')).sort((a,b)=>b.requestedAt-a.requestedAt);
-  const [toast, showToast] = useToast();
-  const pending = requests.filter(r=>r.status==='pending');
-  const others = requests.filter(r=>r.status!=='pending');
-
-  const approve = async (r) => {
-    await db.ref('stockRequests/'+r.id).update({ status:'approved', approvedBy: me.id, approvedByName: me.name, approvedAt: Date.now() });
-    showToast('Permintaan ' + r.driverName + ' disetujui. Gudang bisa keluarkan stok sekarang.');
-  };
-  const reject = async (r) => {
-    await db.ref('stockRequests/'+r.id).update({ status:'rejected', approvedBy: me.id, approvedByName: me.name, approvedAt: Date.now() });
-    showToast('Permintaan ditolak.', 'err');
-  };
-
-  return (
-    <div className="fade-in">
-      {toast}
-      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Persetujuan Permintaan Stok</h2>
-      <Card className="mb-5">
-        <div className="text-sm font-semibold text-glacier-800 mb-4">Menunggu Persetujuan ({pending.length})</div>
-        <div className="space-y-2.5">
-          {pending.map(r => (
-            <div key={r.id} className="flex items-center justify-between px-4 py-3 rounded-xl border border-amber-200 bg-amber-50/60">
-              <div>
-                <div className="text-sm font-semibold text-glacier-900">{r.driverName}</div>
-                <div className="text-xs text-glacier-500">minta {r.qtyRequested} kantong · {waktu(r.requestedAt)}</div>
-              </div>
-              <div className="flex gap-2">
-                <Btn tone="accent" className="!px-3 !py-1.5 text-xs" onClick={()=>approve(r)}>✓ ACC</Btn>
-                <Btn tone="danger" className="!px-3 !py-1.5 text-xs" onClick={()=>reject(r)}>Tolak</Btn>
-              </div>
-            </div>
-          ))}
-          {pending.length===0 && <div className="text-sm text-glacier-400 py-4 text-center">Tidak ada permintaan yang menunggu.</div>}
-        </div>
-      </Card>
-      <Card>
-        <div className="text-sm font-semibold text-glacier-800 mb-4">Riwayat Permintaan</div>
-        <div className="space-y-2 max-h-96 overflow-y-auto">
-          {others.map(r => (
-            <div key={r.id} className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-glacier-100">
-              <div className="text-sm"><span className="font-medium text-glacier-800">{r.driverName}</span><span className="text-glacier-400"> · {r.qtyRequested} kantong</span></div>
-              <Pill tone={r.status==='approved'?'approved':r.status==='fulfilled'?'done':'rejected'}>{r.status}</Pill>
-            </div>
-          ))}
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-/* =========================================================================
-   DRIVER APP
-   ========================================================================= */
-function DriverHome({ me }){
-  const myStock = useDbValue('driverStock/' + me.username, 0);
-  const price = useDbValue('config/pricePerBag', 15000);
-  const myDeliveries = toList(useDbList('deliveries')).filter(d=>d.driverId===me.id).sort((a,b)=>b.timestamp-a.timestamp);
-  const todayTotal = myDeliveries.filter(d => new Date(d.timestamp).toDateString() === new Date().toDateString()).reduce((a,b)=>a+b.qty,0);
-
-  const [customerName, setCustomerName] = useState(''); const [qty, setQty] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [toast, showToast] = useToast();
-
-  const submitDelivery = async () => {
-    const q = parseInt(qty, 10);
-    if (!customerName.trim()) { showToast('Nama pelanggan wajib diisi.', 'err'); return; }
-    if (!q || q <= 0) { showToast('Jumlah kantong tidak valid.', 'err'); return; }
-    if (q > myStock) { showToast('Stok yang kamu bawa cuma ' + myStock + ' kantong.', 'err'); return; }
-    setBusy(true);
-    try {
-      await db.ref('deliveries').push({
-        driverId: me.id, driverName: me.name, customerName: customerName.trim(),
-        qty: q, pricePerUnit: price, total: q*price, timestamp: Date.now()
-      });
-      await db.ref('driverStock/' + me.username).transaction(cur => (cur||0) - q);
-      setCustomerName(''); setQty('');
-      showToast('Pengantaran ke ' + customerName + ' tercatat.');
-    } catch(e){ showToast('Gagal: ' + e.message, 'err'); }
-    setBusy(false);
-  };
-
-  return (
-    <div className="fade-in">
-      {toast}
-      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Halo, {me.name.split(' ')[0]} 👋</h2>
-      <div className="grid md:grid-cols-2 gap-5 mb-6">
-        <Card><IceGauge label="Es yang sedang kamu bawa" value={myStock} max={Math.max(myStock,50)} big /></Card>
-        <Card>
-          <div className="text-xs font-mono tracking-widest text-glacier-400 mb-2">HARI INI</div>
-          <div className="font-display font-bold text-3xl text-glacier-900">{todayTotal} <span className="text-base font-normal text-glacier-500">kantong terjual</span></div>
-          <div className="text-sm text-glacier-500 mt-1">{rupiah(todayTotal*price)} · {myDeliveries.filter(d=>new Date(d.timestamp).toDateString()===new Date().toDateString()).length} pelanggan</div>
-        </Card>
-      </div>
-
-      <Card className="mb-6">
-        <div className="text-sm font-semibold text-glacier-800 mb-4">Input Pengantaran</div>
-        <div className="grid sm:grid-cols-3 gap-3 items-end">
-          <Field label="Nama Pelanggan / Toko"><input className={inputCls} value={customerName} onChange={e=>setCustomerName(e.target.value)} placeholder="mis. Toko Sumber Rejeki" /></Field>
-          <Field label="Jumlah Kantong"><input type="number" min="1" className={inputCls} value={qty} onChange={e=>setQty(e.target.value)} /></Field>
-          <div className="mb-4">
-            <div className="text-xs text-glacier-500 mb-1.5">Total harga</div>
-            <div className="font-mono font-bold text-lg text-glacier-900">{rupiah((parseInt(qty,10)||0)*price)}</div>
-          </div>
-        </div>
-        <Btn tone="accent" onClick={submitDelivery} disabled={busy}>{busy?'Menyimpan…':'Catat Pengantaran'}</Btn>
-      </Card>
-
-      <Card>
-        <div className="text-sm font-semibold text-glacier-800 mb-4">Riwayat Pengantaran Kamu</div>
-        <div className="space-y-2 max-h-80 overflow-y-auto">
-          {myDeliveries.map(d => (
-            <div key={d.id} className="flex justify-between text-sm px-3.5 py-2.5 rounded-xl border border-glacier-100">
-              <div><div className="font-medium text-glacier-800">{d.customerName}</div><div className="text-xs text-glacier-400">{waktu(d.timestamp)}</div></div>
-              <div className="text-right"><div className="font-mono">{d.qty} kantong</div><div className="text-xs text-glacier-500">{rupiah(d.total)}</div></div>
-            </div>
-          ))}
-          {myDeliveries.length===0 && <div className="text-sm text-glacier-400 py-4 text-center">Belum ada pengantaran.</div>}
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-function DriverStockRequest({ me }){
-  const myStock = useDbValue('driverStock/' + me.username, 0);
-  const requests = toList(useDbList('stockRequests')).filter(r=>r.driverId===me.id).sort((a,b)=>b.requestedAt-a.requestedAt);
-  const [qty, setQty] = useState(''); const [busy, setBusy] = useState(false);
-  const [toast, showToast] = useToast();
-
-  const send = async () => {
-    const q = parseInt(qty,10);
-    if (!q || q<=0) { showToast('Jumlah tidak valid.', 'err'); return; }
-    setBusy(true);
-    await db.ref('stockRequests').push({ driverId: me.id, driverName: me.name, qtyRequested: q, status:'pending', requestedAt: Date.now() });
-    setQty(''); showToast('Permintaan ' + q + ' kantong terkirim ke Admin.');
-    setBusy(false);
-  };
-
-  return (
-    <div className="fade-in">
-      {toast}
-      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Minta Stok Es</h2>
-      <Card className="mb-5">
-        <IceGauge label="Sedang kamu bawa" value={myStock} max={Math.max(myStock,50)} />
-      </Card>
-      <Card className="mb-5">
-        <div className="text-sm font-semibold text-glacier-800 mb-4">Ajukan Permintaan Baru</div>
-        <div className="flex gap-3 items-end">
-          <Field label="Jumlah Kantong"><input type="number" min="1" className={inputCls} value={qty} onChange={e=>setQty(e.target.value)} /></Field>
-          <Btn tone="accent" onClick={send} disabled={busy} className="mb-4">{busy?'Mengirim…':'Kirim Permintaan'}</Btn>
-        </div>
-        <p className="text-xs text-glacier-500">Permintaan perlu di-ACC Admin, lalu Gudang akan mengeluarkan stoknya untukmu.</p>
-      </Card>
-      <Card>
-        <div className="text-sm font-semibold text-glacier-800 mb-4">Riwayat Permintaan Kamu</div>
-        <div className="space-y-2">
-          {requests.map(r => (
-            <div key={r.id} className="flex justify-between items-center px-3.5 py-2.5 rounded-xl border border-glacier-100 text-sm">
-              <span>{r.qtyRequested} kantong · {waktu(r.requestedAt)}</span>
-              <Pill tone={r.status==='pending'?'pending':r.status==='approved'?'approved':r.status==='fulfilled'?'done':'rejected'}>{r.status}</Pill>
-            </div>
-          ))}
-          {requests.length===0 && <div className="text-sm text-glacier-400 py-4 text-center">Belum pernah minta stok.</div>}
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-function DriverReturn({ me }){
-  const myStock = useDbValue('driverStock/' + me.username, 0);
-  const returns = toList(useDbList('returnRequests')).filter(r=>r.driverId===me.id).sort((a,b)=>b.requestedAt-a.requestedAt);
-  const [qty, setQty] = useState(''); const [busy, setBusy] = useState(false);
-  const [toast, showToast] = useToast();
-
-  const send = async () => {
-    const q = parseInt(qty,10);
-    if (!q || q<=0) { showToast('Jumlah tidak valid.', 'err'); return; }
-    if (q > myStock) { showToast('Sisa yang kamu bawa cuma ' + myStock + ' kantong.', 'err'); return; }
-    setBusy(true);
-    await db.ref('returnRequests').push({ driverId: me.id, driverName: me.name, qty: q, status:'pending', requestedAt: Date.now() });
-    setQty(''); showToast('Pengembalian ' + q + ' kantong terkirim ke Gudang.');
-    setBusy(false);
-  };
-
-  return (
-    <div className="fade-in">
-      {toast}
-      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Kembalikan Sisa Es</h2>
-      <Card className="mb-5"><IceGauge label="Sisa yang masih kamu bawa" value={myStock} max={Math.max(myStock,50)} /></Card>
-      <Card className="mb-5">
-        <div className="text-sm font-semibold text-glacier-800 mb-4">Kirim Sisa ke Gudang</div>
-        <div className="flex gap-3 items-end">
-          <Field label="Jumlah Kantong Sisa"><input type="number" min="1" className={inputCls} value={qty} onChange={e=>setQty(e.target.value)} /></Field>
-          <Btn tone="accent" onClick={send} disabled={busy} className="mb-4">{busy?'Mengirim…':'Kirim ke Gudang'}</Btn>
-        </div>
-        <p className="text-xs text-glacier-500">Stokmu baru berkurang setelah Gudang menekan "Terima" di sisi mereka.</p>
-      </Card>
-      <Card>
-        <div className="text-sm font-semibold text-glacier-800 mb-4">Riwayat Pengembalian</div>
-        <div className="space-y-2">
-          {returns.map(r => (
-            <div key={r.id} className="flex justify-between items-center px-3.5 py-2.5 rounded-xl border border-glacier-100 text-sm">
-              <span>{r.qty} kantong · {waktu(r.requestedAt)}</span>
-              <Pill tone={r.status==='pending'?'pending':'done'}>{r.status==='pending'?'menunggu diterima':'diterima gudang'}</Pill>
-            </div>
-          ))}
-          {returns.length===0 && <div className="text-sm text-glacier-400 py-4 text-center">Belum pernah mengembalikan stok.</div>}
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-/* =========================================================================
-   GUDANG APP
-   ========================================================================= */
-function GudangHome({ me }){
-  const stock = useDbValue('warehouse/stock', 0);
-  const [qty, setQty] = useState(''); const [note, setNote] = useState(''); const [busy, setBusy] = useState(false);
-  const [toast, showToast] = useToast();
-
-  const addStock = async () => {
-    const q = parseInt(qty,10);
-    if (!q || q<=0) { showToast('Jumlah tidak valid.', 'err'); return; }
-    setBusy(true);
-    await db.ref('warehouse/stock').transaction(cur => (cur||0) + q);
-    await db.ref('warehouse/history').push({ type:'masuk', qty:q, by: me.id, byName: me.name, note, timestamp: Date.now() });
-    setQty(''); setNote(''); showToast(q + ' kantong stok masuk dicatat.');
-    setBusy(false);
-  };
-
-  return (
-    <div className="fade-in">
-      {toast}
-      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Stok Gudang</h2>
-      <Card className="mb-6"><IceGauge label="Total sisa di gudang" value={stock} max={Math.max(stock,100)} big /></Card>
-      <Card>
-        <div className="text-sm font-semibold text-glacier-800 mb-4">Catat Stok Masuk (produksi baru)</div>
-        <div className="grid sm:grid-cols-2 gap-3">
-          <Field label="Jumlah Kantong"><input type="number" min="1" className={inputCls} value={qty} onChange={e=>setQty(e.target.value)} /></Field>
-          <Field label="Catatan (opsional)"><input className={inputCls} value={note} onChange={e=>setNote(e.target.value)} placeholder="mis. produksi hari ini" /></Field>
-        </div>
-        <Btn tone="accent" onClick={addStock} disabled={busy}>{busy?'Menyimpan…':'Tambah Stok'}</Btn>
-      </Card>
-    </div>
-  );
-}
-
-function GudangRelease({ me }){
-  const requests = toList(useDbList('stockRequests')).filter(r=>r.status==='approved').sort((a,b)=>a.approvedAt-b.approvedAt);
-  const stock = useDbValue('warehouse/stock', 0);
-  const [toast, showToast] = useToast();
-
-  const release = async (r) => {
-    if (r.qtyRequested > stock) { showToast('Stok gudang tidak cukup (sisa ' + stock + ').', 'err'); return; }
-    const usersSnap = await db.ref('users/' + r.driverId).once('value');
-    const driverUsername = (usersSnap.val()||{}).username;
-    if (!driverUsername) { showToast('Data driver tidak ditemukan.', 'err'); return; }
-    await db.ref('warehouse/stock').transaction(cur => (cur||0) - r.qtyRequested);
-    await db.ref('driverStock/' + driverUsername).transaction(cur => (cur||0) + r.qtyRequested);
-    await db.ref('stockRequests/'+r.id).update({ status:'fulfilled', fulfilledBy: me.id, fulfilledByName: me.name, fulfilledAt: Date.now() });
-    await db.ref('warehouse/history').push({ type:'keluar', qty:r.qtyRequested, driverId:r.driverId, driverName:r.driverName, by: me.id, byName: me.name, timestamp: Date.now() });
-    showToast('Stok dikeluarkan untuk ' + r.driverName + '.');
-  };
-
-  return (
-    <div className="fade-in">
-      {toast}
-      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Keluarkan Stok ke Driver</h2>
-      <Card>
-        <div className="text-sm font-semibold text-glacier-800 mb-4">Sudah Disetujui Admin, Menunggu Dikeluarkan ({requests.length})</div>
-        <div className="space-y-2.5">
-          {requests.map(r => (
-            <div key={r.id} className="flex items-center justify-between px-4 py-3 rounded-xl border border-sky-200 bg-sky-50/60">
-              <div>
-                <div className="text-sm font-semibold text-glacier-900">{r.driverName}</div>
-                <div className="text-xs text-glacier-500">{r.qtyRequested} kantong · disetujui {r.approvedByName} · {waktu(r.approvedAt)}</div>
-              </div>
-              <Btn tone="accent" className="!px-3 !py-1.5 text-xs" onClick={()=>release(r)}>Keluarkan Stok</Btn>
-            </div>
-          ))}
-          {requests.length===0 && <div className="text-sm text-glacier-400 py-6 text-center">Tidak ada permintaan yang menunggu dikeluarkan.</div>}
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-function GudangReceiveReturns({ me }){
-  const returns = toList(useDbList('returnRequests')).filter(r=>r.status==='pending').sort((a,b)=>a.requestedAt-b.requestedAt);
-  const [toast, showToast] = useToast();
-
-  const receive = async (r) => {
-    await db.ref('warehouse/stock').transaction(cur => (cur||0) + r.qty);
-    const usersSnap = await db.ref('users/' + r.driverId).once('value');
-    const driverUsername = (usersSnap.val()||{}).username;
-    if (driverUsername) {
-      await db.ref('driverStock/' + driverUsername).transaction(cur => Math.max(0, (cur||0) - r.qty));
-    }
-    await db.ref('returnRequests/'+r.id).update({ status:'received', receivedBy: me.id, receivedByName: me.name, receivedAt: Date.now() });
-    await db.ref('warehouse/history').push({ type:'kembali', qty:r.qty, driverId:r.driverId, driverName:r.driverName, by: me.id, byName: me.name, timestamp: Date.now() });
-    showToast('Sisa es dari ' + r.driverName + ' diterima kembali.');
-  };
-
-  return (
-    <div className="fade-in">
-      {toast}
-      <h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Terima Sisa Es dari Driver</h2>
-      <Card>
-        <div className="text-sm font-semibold text-glacier-800 mb-4">Menunggu Diterima ({returns.length})</div>
-        <div className="space-y-2.5">
-          {returns.map(r => (
-            <div key={r.id} className="flex items-center justify-between px-4 py-3 rounded-xl border border-amber-200 bg-amber-50/60">
-              <div>
-                <div className="text-sm font-semibold text-glacier-900">{r.driverName}</div>
-                <div className="text-xs text-glacier-500">{r.qty} kantong · dikirim {waktu(r.requestedAt)}</div>
-              </div>
-              <Btn tone="accent" className="!px-3 !py-1.5 text-xs" onClick={()=>receive(r)}>Terima</Btn>
-            </div>
-          ))}
-          {returns.length===0 && <div className="text-sm text-glacier-400 py-6 text-center">Tidak ada pengembalian yang menunggu.</div>}
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-/* =========================================================================
-   ROLE ROOT APPS
-   ========================================================================= */
-function AdminApp({ me, isSuper }){
-  const tabs = [
-    { key:'overview', label:'Ringkasan', icon:'📊' },
-    { key:'approve', label:'Persetujuan Stok', icon:'✅' },
-    { key:'deliveries', label:'Pengantaran', icon:'🧊' },
-    { key:'drivers', label:'Driver & Gudang', icon:'👥' },
-    ...(isSuper ? [{ key:'admins', label:'Kelola Admin', icon:'🛡️' }] : []),
-  ];
-  const [active, setActive] = useState('overview');
-  return (
-    <Shell user={me} tabs={tabs} active={active} setActive={setActive} onLogout={()=>{ localStorage.removeItem('glasires_uid'); location.reload(); }}>
-      {active==='overview' && <div className="fade-in"><h2 className="font-display font-bold text-xl text-glacier-900 mb-5">Ringkasan {isSuper?'(Super Admin)':''}</h2><StockOverview /><DeliveriesTable /></div>}
-      {active==='approve' && <ApproveRequests me={me} />}
-      {active==='deliveries' && <div className="fade-in"><StockOverview /><DeliveriesTable /></div>}
-      {active==='drivers' && <ManageUsers me={me} allowedRoles={['driver','gudang']} title="Kelola Driver & Petugas Gudang" />}
-      {active==='admins' && isSuper && <ManageUsers me={me} allowedRoles={['admin']} title="Kelola Akun Admin" />}
-    </Shell>
-  );
-}
-
-function DriverApp({ me }){
-  const tabs = [
-    { key:'home', label:'Beranda', icon:'🏠' },
-    { key:'request', label:'Minta Stok', icon:'📦' },
-    { key:'return', label:'Kembalikan Sisa', icon:'↩️' },
-  ];
-  const [active, setActive] = useState('home');
-  return (
-    <Shell user={me} tabs={tabs} active={active} setActive={setActive} onLogout={()=>{ localStorage.removeItem('glasires_uid'); location.reload(); }}>
-      {active==='home' && <DriverHome me={me} />}
-      {active==='request' && <DriverStockRequest me={me} />}
-      {active==='return' && <DriverReturn me={me} />}
-    </Shell>
-  );
-}
-
-function GudangApp({ me }){
-  const tabs = [
-    { key:'home', label:'Stok Gudang', icon:'🏔️' },
-    { key:'release', label:'Keluarkan ke Driver', icon:'🚚' },
-    { key:'returns', label:'Terima Kembalian', icon:'↩️' },
-  ];
-  const [active, setActive] = useState('home');
-  return (
-    <Shell user={me} tabs={tabs} active={active} setActive={setActive} onLogout={()=>{ localStorage.removeItem('glasires_uid'); location.reload(); }}>
-      {active==='home' && <GudangHome me={me} />}
-      {active==='release' && <GudangRelease me={me} />}
-      {active==='returns' && <GudangReceiveReturns me={me} />}
-    </Shell>
-  );
-}
-
-function ConfigErrorScreen({ reason }){
-  return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <Card className="max-w-lg fade-in">
-        <div className="text-xs font-mono tracking-widest text-rose-500 mb-2">BELUM TERHUBUNG KE FIREBASE</div>
-        <h1 className="font-display font-bold text-xl text-glacier-900 mb-3">
-          {reason === 'PLACEHOLDER' ? 'Config Firebase belum diisi' : 'Gagal terhubung ke Firebase'}
-        </h1>
-        <p className="text-sm text-glacier-600 mb-4">
-          {reason === 'PLACEHOLDER'
-            ? 'Buka file HTML ini dengan editor teks (Notepad, VS Code, dsb), cari tulisan FIREBASE_CONFIG di bagian atas kode, lalu ganti semua nilai yang bertuliskan "GANTI_..." dengan config asli dari project Firebase kamu. Simpan file, lalu muat ulang halaman ini.'
-            : 'Detail teknis: ' + reason}
-        </p>
-        <div className="text-sm font-semibold text-glacier-800 mb-2">Cara ambil config Firebase:</div>
-        <ol className="text-sm text-glacier-700 list-decimal pl-5 space-y-1.5 mb-4">
-          <li>Buka <span className="font-mono text-xs">console.firebase.google.com</span> → buat project baru (atau pakai yang sudah ada)</li>
-          <li>Klik ⚙️ (Project Settings) → scroll ke "Your apps" → tambah app Web (ikon &lt;/&gt;) kalau belum ada → copy objek <span className="font-mono text-xs">firebaseConfig</span></li>
-          <li>Di menu kiri, klik "Build" → "Realtime Database" → "Create Database" (bukan Firestore)</li>
-          <li>Tempel config yang tadi dicopy ke <span className="font-mono text-xs">FIREBASE_CONFIG</span> di file ini, simpan, muat ulang halaman</li>
-        </ol>
-        <p className="text-xs text-glacier-400">Kalau sudah diganti tapi masih muncul pesan ini, cek lagi apakah ada tanda kutip atau koma yang salah ketik.</p>
-      </Card>
-    </div>
-  );
-}
-
-/* =========================================================================
-   ROOT
-   ========================================================================= */
-function App(){
-  const [loading, setLoading] = useState(true);
-  const [hasUsers, setHasUsers] = useState(true);
-  const [me, setMe] = useState(null);
-
-  useEffect(() => {
-    (async () => {
-      const snap = await db.ref('users').once('value');
-      const usersExist = snap.exists();
-      setHasUsers(usersExist);
-      const uid = localStorage.getItem('glasires_uid');
-      if (usersExist && uid) {
-        const uSnap = await db.ref('users/' + uid).once('value');
-        if (uSnap.exists() && uSnap.val().active !== false) setMe({ id: uid, ...uSnap.val() });
-        else localStorage.removeItem('glasires_uid');
-      }
-      setLoading(false);
-    })();
-  }, []);
-
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-glacier-400 font-mono text-sm">Memuat…</div>;
-  if (!hasUsers) return <SetupScreen onDone={()=>location.reload()} />;
-  if (!me) return <LoginScreen onLogin={(u)=>setMe(u)} />;
-
-  if (me.role === 'superadmin') return <AdminApp me={me} isSuper={true} />;
-  if (me.role === 'admin') return <AdminApp me={me} isSuper={false} />;
-  if (me.role === 'driver') return <DriverApp me={me} />;
-  if (me.role === 'gudang') return <GudangApp me={me} />;
-  return <div className="p-8">Peran tidak dikenal.</div>;
-}
-
-ReactDOM.createRoot(document.getElementById('root')).render(
-  FIREBASE_INIT_ERROR ? <ConfigErrorScreen reason={FIREBASE_INIT_ERROR} /> : <App />
-);
-
-
-/* ===== ANTI INSPECT ===== */
-
-document.addEventListener('contextmenu', function(e){
-    e.preventDefault();
-});
-
-document.onkeydown = function(e){
-
-    // F12
-    if(e.keyCode == 123){
-        return false;
-    }
-
-    // CTRL + SHIFT + I
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 73){
-        return false;
-    }
-
-    // CTRL + SHIFT + J
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 74){
-        return false;
-    }
-
-    // CTRL + U
-    if(e.ctrlKey && e.keyCode == 85){
-        return false;
-    }
-
-    // CTRL + SHIFT + C
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 67){
-        return false;
-    }
-
-};
-
-
-document.onselectstart = function(e){
-
-    if(e.target.closest("#listKantong")){
-        return true;
-    }
-
-    return false;
-};
-
-
-(function(){
-
-function detectDevTools(){
-
-    const start = new Date();
-
-    debugger;
-
-    const end = new Date();
-
-    if(end - start > 100){
-
-        document.body.innerHTML =
-        "<h1 style='color:red;text-align:center;margin-top:100px;'>SECURITY BLOCKED</h1>";
-
-    }
-
-}
-
-setInterval(detectDevTools,1000);
-
-})();
-
-// ===== KLIK NOMOR KANTONG AUTO COPY =====
-document.addEventListener("click", function(e){
-
-    if(e.target.tagName === "TD" && e.target.parentElement.parentElement.id === "listKantong"){
-
-        var teks = e.target.innerText;
-
-        navigator.clipboard.writeText(teks).then(function(){
-
-            // efek notifikasi kecil
-            e.target.style.background = "#00c896";
-
-            setTimeout(function(){
-                e.target.style.background = "";
-            },500);
-
+  const recoverBig=async()=>{
+    setRBusy(true);setRE('');
+    try{
+      if(!ru.trim()||!rp||!rbu.trim()||!rbp)throw Error('Semua kolom pemulihan wajib diisi.');
+      if(rbp.length<6)throw Error('Password BIG SUPER ADMIN minimal 6 karakter.');
+      const s=await db.ref('users').once('value'),a=toList(s.val());
+      const su=a.find(z=>z.username===ru.trim()&&z.role==='superadmin'&&z.active!==false);
+      if(!su)throw Error('Akun SUPER ADMIN tidak ditemukan atau tidak aktif.');
+      if(await sha256(rp)!==su.passwordHash)throw Error('Password SUPER ADMIN salah.');
+      if(a.some(z=>z.username===rbu.trim()&&z.role!=='bigsuperadmin'))throw Error('Username BIG baru sudah dipakai user lain.');
+
+      const big=a.find(z=>z.role==='bigsuperadmin');
+      const now=Date.now();
+      if(big){
+        await db.ref('users/'+big.id).update({
+          username:rbu.trim(),
+          passwordHash:await sha256(rbp),
+          name:rn.trim()||big.name||'BIG SUPER ADMIN',
+          active:true,
+          protected:true,
+          recoveredAt:now,
+          recoveredBy:su.id,
+          recoveredByName:su.name
         });
+        await createAudit('bigadmin_recovered',`BIG SUPER ADMIN dipulihkan oleh ${su.name}`,su);
+      }else{
+        const r=db.ref('users').push();
+        await r.set({
+          name:rn.trim()||'BIG SUPER ADMIN',
+          username:rbu.trim(),
+          passwordHash:await sha256(rbp),
+          role:'bigsuperadmin',
+          active:true,
+          protected:true,
+          createdAt:now,
+          createdBy:su.id,
+          createdByName:su.name
+        });
+        await createAudit('bigadmin_recovered_created',`BIG SUPER ADMIN dibuat kembali oleh ${su.name}`,su);
+      }
 
-    }
+      setRU('');setRP('');setRBU('');setRBP('');
+      setRE('');setRecover(false);
+      setU(rbu.trim());setP('');
+      alert('BIG SUPER ADMIN berhasil dipulihkan. Silakan login menggunakan username baru dan password baru yang Anda buat.');
+    }catch(z){setRE(z.message)}
+    setRBusy(false)
+  };
 
-});
+  return <div className="min-h-screen flex items-center justify-center p-6">
+    <div className="w-full max-w-md">
+      <div className="text-center mb-7">
+        <div className="font-display font-extrabold text-3xl">GlasirEs</div>
+        <p className="text-sm text-slate-500">Sistem distribusi & stok es kristal</p>
+      </div>
 
+      {!recover ? <Card>
+        <Field label="Username">
+          <input className={inputCls} value={u} onChange={e=>setU(e.target.value)} onKeyDown={e=>e.key==='Enter'&&go()}/>
+        </Field>
+        <Field label="Password">
+          <input type="password" className={inputCls} value={p} onChange={e=>setP(e.target.value)} onKeyDown={e=>e.key==='Enter'&&go()}/>
+        </Field>
+        {e&&<p className="text-rose-600 text-sm mb-3">{e}</p>}
+        <Btn tone="accent" className="w-full" onClick={go} disabled={busy}>{busy?'Memeriksa…':'Masuk'}</Btn>
+      </Card> : <Card className="border-2 border-amber-200">
+        <div className="flex items-start gap-3 mb-5">
+          <div className="text-3xl">🛡️</div>
+          <div>
+            <h2 className="font-display font-bold text-xl">Pemulihan BIG SUPER ADMIN</h2>
+            <p className="text-xs text-slate-500 mt-1">Hanya SUPER ADMIN yang aktif yang dapat memulihkan akun ini.</p>
+          </div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 mb-4">
+          Masukkan kredensial SUPER ADMIN yang masih aktif, lalu tentukan username dan password BIG SUPER ADMIN yang baru.
+        </div>
+
+        <Field label="Username SUPER ADMIN">
+          <input className={inputCls} value={ru} onChange={e=>setRU(e.target.value)}/>
+        </Field>
+        <Field label="Password SUPER ADMIN">
+          <input type="password" className={inputCls} value={rp} onChange={e=>setRP(e.target.value)}/>
+        </Field>
+
+        <div className="border-t border-slate-200 my-4"></div>
+
+        <Field label="Nama BIG SUPER ADMIN">
+          <input className={inputCls} value={rn} onChange={e=>setRN(e.target.value)}/>
+        </Field>
+        <Field label="Username BIG SUPER ADMIN Baru">
+          <input className={inputCls} value={rbu} onChange={e=>setRBU(e.target.value)} placeholder="Contoh: bigsuperadmin"/>
+        </Field>
+        <Field label="Password BIG SUPER ADMIN Baru">
+          <input type="password" className={inputCls} value={rbp} onChange={e=>setRBP(e.target.value)} placeholder="Minimal 6 karakter"/>
+        </Field>
+
+        {re&&<p className="text-rose-600 text-sm mb-3">{re}</p>}
+
+        <div className="grid grid-cols-2 gap-2">
+          <Btn tone="ghost" onClick={()=>{setRecover(false);setRE('')}} disabled={rbusy}>Kembali</Btn>
+          <Btn tone="danger" onClick={recoverBig} disabled={rbusy}>{rbusy?'Memulihkan…':'Pulihkan Akun'}</Btn>
+        </div>
+      </Card>}
+    </div>
+    <div className="login-copyright">Copyright © 2026 | Power by <span className="bait-brand">Syech B@-it</span></div>
+  </div>
+}
+function NotificationPanel({user,onClose}){const ns=useNotifications(user);return <div className="absolute right-0 top-14 w-[min(390px,calc(100vw-30px))] max-h-[520px] overflow-hidden rounded-2xl shadow-2xl bg-white border z-[90]"><div className="flex justify-between p-4 border-b font-bold">🔔 Notifikasi <button onClick={onClose}>✕</button></div><div className="overflow-y-auto max-h-[460px]">{ns.length?ns.map(n=><div key={n.id} onClick={()=>markRead(n.id)} className={'p-4 border-b cursor-pointer '+(!n.read?'bg-blue-50':'')}><div className="font-semibold">{n.title}</div><div className="text-sm mt-1">{n.message}</div><div className="text-xs text-slate-400 mt-2">{waktu(n.createdAt)}</div></div>):<div className="p-8 text-center text-slate-400">Tidak ada notifikasi</div>}</div></div>}
+function Shell({user,tabs,active,setActive,onLogout,children}){const[mo,setMo]=useState(false),[sn,setSn]=useState(false);const ns=useNotifications(user);useNewNotificationSound(ns);const unread=ns.filter(n=>!n.read).length;return <div className="min-h-screen flex"><aside className={'fixed lg:static z-40 inset-y-0 left-0 w-64 bg-glacier-900 text-frost-200 flex flex-col transition-transform '+(mo?'translate-x-0':'-translate-x-full lg:translate-x-0')}><div className="px-5 py-5 border-b border-white/10"><span className="font-display font-extrabold text-xl text-white">GlasirEs</span></div><nav className="flex-1 p-3 space-y-1 overflow-y-auto">{tabs.map(t=><button key={t.key} onClick={()=>{setActive(t.key);setMo(false)}} className={'w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium '+(active===t.key?'bg-frost-400 text-glacier-900':'text-frost-200/80 hover:bg-white/5')}>{t.icon} {t.label}</button>)}</nav><div className="p-4 border-t border-white/10"><div className="text-xs text-frost-200/60">Masuk sebagai</div><div className="font-semibold text-white">{user.name}</div><span className={'inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 '+BADGE[user.role]}>{ROLES[user.role]}</span><Btn tone="ghost" className="w-full mt-3 !bg-white/5 !text-white !border-white/15" onClick={onLogout}>Keluar</Btn></div><footer className="bait-developer-footer"><div className="bait-developer-content"><div className="bait-powered">● Power by</div><div className="bait-name">Syech B@-it</div><div className="bait-copyright">Copyright © 2026</div></div></footer></aside>{mo&&<div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={()=>setMo(false)}/>}<main className="flex-1 min-w-0"><div className="lg:hidden sticky top-0 z-20 glass flex justify-between p-3"><button onClick={()=>setMo(true)}>☰</button><b>GlasirEs</b><span/></div><div className="p-5 lg:p-8 max-w-7xl mx-auto"><div className="flex justify-end mb-4 relative"><button onClick={()=>setSn(!sn)} className="bg-white border rounded-full w-11 h-11 shadow">🔔{unread>0&&<span className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full text-[10px] min-w-[18px] h-[18px] flex items-center justify-center">{unread}</span>}</button>{sn&&<NotificationPanel user={user} onClose={()=>setSn(false)}/>}</div>{children}</div></main></div>}
+
+function StockOverview(){const ws=useDbValue('warehouse/stock',0),ds=useDbList('driverStock'),us=toList(useDbList('users')),drivers=us.filter(u=>u.role==='driver'),car=Object.values(ds).reduce((a,b)=>a+(+b||0),0);return <div className="grid md:grid-cols-2 gap-5 mb-6"><Card><div className="text-xs font-mono text-slate-400 mb-3">STOK GUDANG</div><IceGauge label="Sisa es di gudang" value={ws} max={Math.max(ws,car,100)} big/></Card><Card><div className="text-xs font-mono text-slate-400 mb-3">DIBAWA DRIVER</div><IceGauge label="Total sedang dibawa" value={car} max={Math.max(ws,car,100)} big/><div className="mt-4 space-y-2">{drivers.map(d=><div key={d.id} className="flex justify-between text-sm"><span>{d.name}</span><b>{ds[d.username]||0} kantong</b></div>)}</div></Card></div>}
+
+function DeliveriesTable({filterUser='',paymentFilter=''}){const ds=toList(useDbList('deliveries')).filter(d=>(!filterUser||d.driverId===filterUser)&&(!paymentFilter||d.paymentMethod===paymentFilter)).sort((a,b)=>b.timestamp-a.timestamp);return <Card><div className="font-semibold mb-4">Riwayat Pengantaran ({ds.length})</div><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="text-left text-slate-400 text-xs border-b"><th className="py-2">Waktu</th><th>Driver</th><th>Pelanggan</th><th>Qty</th><th>Total</th><th>Pembayaran</th><th>Status</th></tr></thead><tbody>{ds.map(d=><tr key={d.id} className="border-b border-slate-100"><td className="py-2 text-xs">{waktu(d.timestamp)}</td><td>{d.driverName}</td><td>{d.customerName}</td><td>{d.qty}</td><td>{rupiah(d.total)}</td><td>{d.paymentMethod==='invoice'?'INVOICE':'CASH'}</td><td>{d.paymentMethod==='invoice'?(d.paymentStatus==='paid'?'LUNAS':'BELUM LUNAS'):'LUNAS'}</td></tr>)}</tbody></table></div></Card>}
+
+function ApproveRequests({me}){const rs=toList(useDbList('stockRequests')).sort((a,b)=>b.requestedAt-a.requestedAt),[toast,show]=useToast();const act=async(r,status)=>{await db.ref('stockRequests/'+r.id).update({status,approvedBy:me.id,approvedByName:me.name,approvedAt:Date.now()});await notify({title:status==='approved'?'Permintaan stok disetujui':'Permintaan stok ditolak',message:`Permintaan ${r.qtyRequested} kantong dari ${r.driverName} ${status==='approved'?'telah di-ACC.':'ditolak.'}`,type:status,toUser:r.driverId,fromUser:me.id,data:{requestId:r.id}});await createAudit('stock_request_'+status,`${r.driverName} ${r.qtyRequested} kantong`,me);show(status==='approved'?'Permintaan disetujui.':'Permintaan ditolak.',status==='approved'?'ok':'err')};return <div className="fade-in">{toast}<h2 className="font-display font-bold text-xl mb-5">Persetujuan Permintaan Stok</h2><Card><div className="font-semibold mb-4">Menunggu Persetujuan</div><div className="space-y-2">{rs.filter(r=>r.status==='pending').map(r=><div key={r.id} className="flex justify-between items-center p-4 rounded-xl border bg-amber-50"><div><b>{r.driverName}</b><div className="text-xs text-slate-500">{r.qtyRequested} kantong · {waktu(r.requestedAt)}</div></div><div className="flex gap-2"><Btn tone="accent" onClick={()=>act(r,'approved')}>✓ ACC</Btn><Btn tone="danger" onClick={()=>act(r,'rejected')}>Tolak</Btn></div></div>)}{!rs.some(r=>r.status==='pending')&&<div className="text-center text-slate-400 py-6">Tidak ada permintaan.</div>}</div></Card></div>}
+
+function ManageUsers({me,roles,title}){const users=toList(useDbList('users')),[name,setN]=useState(''),[un,setU]=useState(''),[pw,setP]=useState(''),[role,setR]=useState(roles[0]),[toast,show]=useToast();const list=users.filter(u=>roles.includes(u.role));const add=async()=>{if(!name||!un||!pw)return show('Lengkapi data.','err');if(users.some(u=>u.username===un.trim()))return show('Username sudah dipakai.','err');const r=await db.ref('users').push({name,username:un.trim(),passwordHash:await sha256(pw),role,active:true,createdAt:Date.now()});if(role==='driver')await db.ref('driverStock/'+un.trim()).set(0);await notify({title:'User baru ditambahkan',message:`${name} (${ROLES[role]}) telah dibuat oleh ${me.name}`,toRole:'superadmin',fromUser:me.id});show('User berhasil ditambahkan.');setN('');setU('');setP('')};const del=async u=>{if(u.id===me.id)return show('Akun sendiri tidak dapat dihapus.','err');if(!confirm(`Hapus ${u.name}?`))return;await db.ref('users/'+u.id).remove();if(u.role==='driver')await db.ref('driverStock/'+u.username).remove();await createAudit('user_deleted',`Menghapus ${u.name} (${ROLES[u.role]})`,me);show('User dihapus.')};return <div className="fade-in">{toast}<h2 className="font-display font-bold text-xl mb-5">{title}</h2><div className="grid lg:grid-cols-5 gap-5"><Card className="lg:col-span-2"><b className="block mb-4">Tambah Pengguna</b><Field label="Nama"><input className={inputCls} value={name} onChange={e=>setN(e.target.value)}/></Field><Field label="Username"><input className={inputCls} value={un} onChange={e=>setU(e.target.value)}/></Field><Field label="Password"><input type="password" className={inputCls} value={pw} onChange={e=>setP(e.target.value)}/></Field>{roles.length>1&&<Field label="Peran"><select className={inputCls} value={role} onChange={e=>setR(e.target.value)}>{roles.map(r=><option key={r}>{r}</option>)}</select></Field>}<Btn tone="accent" className="w-full" onClick={add}>Tambah Pengguna</Btn></Card><Card className="lg:col-span-3"><b>Daftar Pengguna ({list.length})</b><div className="space-y-2 mt-4">{list.map(u=><div key={u.id} className="flex justify-between items-center p-3 border rounded-xl"><div><b>{u.name}</b><div className="text-xs text-slate-500">@{u.username}</div></div><div className="flex gap-2 items-center"><Pill>{ROLES[u.role]}</Pill><Btn tone="danger" className="!px-3 !py-1 text-xs" onClick={()=>del(u)}>Hapus</Btn></div></div>)}</div></Card></div></div>}
+
+function GudangHome({me}){const stock=useDbValue('warehouse/stock',0),[q,setQ]=useState(''),[note,setNote]=useState(''),[toast,show]=useToast();const add=async()=>{const n=+q;if(!n||n<1)return show('Jumlah tidak valid.','err');await db.ref('warehouse/stock').transaction(v=>(v||0)+n);await db.ref('warehouse/history').push({type:'masuk',qty:n,by:me.id,byName:me.name,note,timestamp:Date.now()});await notify({title:'Stok gudang bertambah',message:`${me.name} menambahkan ${n} kantong ke gudang.`,toRole:'admin',fromUser:me.id});await notify({title:'Stok gudang bertambah',message:`${me.name} menambahkan ${n} kantong ke gudang.`,toRole:'superadmin',fromUser:me.id});await createAudit('stock_in',`${n} kantong`,me);setQ('');setNote('');show('Stok masuk dicatat.')};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">Stok Gudang</h2><Card className="mb-5"><IceGauge label="Total sisa di gudang" value={stock} max={Math.max(stock,100)} big/></Card><Card><b>Catat Stok Masuk</b><div className="grid sm:grid-cols-2 gap-3 mt-4"><Field label="Jumlah"><input type="number" className={inputCls} value={q} onChange={e=>setQ(e.target.value)}/></Field><Field label="Catatan"><input className={inputCls} value={note} onChange={e=>setNote(e.target.value)}/></Field></div><Btn tone="accent" onClick={add}>Tambah Stok</Btn></Card></div>}
+
+function GudangRelease({me}){const rs=toList(useDbList('stockRequests')).filter(r=>r.status==='approved'),stock=useDbValue('warehouse/stock',0),[toast,show]=useToast();const release=async r=>{if(r.qtyRequested>stock)return show('Stok gudang tidak cukup.','err');const s=await db.ref('users/'+r.driverId).once('value'),u=s.val();if(!u?.username)return show('Driver tidak ditemukan.','err');await db.ref('warehouse/stock').transaction(v=>(v||0)-r.qtyRequested);await db.ref('driverStock/'+u.username).transaction(v=>(v||0)+r.qtyRequested);await db.ref('stockRequests/'+r.id).update({status:'fulfilled',fulfilledBy:me.id,fulfilledByName:me.name,fulfilledAt:Date.now()});await db.ref('warehouse/history').push({type:'keluar',qty:r.qtyRequested,driverId:r.driverId,driverName:r.driverName,by:me.id,byName:me.name,timestamp:Date.now()});await notify({title:'Stok telah dikeluarkan',message:`${r.qtyRequested} kantong telah diberikan kepada ${r.driverName}.`,toUser:r.driverId,fromUser:me.id});await createAudit('stock_release',`${r.qtyRequested} kantong untuk ${r.driverName}`,me);show('Stok dikeluarkan.')};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">Keluarkan Stok ke Driver</h2><Card><div className="space-y-2">{rs.map(r=><div key={r.id} className="flex justify-between items-center p-4 border rounded-xl bg-sky-50"><div><b>{r.driverName}</b><div className="text-xs">{r.qtyRequested} kantong · ACC {r.approvedByName}</div></div><Btn tone="accent" onClick={()=>release(r)}>Keluarkan Stok</Btn></div>)}{!rs.length&&<div className="text-center text-slate-400 py-6">Tidak ada stok yang menunggu.</div>}</div></Card></div>}
+
+function GudangReceive({me}){const rs=toList(useDbList('returnRequests')).filter(r=>r.status==='pending'),[toast,show]=useToast();const receive=async r=>{const s=await db.ref('users/'+r.driverId).once('value'),u=s.val();await db.ref('warehouse/stock').transaction(v=>(v||0)+r.qty);if(u?.username)await db.ref('driverStock/'+u.username).transaction(v=>Math.max(0,(v||0)-r.qty));await db.ref('returnRequests/'+r.id).update({status:'received',receivedBy:me.id,receivedByName:me.name,receivedAt:Date.now()});await notify({title:'Pengembalian diterima gudang',message:`${r.qty} kantong dari ${r.driverName} telah diterima.`,toUser:r.driverId,fromUser:me.id});await createAudit('stock_return_received',`${r.qty} kantong dari ${r.driverName}`,me);show('Pengembalian diterima.')};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">Terima Sisa Es</h2><Card><div className="space-y-2">{rs.map(r=><div key={r.id} className="flex justify-between items-center p-4 border rounded-xl bg-amber-50"><div><b>{r.driverName}</b><div className="text-xs">{r.qty} kantong · {waktu(r.requestedAt)}</div></div><Btn tone="accent" onClick={()=>receive(r)}>Terima</Btn></div>)}{!rs.length&&<div className="text-center text-slate-400 py-6">Tidak ada pengembalian.</div>}</div></Card></div>}
+
+function DriverHome({me}){const stock=useDbValue('driverStock/'+me.username,0),price=useDbValue('config/pricePerBag',15000),ds=toList(useDbList('deliveries')).filter(d=>d.driverId===me.id).sort((a,b)=>b.timestamp-a.timestamp),[customer,setCustomer]=useState(''),[qty,setQty]=useState(''),[pay,setPay]=useState('cash'),[toast,show]=useToast();const save=async()=>{const q=+qty;if(!customer.trim()||q<1)return show('Lengkapi pelanggan dan jumlah.','err');if(q>stock)return show('Stok tidak cukup.','err');let paymentStatus=pay==='cash'?'paid':'unpaid';const r=await db.ref('deliveries').push({driverId:me.id,driverName:me.name,customerName:customer.trim(),qty:q,pricePerUnit:price,total:q*price,paymentMethod:pay,paymentStatus,timestamp:Date.now()});await db.ref('driverStock/'+me.username).transaction(v=>(v||0)-q);await notify({title:'Pengantaran baru',message:`${me.name} mengantar ${q} kantong ke ${customer.trim()} (${pay.toUpperCase()}).`,toRole:'admin',fromUser:me.id,data:{deliveryId:r.key}});await notify({title:'Pengantaran baru',message:`${me.name} mengantar ${q} kantong ke ${customer.trim()}.`,toRole:'superadmin',fromUser:me.id});await createAudit('delivery',`${customer.trim()} ${q} kantong ${pay}`,me);setCustomer('');setQty('');show('Pengantaran tersimpan.')};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">Halo, {me.name.split(' ')[0]} 👋</h2><div className="grid md:grid-cols-2 gap-5 mb-5"><Card><IceGauge label="Es yang kamu bawa" value={stock} max={Math.max(stock,50)} big/></Card><Card><div className="text-xs text-slate-400">HARGA SAAT INI</div><div className="text-3xl font-display font-bold">{rupiah(price)}</div><div className="text-sm text-slate-500">per kantong</div></Card></div><Card className="mb-5"><b>Input Pengantaran</b><div className="grid sm:grid-cols-4 gap-3 mt-4"><Field label="Pelanggan / Toko"><input className={inputCls} value={customer} onChange={e=>setCustomer(e.target.value)}/></Field><Field label="Jumlah"><input type="number" className={inputCls} value={qty} onChange={e=>setQty(e.target.value)}/></Field><Field label="Pembayaran"><select className={inputCls} value={pay} onChange={e=>setPay(e.target.value)}><option value="cash">CASH</option><option value="invoice">INVOICE</option></select></Field><div className="mb-3"><span className="text-xs text-slate-500">Total</span><div className="font-mono font-bold">{rupiah((+qty||0)*price)}</div></div></div><Btn tone="accent" onClick={save}>Catat Pengantaran</Btn></Card><Card><b>Riwayat Pengantaran</b><div className="mt-4 space-y-2">{ds.slice(0,30).map(d=><div key={d.id} className="flex justify-between p-3 border rounded-xl text-sm"><span><b>{d.customerName}</b><br/><small>{waktu(d.timestamp)}</small></span><span className="text-right">{d.qty} kantong<br/>{rupiah(d.total)} · {d.paymentMethod==='invoice'?'INVOICE':'CASH'}</span></div>)}</div></Card></div>}
+
+function DriverRequest({me}){const rs=toList(useDbList('stockRequests')).filter(r=>r.driverId===me.id).sort((a,b)=>b.requestedAt-a.requestedAt),[q,setQ]=useState(''),[toast,show]=useToast();const send=async()=>{const n=+q;if(n<1)return show('Jumlah tidak valid.','err');const r=await db.ref('stockRequests').push({driverId:me.id,driverName:me.name,qtyRequested:n,status:'pending',requestedAt:Date.now()});await notify({title:'Permintaan stok baru',message:`${me.name} meminta ${n} kantong stok.`,toRole:'admin',fromUser:me.id,data:{requestId:r.key}});await notify({title:'Permintaan stok baru',message:`${me.name} meminta ${n} kantong stok.`,toRole:'superadmin',fromUser:me.id});setQ('');show('Permintaan dikirim.')};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">Minta Stok Es</h2><Card className="mb-5"><Field label="Jumlah Kantong"><input type="number" className={inputCls} value={q} onChange={e=>setQ(e.target.value)}/></Field><Btn tone="accent" onClick={send}>Kirim Permintaan</Btn></Card><Card><b>Riwayat</b><div className="mt-4 space-y-2">{rs.map(r=><div key={r.id} className="flex justify-between p-3 border rounded-xl"><span>{r.qtyRequested} kantong<br/><small>{waktu(r.requestedAt)}</small></span><Pill tone={r.status==='pending'?'pending':r.status==='approved'||r.status==='fulfilled'?'approved':'rejected'}>{r.status}</Pill></div>)}</div></Card></div>}
+function DriverReturn({me}){const stock=useDbValue('driverStock/'+me.username,0),[q,setQ]=useState(''),[toast,show]=useToast();const send=async()=>{const n=+q;if(n<1||n>stock)return show('Jumlah tidak valid.','err');const r=await db.ref('returnRequests').push({driverId:me.id,driverName:me.name,qty:n,status:'pending',requestedAt:Date.now()});await notify({title:'Pengembalian stok',message:`${me.name} mengirim permintaan pengembalian ${n} kantong.`,toRole:'gudang',fromUser:me.id,data:{returnId:r.key}});setQ('');show('Permintaan pengembalian dikirim.')};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">Kembalikan Sisa Es</h2><Card className="mb-5"><IceGauge label="Sisa yang dibawa" value={stock} max={Math.max(stock,50)}/></Card><Card><Field label="Jumlah yang dikembalikan"><input type="number" className={inputCls} value={q} onChange={e=>setQ(e.target.value)}/></Field><Btn tone="accent" onClick={send}>Kirim ke Gudang</Btn></Card></div>}
+
+function InvoicePrint({bill,cfg}){const print=()=>{const w=window.open('','_blank','width=900,height=1000');if(!w)return;const logo=cfg.logo?`<img src="${cfg.logo}" style="width:76px;height:76px;object-fit:contain;border-radius:14px">`:'';w.document.write(`<!doctype html><html><head><title>${bill.invoiceNo||'Invoice'}</title><meta charset="utf-8"><style>*{box-sizing:border-box}body{font-family:Arial,sans-serif;background:#eef9fc;margin:0;padding:30px;color:#102a43}.sheet{max-width:820px;margin:auto;background:#fff;padding:42px;border-radius:22px;box-shadow:0 15px 50px rgba(0,100,140,.16)}.top{display:flex;justify-content:space-between;gap:25px;border-bottom:4px solid #1c4a73;padding-bottom:22px}.brand{display:flex;gap:18px;align-items:center}.brand h1{margin:0;font-size:26px}.muted{color:#64748b;font-size:13px;line-height:1.6}.inv{text-align:right}.inv h2{margin:0 0 8px;font-size:25px;color:#075572}.box{background:#f4fbfd;border:1px solid #d8edf3;border-radius:14px;padding:16px;margin-top:22px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.08em}.value{font-weight:700;margin-top:4px}.items{width:100%;border-collapse:collapse;margin-top:25px}.items th{background:#07334b;color:#fff;text-align:left;padding:12px}.items td{padding:13px;border-bottom:1px solid #e2e8f0}.right{text-align:right}.total{margin-left:auto;width:330px;margin-top:18px}.total div{display:flex;justify-content:space-between;padding:8px 0}.grand{font-size:20px;font-weight:800;border-top:2px solid #1c4a73;margin-top:5px;padding-top:12px}.status{display:inline-block;padding:7px 12px;border-radius:999px;background:#fff4d6;color:#9a6700;font-weight:700;font-size:12px}.foot{margin-top:45px;display:grid;grid-template-columns:1fr 1fr;gap:80px;text-align:center}.line{border-bottom:1px solid #334155;margin:55px 20px 8px}.small{font-size:11px;color:#94a3b8;text-align:center;margin-top:35px}@media print{body{background:#fff;padding:0}.sheet{box-shadow:none;border-radius:0;max-width:none;padding:25px}.no-print{display:none}}@media(max-width:650px){.top,.grid{display:block}.inv{text-align:left;margin-top:20px}.total{width:100%}.foot{gap:25px}}</style></head><body><div class="sheet"><div class="top"><div class="brand">${logo}<div><h1>${cfg.name||'GlasirEs'}</h1><div class="muted">${cfg.address||''}<br>${cfg.phone||''}</div></div></div><div class="inv"><h2>INVOICE</h2><b>${bill.invoiceNo||'-'}</b><div class="muted">Tanggal: ${new Date(bill.createdAt||Date.now()).toLocaleDateString('id-ID')}<br>Jatuh Tempo: ${bill.dueDate?new Date(bill.dueDate+'T00:00:00').toLocaleDateString('id-ID'):'-'}</div></div></div><div class="box grid"><div><div class="label">Ditagihkan kepada</div><div class="value">${bill.customerName||'-'}</div><div class="muted">${bill.customerPhone||''}<br>${bill.customerAddress||''}</div></div><div><div class="label">Penagih</div><div class="value">${bill.collectorName||'Belum ditugaskan'}</div><div class="muted">Metode: INVOICE<br>Status: <span class="status">${bill.status==='paid'?'LUNAS':'BELUM LUNAS'}</span></div></div></div><table class="items"><thead><tr><th>Deskripsi</th><th>Qty</th><th>Harga</th><th class="right">Jumlah</th></tr></thead><tbody><tr><td>Es Kristal</td><td>${bill.qty||0} kantong</td><td>${rupiah(bill.pricePerUnit||0)}</td><td class="right">${rupiah(bill.total||0)}</td></tr></tbody></table><div class="total"><div><span>Subtotal</span><b>${rupiah(bill.total||0)}</b></div><div class="grand"><span>TOTAL TAGIHAN</span><span>${rupiah(bill.total||0)}</span></div></div><div class="box"><b>Catatan Penagihan</b><div class="muted" style="margin-top:6px">${bill.note||'Mohon melakukan pembayaran sesuai jumlah dan tanggal jatuh tempo.'}</div></div><div class="foot"><div>Hormat kami,<div class="line"></div><b>${cfg.name||'GlasirEs'}</b></div><div>Dibuat oleh,<div class="line"></div><b>${bill.createdByName||'Admin'}</b></div></div><div class="small">Invoice resmi ${cfg.name||'GlasirEs'} · Power by Syech B@-it · Copyright © 2026</div></div><div class="no-print" style="text-align:center;margin:18px"><button onclick="window.print()" style="padding:12px 20px;border:0;border-radius:12px;background:#07334b;color:#fff;font-weight:700">🖨 Cetak Invoice</button></div></body></html>`);w.document.close();w.focus()};return <Btn tone="accent" onClick={print}>🖨 Cetak Invoice</Btn>}
+
+function InvoiceDriver({me}){const price=useDbValue('config/pricePerBag',15000), bills=toList(useDbList('invoiceCustomers')).filter(x=>x.createdBy===me.id||x.collectorId===me.id).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)),[name,setName]=useState(''),[phone,setPhone]=useState(''),[address,setAddress]=useState(''),[qty,setQty]=useState(''),[due,setDue]=useState(''),[note,setNote]=useState(''),[toast,show]=useToast();const submit=async()=>{const q=+qty;if(!name.trim()||q<1)return show('Nama pelanggan dan jumlah wajib diisi.','err');const r=db.ref('invoiceCustomers').push();const no='INV-'+new Date().getFullYear()+'-'+String(Date.now()).slice(-7);await r.set({invoiceNo:no,customerName:name.trim(),customerPhone:phone.trim(),customerAddress:address.trim(),qty:q,pricePerUnit:+price||0,total:q*(+price||0),dueDate:due,note:note.trim(),status:'pending',createdBy:me.id,createdByName:me.name,createdAt:Date.now()});await notify({title:'Pelanggan Invoice baru',message:`${me.name} mengajukan pelanggan invoice ${name.trim()} sebesar ${rupiah(q*(+price||0))}.`,toRole:'admin',fromUser:me.id,data:{invoiceId:r.key}});await notify({title:'Pelanggan Invoice baru',message:`${me.name} mengajukan pelanggan invoice ${name.trim()}.`,toRole:'superadmin',fromUser:me.id,data:{invoiceId:r.key}});await createAudit('invoice_customer_submit',`${name.trim()} ${q} kantong`,me);setName('');setPhone('');setAddress('');setQty('');setDue('');setNote('');show('Data pelanggan invoice berhasil dikirim ke admin.')};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">Pelanggan & Penagihan Invoice</h2><Card className="mb-5"><b className="block mb-4">Ajukan Pelanggan Pembayaran Invoice</b><div className="grid md:grid-cols-2 gap-3"><Field label="Nama Pelanggan / Toko"><input className={inputCls} value={name} onChange={e=>setName(e.target.value)} placeholder="Contoh: Toko Makmur"/></Field><Field label="No. HP"><input className={inputCls} value={phone} onChange={e=>setPhone(e.target.value)}/></Field><Field label="Alamat"><input className={inputCls} value={address} onChange={e=>setAddress(e.target.value)}/></Field><Field label="Jumlah Es (Kantong)"><input type="number" className={inputCls} value={qty} onChange={e=>setQty(e.target.value)}/></Field><Field label="Jatuh Tempo"><input type="date" className={inputCls} value={due} onChange={e=>setDue(e.target.value)}/></Field><Field label="Catatan"><input className={inputCls} value={note} onChange={e=>setNote(e.target.value)} placeholder="Contoh: tagih setiap tanggal 30"/></Field></div><div className="flex justify-between items-center mt-2"><div className="text-sm text-slate-500">Total perkiraan: <b className="text-glacier-900">{rupiah((+qty||0)*(+price||0))}</b></div><Btn tone="accent" onClick={submit}>📨 Kirim ke Admin</Btn></div></Card><Card><div className="flex justify-between items-center mb-4"><b>Data Invoice Saya</b><Pill>{bills.length} data</Pill></div><div className="space-y-3">{bills.map(b=><div key={b.id} className="p-4 border rounded-2xl bg-white/70"><div className="flex flex-wrap justify-between gap-3"><div><b>{b.customerName}</b><div className="text-xs text-slate-500">{b.invoiceNo} · {b.qty} kantong · {rupiah(b.total)}</div><div className="text-xs mt-1">Jatuh tempo: {b.dueDate||'-'} · Penagih: {b.collectorName||'Menunggu admin'}</div></div><div className="flex items-center gap-2"><Pill tone={b.status==='paid'?'done':b.status==='assigned'?'approved':'pending'}>{b.status==='paid'?'LUNAS':b.status==='assigned'?'DITUGASKAN':'MENUNGGU ADMIN'}</Pill></div></div></div>)}{!bills.length&&<div className="text-center text-slate-400 py-6">Belum ada data pelanggan invoice.</div>}</div></Card></div>}
+
+function InvoiceAdmin({me}){const bills=toList(useDbList('invoiceCustomers')).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)),users=toList(useDbList('users')),drivers=users.filter(u=>u.role==='driver'&&u.active!==false),cfg=useDbValue('config/company',{}),price=useDbValue('config/pricePerBag',15000),[name,setName]=useState(''),[phone,setPhone]=useState(''),[address,setAddress]=useState(''),[qty,setQty]=useState(''),[due,setDue]=useState(''),[note,setNote]=useState(''),[toast,show]=useToast();const create=async()=>{const q=+qty;if(!name.trim()||q<1)return show('Nama pelanggan dan jumlah wajib diisi.','err');const r=db.ref('invoiceCustomers').push(),no='INV-'+new Date().getFullYear()+'-'+String(Date.now()).slice(-7);await r.set({invoiceNo:no,customerName:name.trim(),customerPhone:phone.trim(),customerAddress:address.trim(),qty:q,pricePerUnit:+price||0,total:q*(+price||0),dueDate:due,note:note.trim(),status:'pending',createdBy:me.id,createdByName:me.name,createdAt:Date.now()});setName('');setPhone('');setAddress('');setQty('');setDue('');setNote('');show('Pelanggan invoice ditambahkan.')};const assign=async(b,driverId)=>{if(!driverId)return;const d=drivers.find(x=>x.id===driverId);if(!d)return;await db.ref('invoiceCustomers/'+b.id).update({collectorId:d.id,collectorName:d.name,status:b.status==='paid'?'paid':'assigned',assignedAt:Date.now(),assignedBy:me.id,assignedByName:me.name});await notify({title:'Tugas penagihan invoice',message:`Anda ditugaskan menagih ${b.customerName} (${b.invoiceNo}) sebesar ${rupiah(b.total)}.`,toUser:d.id,fromUser:me.id,data:{invoiceId:b.id}});await notify({title:'Invoice ditugaskan ke driver',message:`${b.customerName} ditugaskan kepada ${d.name}.`,toRole:'superadmin',fromUser:me.id,data:{invoiceId:b.id}});await createAudit('invoice_assign',`${b.invoiceNo} -> ${d.name}`,me);show(`Penagihan ditugaskan ke ${d.name}.`)};const remove=async b=>{if(!confirm('Hapus data invoice ini?'))return;await db.ref('invoiceCustomers/'+b.id).remove();show('Data invoice dihapus.')};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">Pelanggan & Penagihan Invoice</h2><Card className="mb-5"><div className="flex flex-wrap justify-between gap-3 mb-4"><div><b>Tambah Pelanggan Invoice</b><div className="text-xs text-slate-500 mt-1">Admin dapat memasukkan pelanggan langsung tanpa menunggu driver.</div></div><Pill tone="approved">Harga {rupiah(price)}/kantong</Pill></div><div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3"><Field label="Nama Pelanggan / Toko"><input className={inputCls} value={name} onChange={e=>setName(e.target.value)}/></Field><Field label="No. HP"><input className={inputCls} value={phone} onChange={e=>setPhone(e.target.value)}/></Field><Field label="Alamat"><input className={inputCls} value={address} onChange={e=>setAddress(e.target.value)}/></Field><Field label="Jumlah Kantong"><input type="number" className={inputCls} value={qty} onChange={e=>setQty(e.target.value)}/></Field><Field label="Jatuh Tempo"><input type="date" className={inputCls} value={due} onChange={e=>setDue(e.target.value)}/></Field><Field label="Catatan"><input className={inputCls} value={note} onChange={e=>setNote(e.target.value)}/></Field></div><Btn tone="accent" onClick={create}>➕ Simpan Pelanggan & Buat Invoice</Btn></Card><Card><div className="flex justify-between items-center mb-4"><div><b>Daftar Pelanggan Invoice</b><div className="text-xs text-slate-500">Driver mengajukan data dari menu mereka; admin mengatur penagih di sini.</div></div><Pill>{bills.length} invoice</Pill></div><div className="space-y-4">{bills.map(b=><div key={b.id} className="border rounded-2xl p-4 bg-white/70"><div className="flex flex-wrap justify-between gap-4"><div><div className="flex items-center gap-2 flex-wrap"><b className="text-lg">{b.customerName}</b><Pill tone={b.status==='paid'?'done':b.status==='assigned'?'approved':'pending'}>{b.status==='paid'?'LUNAS':b.status==='assigned'?'DITUGASKAN':'MENUNGGU'}</Pill></div><div className="text-xs text-slate-500 mt-1">{b.invoiceNo} · {b.qty} kantong · {rupiah(b.total)}</div><div className="text-xs text-slate-500">Jatuh tempo: {b.dueDate||'-'} · Dibuat: {waktu(b.createdAt)}</div><div className="text-xs mt-1">Pengusul: {b.createdByName||'-'} · Penagih: <b>{b.collectorName||'Belum ditugaskan'}</b></div></div><div className="flex flex-wrap gap-2 items-center"><select className={inputCls+' !w-auto min-w-[190px]'} value={b.collectorId||''} onChange={e=>assign(b,e.target.value)} disabled={b.status==='paid'}><option value="">Pilih Driver Penagih</option>{drivers.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select><InvoicePrint bill={b} cfg={cfg}/>{b.status!=='paid'&&<Btn tone="danger" className="!py-2" onClick={()=>remove(b)}>Hapus</Btn>}</div></div>{b.note&&<div className="mt-3 p-3 rounded-xl bg-sky-50 text-sm">📝 {b.note}</div>}{b.status==='paid'&&<div className="mt-3 p-3 rounded-xl bg-emerald-50 text-sm text-emerald-800">✅ Sudah dibayar {b.paidAt?waktu(b.paidAt):''} oleh {b.paidByName||b.collectorName||'-'}{b.paymentNote?' · '+b.paymentNote:''}</div>}</div>)}{!bills.length&&<div className="text-center text-slate-400 py-8">Belum ada pelanggan invoice.</div>}</div></Card></div>}
+
+function InvoiceCollectionDriver({me}){const bills=toList(useDbList('invoiceCustomers')).filter(b=>b.collectorId===me.id&&b.status==='assigned').sort((a,b)=>(a.dueDate||'').localeCompare(b.dueDate||'')),[toast,show]=useToast(),[note,setNote]=useState('');const paid=async b=>{await db.ref('invoiceCustomers/'+b.id).update({status:'paid',paidAt:Date.now(),paidBy:me.id,paidByName:me.name,paymentNote:note.trim()});await notify({title:'Pembayaran invoice diterima',message:`${me.name} melaporkan ${b.customerName} (${b.invoiceNo}) sudah membayar ${rupiah(b.total)}.`,toRole:'admin',fromUser:me.id,data:{invoiceId:b.id}});await notify({title:'Pembayaran invoice diterima',message:`${b.customerName} (${b.invoiceNo}) sudah membayar ${rupiah(b.total)} melalui ${me.name}.`,toRole:'superadmin',fromUser:me.id,data:{invoiceId:b.id}});await createAudit('invoice_paid',`${b.invoiceNo} dibayar oleh ${me.name}`,me);setNote('');show('Pembayaran berhasil dilaporkan ke admin.')};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">Penagihan Invoice Saya</h2><Card className="mb-5"><div className="flex items-center gap-3"><div className="text-4xl">💰</div><div><b className="text-lg">Tugas Penagihan</b><div className="text-sm text-slate-500">Invoice yang ditugaskan admin akan muncul di sini.</div></div></div></Card><div className="space-y-4">{bills.map(b=><Card key={b.id} className="border-l-4 border-cyan-400"><div className="flex flex-wrap justify-between gap-4"><div><div className="text-xs text-slate-400">{b.invoiceNo}</div><b className="text-xl">{b.customerName}</b><div className="text-sm mt-1">{b.customerPhone||'-'} · {b.customerAddress||'Alamat belum diisi'}</div><div className="mt-2 text-sm">Tagihan: <b>{rupiah(b.total)}</b> · Jatuh tempo: <b>{b.dueDate||'-'}</b></div><div className="text-xs text-slate-500 mt-1">{b.qty} kantong × {rupiah(b.pricePerUnit)}</div></div><Pill tone="approved">DITUGASKAN</Pill></div><div className="mt-4 grid md:grid-cols-[1fr_auto] gap-3 items-end"><Field label="Catatan saat pembayaran"><input className={inputCls} value={note} onChange={e=>setNote(e.target.value)} placeholder="Contoh: dibayar tunai di toko"/></Field><Btn tone="accent" onClick={()=>paid(b)}>✓ Pelanggan Sudah Bayar</Btn></div></Card>)}{!bills.length&&<Card><div className="text-center text-slate-400 py-8">Tidak ada tagihan yang sedang ditugaskan kepada Anda.</div></Card>}</div></div>}
+
+function CompanySettings({me}){const cfg=useDbValue('config/company',{}),price=useDbValue('config/pricePerBag',15000),[form,setForm]=useState({name:'',address:'',phone:'',logo:'',reportColor:'#1c4a73'}),[p,setP]=useState(price),[toast,show]=useToast();useEffect(()=>setForm({...cfg}),[cfg]);useEffect(()=>setP(price),[price]);const save=async()=>{await db.ref('config/company').set(form);await db.ref('config/pricePerBag').set(+p||0);await createAudit('company_settings','Memperbarui identitas perusahaan dan harga',me);show('Pengaturan disimpan.')};const logo=e=>{const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>setForm(x=>({...x,logo:r.result}));r.readAsDataURL(f)};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">Pengaturan Perusahaan & Harga</h2><div className="grid lg:grid-cols-2 gap-5"><Card><b>Identitas Perusahaan</b><Field label="Nama Perusahaan"><input className={inputCls} value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/></Field><Field label="Alamat"><textarea className={inputCls} rows="3" value={form.address||''} onChange={e=>setForm({...form,address:e.target.value})}/></Field><Field label="Telepon / Kontak"><input className={inputCls} value={form.phone||''} onChange={e=>setForm({...form,phone:e.target.value})}/></Field><Field label="Logo"><input type="file" accept="image/*" onChange={logo}/></Field>{form.logo&&<img src={form.logo} className="w-20 h-20 object-contain border rounded-xl p-2"/>}<Field label="Warna Laporan"><input type="color" value={form.reportColor||'#1c4a73'} onChange={e=>setForm({...form,reportColor:e.target.value})}/></Field></Card><Card><b>Harga Jual</b><Field label="Harga per Kantong"><input type="number" className={inputCls} value={p} onChange={e=>setP(e.target.value)}/></Field><div className="text-3xl font-display font-bold mb-2">{rupiah(p)}</div><p className="text-sm text-slate-500 mb-5">Perubahan harga hanya berlaku untuk transaksi baru. Harga transaksi lama tetap tersimpan.</p><Btn tone="accent" onClick={save}>Simpan Pengaturan</Btn></Card></div></div>}
+
+function PaymentManager(){const ds=toList(useDbList('deliveries')).filter(d=>d.paymentMethod==='invoice'&&d.paymentStatus!=='paid'),[toast,show]=useToast();const pay=async d=>{await db.ref('deliveries/'+d.id).update({paymentStatus:'paid',paidAt:Date.now()});await notify({title:'Invoice lunas',message:`Invoice ${d.customerName} sebesar ${rupiah(d.total)} sudah lunas.`,toRole:'admin'});show('Invoice ditandai lunas.')};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">Pembayaran Invoice</h2><Card><div className="space-y-2">{ds.map(d=><div key={d.id} className="flex justify-between items-center p-4 border rounded-xl"><div><b>{d.customerName}</b><div className="text-xs">{d.driverName} · {waktu(d.timestamp)}</div></div><div className="text-right"><b>{rupiah(d.total)}</b><br/><Btn tone="accent" className="!py-1 !px-3 text-xs mt-1" onClick={()=>pay(d)}>Tandai Lunas</Btn></div></div>)}{!ds.length&&<div className="text-center text-slate-400 py-6">Tidak ada invoice belum lunas.</div>}</div></Card></div>}
+
+function Reports({me}){const ds=toList(useDbList('deliveries')),us=toList(useDbList('users')),cfg=useDbValue('config/company',{}),[period,setPeriod]=useState('month'),[date,setDate]=useState(new Date().toISOString().slice(0,10)),[userId,setUserId]=useState(''),[pay,setPay]=useState(''),[toast,show]=useToast();const start=new Date(date);let end=new Date(date);if(period==='day'){start.setHours(0,0,0,0);end.setHours(23,59,59,999)}else if(period==='month'){start.setDate(1);end=new Date(start.getFullYear(),start.getMonth()+1,0,23,59,59,999)}else{start.setMonth(0,1);start.setHours(0,0,0,0);end=new Date(start.getFullYear(),11,31,23,59,59,999)}const rows=ds.filter(d=>d.timestamp>=start.getTime()&&d.timestamp<=end.getTime()&&(!userId||d.driverId===userId)&&(!pay||d.paymentMethod===pay));const cash=rows.filter(d=>d.paymentMethod==='cash').reduce((a,d)=>a+d.total,0),inv=rows.filter(d=>d.paymentMethod==='invoice').reduce((a,d)=>a+d.total,0),paid=rows.filter(d=>d.paymentMethod==='invoice'&&d.paymentStatus==='paid').reduce((a,d)=>a+d.total,0),unpaid=inv-paid;const print=()=>window.print();const exportPdf=()=>{try{const {jsPDF}=window.jspdf;const pdf=new jsPDF();pdf.setFont('helvetica','bold');pdf.setFontSize(18);pdf.text(cfg.name||'GlasirEs',15,18);pdf.setFontSize(10);pdf.setFont('helvetica','normal');pdf.text(cfg.address||'',15,25);pdf.text(cfg.phone||'',15,31);pdf.text('LAPORAN '+period.toUpperCase(),15,42);pdf.text(`Periode: ${start.toLocaleDateString('id-ID')} - ${end.toLocaleDateString('id-ID')}`,15,48);pdf.text(`Total transaksi: ${rows.length}`,15,58);pdf.text(`Total kantong: ${rows.reduce((a,d)=>a+d.qty,0)}`,15,65);pdf.text(`CASH: ${rupiah(cash)}`,15,72);pdf.text(`INVOICE: ${rupiah(inv)}`,15,79);pdf.text(`LUNAS: ${rupiah(paid)}`,15,86);pdf.text(`BELUM LUNAS: ${rupiah(unpaid)}`,15,93);let y=104;pdf.setFontSize(8);rows.slice(0,35).forEach((d,i)=>{pdf.text(`${i+1}. ${new Date(d.timestamp).toLocaleDateString('id-ID')} | ${d.driverName} | ${d.customerName} | ${d.qty} | ${rupiah(d.total)} | ${d.paymentMethod}`,15,y);y+=6});if(rows.length>35)pdf.text(`... dan ${rows.length-35} transaksi lainnya.`,15,y);pdf.save('laporan-glasires.pdf')}catch(e){show('PDF gagal: '+e.message,'err')}};return <div className="fade-in"><div className="no-print"><h2 className="font-display font-bold text-xl mb-5">Laporan</h2><Card className="mb-5"><div className="grid md:grid-cols-5 gap-3"><Field label="Periode"><select className={inputCls} value={period} onChange={e=>setPeriod(e.target.value)}><option value="day">Harian</option><option value="month">Bulanan</option><option value="year">Tahunan</option></select></Field><Field label="Tanggal acuan"><input type="date" className={inputCls} value={date} onChange={e=>setDate(e.target.value)}/></Field><Field label="User / Driver"><select className={inputCls} value={userId} onChange={e=>setUserId(e.target.value)}><option value="">Semua</option>{us.filter(u=>u.role==='driver'||u.role==='gudang').map(u=><option value={u.id} key={u.id}>{u.name} — {ROLES[u.role]}</option>)}</select></Field><Field label="Pembayaran"><select className={inputCls} value={pay} onChange={e=>setPay(e.target.value)}><option value="">Semua</option><option value="cash">CASH</option><option value="invoice">INVOICE</option></select></Field><div className="flex items-end gap-2 mb-3"><Btn tone="accent" onClick={print}>🖨 Print / PDF</Btn><Btn tone="ghost" onClick={exportPdf}>PDF</Btn></div></div></Card></div><div className="report-page report-print-area" style={{'--report-color':cfg.reportColor||'#1c4a73'}}><div className="report-head">{cfg.logo&&<img className="report-logo" src={cfg.logo}/>}<div><div className="report-title text-2xl font-bold">{cfg.name||'GlasirEs'}</div><div className="text-sm">{cfg.address||'Alamat perusahaan belum diatur'}</div><div className="text-sm">{cfg.phone||''}</div></div></div><h1 className="text-xl font-bold mt-6">LAPORAN TRANSAKSI</h1><p className="text-sm">Periode: {start.toLocaleDateString('id-ID')} s/d {end.toLocaleDateString('id-ID')}</p><div className="grid grid-cols-2 md:grid-cols-4 gap-3 my-5"><div className="p-3 border rounded-xl"><small>Transaksi</small><b className="block text-xl">{rows.length}</b></div><div className="p-3 border rounded-xl"><small>Kantong</small><b className="block text-xl">{rows.reduce((a,d)=>a+d.qty,0)}</b></div><div className="p-3 border rounded-xl"><small>CASH</small><b className="block">{rupiah(cash)}</b></div><div className="p-3 border rounded-xl"><small>INVOICE</small><b className="block">{rupiah(inv)}</b></div></div><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b text-left"><th>No</th><th>Tanggal</th><th>Driver</th><th>Pelanggan</th><th>Qty</th><th>Total</th><th>Bayar</th></tr></thead><tbody>{rows.map((d,i)=><tr key={d.id} className="border-b"><td className="py-2">{i+1}</td><td>{new Date(d.timestamp).toLocaleDateString('id-ID')}</td><td>{d.driverName}</td><td>{d.customerName}</td><td>{d.qty}</td><td>{rupiah(d.total)}</td><td>{d.paymentMethod==='invoice'?`INVOICE (${d.paymentStatus==='paid'?'LUNAS':'BELUM'})`:'CASH'}</td></tr>)}</tbody></table></div><div className="mt-5 text-right"><b>Total CASH: {rupiah(cash)}</b><br/><b>Total INVOICE: {rupiah(inv)}</b><br/><b>Invoice Lunas: {rupiah(paid)}</b><br/><b>Invoice Belum Lunas: {rupiah(unpaid)}</b></div><div className="sig"><div>Mengetahui,<div className="sigline"></div><b>{cfg.name||'Perusahaan'}</b></div><div>Dibuat oleh,<div className="sigline"></div><b>{me.name}</b><div className="text-xs">{ROLES[me.role]}</div></div></div><div className="text-center text-[10px] text-slate-400 mt-8">Power by Syech B@-it · Copyright © 2026</div></div></div>}
+
+function IncomeReport({me}){const ds=toList(useDbList('deliveries')),us=toList(useDbList('users')),cfg=useDbValue('config/company',{}),[period,setPeriod]=useState('month'),[date,setDate]=useState(new Date().toISOString().slice(0,10)),[driverId,setDriverId]=useState(''),[payment,setPayment]=useState(''),[toast,show]=useToast();const start=new Date(date);let end=new Date(date);if(period==='day'){start.setHours(0,0,0,0);end.setHours(23,59,59,999)}else if(period==='month'){start.setDate(1);start.setHours(0,0,0,0);end=new Date(start.getFullYear(),start.getMonth()+1,0,23,59,59,999)}else{start.setMonth(0,1);start.setHours(0,0,0,0);end=new Date(start.getFullYear(),11,31,23,59,59,999)}const own=me.role==='driver'?me.id:driverId;const rows=ds.filter(d=>d.timestamp>=start.getTime()&&d.timestamp<=end.getTime()&&(!own||d.driverId===own)&&(!payment||d.paymentMethod===payment));const total=rows.reduce((a,d)=>a+(+d.total||0),0),cash=rows.filter(d=>d.paymentMethod==='cash').reduce((a,d)=>a+(+d.total||0),0),inv=rows.filter(d=>d.paymentMethod==='invoice').reduce((a,d)=>a+(+d.total||0),0),paid=rows.filter(d=>d.paymentMethod==='invoice'&&d.paymentStatus==='paid').reduce((a,d)=>a+(+d.total||0),0),unpaid=inv-paid,qty=rows.reduce((a,d)=>a+(+d.qty||0),0),cashPct=total?cash/total*100:0,invPct=total?inv/total*100:0;const print=()=>window.print();const exportPdf=()=>{try{const {jsPDF}=window.jspdf;const pdf=new jsPDF();pdf.setFont('helvetica','bold');pdf.setFontSize(18);pdf.text(cfg.name||'GlasirEs',15,18);pdf.setFontSize(10);pdf.setFont('helvetica','normal');pdf.text(cfg.address||'',15,25);pdf.text(cfg.phone||'',15,31);pdf.text('LAPORAN PENDAPATAN',15,42);pdf.text(`Periode: ${start.toLocaleDateString('id-ID')} - ${end.toLocaleDateString('id-ID')}`,15,48);pdf.text(`Transaksi: ${rows.length}`,15,58);pdf.text(`Kantong: ${qty}`,15,65);pdf.text(`Total pendapatan: ${rupiah(total)}`,15,72);pdf.text(`CASH: ${rupiah(cash)} (${cashPct.toFixed(1)}%)`,15,79);pdf.text(`INVOICE: ${rupiah(inv)} (${invPct.toFixed(1)}%)`,15,86);pdf.text(`Invoice lunas: ${rupiah(paid)}`,15,93);pdf.text(`Invoice belum lunas: ${rupiah(unpaid)}`,15,100);let y=111;pdf.setFontSize(8);rows.slice(0,35).forEach((d,i)=>{pdf.text(`${i+1}. ${new Date(d.timestamp).toLocaleDateString('id-ID')} | ${d.driverName||'-'} | ${d.customerName||'-'} | ${d.qty||0} | ${rupiah(d.total||0)} | ${(d.paymentMethod||'cash').toUpperCase()}`,15,y);y+=6});if(rows.length>35)pdf.text(`... dan ${rows.length-35} transaksi lainnya.`,15,y);pdf.save('laporan-pendapatan-glasires.pdf')}catch(e){show('PDF gagal: '+e.message,'err')}};return <div className="fade-in">{toast}<div className="no-print"><h2 className="font-display font-bold text-xl mb-5">Laporan Pendapatan</h2><Card className="mb-5"><div className="grid md:grid-cols-5 gap-3"><Field label="Periode"><select className={inputCls} value={period} onChange={e=>setPeriod(e.target.value)}><option value="day">Harian</option><option value="month">Bulanan</option><option value="year">Tahunan</option></select></Field><Field label="Tanggal acuan"><input type="date" className={inputCls} value={date} onChange={e=>setDate(e.target.value)}/></Field>{me.role!=='driver'&&<Field label="Driver"><select className={inputCls} value={driverId} onChange={e=>setDriverId(e.target.value)}><option value="">Semua Driver</option>{us.filter(u=>u.role==='driver').map(u=><option value={u.id} key={u.id}>{u.name}</option>)}</select></Field>}<Field label="Pembayaran"><select className={inputCls} value={payment} onChange={e=>setPayment(e.target.value)}><option value="">Semua</option><option value="cash">CASH</option><option value="invoice">INVOICE</option></select></Field><div className="flex items-end gap-2 mb-3"><Btn tone="accent" onClick={print}>🖨 Print</Btn><Btn tone="ghost" onClick={exportPdf}>PDF</Btn></div></div></Card></div><div className="report-page report-print-area" style={{'--report-color':cfg.reportColor||'#1c4a73'}}><div className="report-head">{cfg.logo&&<img className="report-logo" src={cfg.logo}/>}<div><div className="report-title text-2xl font-bold">{cfg.name||'GlasirEs'}</div><div className="text-sm">{cfg.address||'Alamat perusahaan belum diatur'}</div><div className="text-sm">{cfg.phone||''}</div></div></div><h1 className="text-xl font-bold mt-6">LAPORAN PENDAPATAN</h1><p className="text-sm">Periode: {start.toLocaleDateString('id-ID')} s/d {end.toLocaleDateString('id-ID')}</p><div className="grid grid-cols-2 md:grid-cols-6 gap-3 my-5"><div className="p-3 border rounded-xl"><small>Transaksi</small><b className="block text-xl">{rows.length}</b></div><div className="p-3 border rounded-xl"><small>Kantong</small><b className="block text-xl">{qty}</b></div><div className="p-3 border rounded-xl"><small>Total</small><b className="block">{rupiah(total)}</b></div><div className="p-3 border rounded-xl"><small>CASH</small><b className="block">{rupiah(cash)} <span className="text-xs">({cashPct.toFixed(1)}%)</span></b></div><div className="p-3 border rounded-xl"><small>INVOICE</small><b className="block">{rupiah(inv)} <span className="text-xs">({invPct.toFixed(1)}%)</span></b></div><div className="p-3 border rounded-xl"><small>LUNAS</small><b className="block">{rupiah(paid)}</b></div></div><div className="grid md:grid-cols-2 gap-5 mb-5"><div className="p-5 border rounded-2xl"><h3 className="font-bold mb-3">Komposisi Pendapatan</h3><div className="flex items-center gap-4"><div className="w-32 h-32 rounded-full" style={{background:`conic-gradient(#16a34a 0 ${cashPct}%, #2563eb ${cashPct}% 100%)`}}></div><div className="text-sm"><div><span className="inline-block w-3 h-3 rounded mr-2 bg-green-600"></span>CASH — {cashPct.toFixed(1)}%</div><div><span className="inline-block w-3 h-3 rounded mr-2 bg-blue-600"></span>INVOICE — {invPct.toFixed(1)}%</div></div></div></div><div className="p-5 border rounded-2xl"><h3 className="font-bold mb-3">Status Invoice</h3><div className="h-6 rounded-full overflow-hidden bg-slate-100"><div className="h-full bg-emerald-500" style={{width:`${inv?paid/inv*100:0}%`}}></div></div><div className="flex justify-between text-sm mt-2"><span>Lunas: {rupiah(paid)}</span><span>Belum: {rupiah(unpaid)}</span></div></div></div><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b text-left"><th>No</th><th>Tanggal</th><th>Driver</th><th>Pelanggan</th><th>Qty</th><th>Total</th><th>Bayar</th></tr></thead><tbody>{rows.map((d,i)=><tr key={d.id} className="border-b"><td className="py-2">{i+1}</td><td>{new Date(d.timestamp).toLocaleDateString('id-ID')}</td><td>{d.driverName||'-'}</td><td>{d.customerName||'-'}</td><td>{d.qty||0}</td><td>{rupiah(d.total||0)}</td><td>{d.paymentMethod==='invoice'?`INVOICE (${d.paymentStatus==='paid'?'LUNAS':'BELUM'})`:'CASH'}</td></tr>)}</tbody></table></div><div className="mt-5 text-right"><b>Total Pendapatan: {rupiah(total)}</b><br/><b>CASH: {rupiah(cash)} ({cashPct.toFixed(1)}%)</b><br/><b>INVOICE: {rupiah(inv)} ({invPct.toFixed(1)}%)</b><br/><b>Invoice Lunas: {rupiah(paid)}</b><br/><b>Invoice Belum Lunas: {rupiah(unpaid)}</b></div><div className="sig"><div>Mengetahui,<div className="sigline"></div><b>{cfg.name||'Perusahaan'}</b></div><div>Dibuat oleh,<div className="sigline"></div><b>{me.name}</b><div className="text-xs">{ROLES[me.role]}</div></div></div><div className="text-center text-[10px] text-slate-400 mt-8">Power by Syech B@-it · Copyright © 2026</div></div></div>}
+function PaymentReport({me}){return <Reports me={me}/>}
+function BigSuperAdminCreator({me}){const users=toList(useDbList('users')),existing=users.find(u=>u.role==='bigsuperadmin'),[name,setName]=useState('BIG SUPER ADMIN'),[un,setUn]=useState('bigsuperadmin'),[pw,setPw]=useState(''),[toast,show]=useToast();const save=async()=>{if(existing)return show('BIG SUPER ADMIN sudah ada. Login menggunakan akun tersebut.','err');if(!name.trim()||!un.trim()||!pw)return show('Lengkapi nama, username dan password.','err');if(users.some(u=>u.username===un.trim()))return show('Username sudah dipakai.','err');await db.ref('users').push({name:name.trim(),username:un.trim(),passwordHash:await sha256(pw),role:'bigsuperadmin',active:true,protected:true,createdAt:Date.now(),createdBy:me.id,createdByName:me.name});await createAudit('bigadmin_created',`BIG SUPER ADMIN dibuat oleh ${me.name}`,me);show('BIG SUPER ADMIN berhasil dibuat. Jika lupa kredensial, gunakan tombol Pemulihan BIG SUPER ADMIN di halaman login dengan akun SUPER ADMIN yang masih aktif.');setPw('')};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">BIG SUPER ADMIN</h2><Card className="max-w-2xl">{existing?<div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200"><b>✓ BIG SUPER ADMIN sudah tersedia</b><p className="text-sm mt-1">Username: <b>{existing.username}</b>. Akun ini dapat login dan memiliki menu reset database.</p></div>:<><p className="text-sm text-slate-500 mb-5">Buat akun khusus yang memiliki akses tertinggi. Setelah dibuat, logout lalu login menggunakan akun BIG SUPER ADMIN tersebut.</p><div className="grid md:grid-cols-2 gap-3"><Field label="Nama"><input className={inputCls} value={name} onChange={e=>setName(e.target.value)}/></Field><Field label="Username"><input className={inputCls} value={un} onChange={e=>setUn(e.target.value)}/></Field><Field label="Password"><input type="password" className={inputCls} value={pw} onChange={e=>setPw(e.target.value)}/></Field></div><Btn tone="danger" onClick={save}>🛡️ Buat BIG SUPER ADMIN</Btn></>}</Card></div>}
+
+function BigSuperAdminApp({me}){
+  const users=toList(useDbList('users'));
+  const [active,setActive]=useState('dashboard');
+  const [name,setName]=useState(''),[username,setUsername]=useState(''),[password,setPassword]=useState(''),[role,setRole]=useState('superadmin');
+  const [confirmText,setConfirmText]=useState('');
+  const [toast,show]=useToast();
+  const counts=useMemo(()=>({bigsuperadmin:users.filter(u=>u.role==='bigsuperadmin').length,superadmin:users.filter(u=>u.role==='superadmin').length,admin:users.filter(u=>u.role==='admin').length,driver:users.filter(u=>u.role==='driver').length,gudang:users.filter(u=>u.role==='gudang').length}),[users]);
+  const addUser=async()=>{if(!name.trim()||!username.trim()||!password)return show('Nama, username dan password wajib diisi.','err');if(users.some(u=>u.username===username.trim()))return show('Username sudah dipakai.','err');await db.ref('users').push({name:name.trim(),username:username.trim(),passwordHash:await sha256(password),role,active:true,createdAt:Date.now(),createdBy:me.id,createdByName:me.name});if(role==='driver')await db.ref('driverStock/'+username.trim()).set(0);await createAudit('bigadmin_user_created',`BIG SUPER ADMIN membuat ${name.trim()} (${ROLES[role]})`,me);setName('');setUsername('');setPassword('');show('User berhasil dibuat.')};
+  const deleteUser=async(u)=>{if(u.id===me.id||u.role==='bigsuperadmin')return show('Akun BIG SUPER ADMIN tidak dapat dihapus dari menu ini.','err');if(!confirm(`Hapus permanen user ${u.name} (${ROLES[u.role]})?`))return;await db.ref('users/'+u.id).remove();if(u.role==='driver'&&u.username)await db.ref('driverStock/'+u.username).remove();await createAudit('bigadmin_user_deleted',`BIG SUPER ADMIN menghapus ${u.name} (${ROLES[u.role]})`,me);show('User dihapus permanen.')};
+  const resetAll=async()=>{if(confirmText!=='RESET SEMUA DATA')return show('Ketik RESET SEMUA DATA persis untuk melanjutkan.','err');if(!confirm('PERINGATAN TERAKHIR: semua data Firebase akan dihapus dan hanya akun BIG SUPER ADMIN ini yang dipertahankan. Lanjutkan?'))return;try{const keep={...me};delete keep.id;await db.ref().set({users:{[me.id]:keep}});localStorage.setItem('glasires_uid',me.id);setConfirmText('');show('Database berhasil di-reset. Hanya BIG SUPER ADMIN yang dipertahankan.');setTimeout(()=>location.reload(),900)}catch(e){show('Reset gagal: '+e.message,'err')}};
+  const logout=()=>{localStorage.removeItem('glasires_uid');location.reload()};
+  const nav=[{key:'dashboard',label:'Dashboard',icon:'🛡️'},{key:'users',label:'Kelola Semua User',icon:'👥'},{key:'create',label:'Buat User Baru',icon:'➕'},{key:'reset',label:'RESET DATABASE',icon:'⚠️'}];
+  return <div className="min-h-screen flex bg-slate-50">{toast}<aside className="fixed lg:static z-40 inset-y-0 left-0 w-72 bg-gradient-to-b from-slate-950 via-slate-900 to-amber-950 text-white flex flex-col shadow-2xl"><div className="px-5 py-6 border-b border-white/10"><div className="text-xs tracking-[.25em] text-amber-300 font-bold">SYSTEM CONTROL</div><div className="font-display font-extrabold text-xl mt-1">BIG SUPER ADMIN</div><div className="text-xs text-white/50 mt-1">Akses penuh & reset database</div></div><nav className="flex-1 p-3 space-y-2">{nav.map(n=><button key={n.key} onClick={()=>setActive(n.key)} className={'w-full text-left px-4 py-3 rounded-xl text-sm font-semibold '+(active===n.key?'bg-amber-300 text-slate-950':'text-white/80 hover:bg-white/10')}>{n.icon} {n.label}</button>)}</nav><div className="p-4 border-t border-white/10"><div className="text-xs text-white/50">Masuk sebagai</div><div className="font-bold">{me.name}</div><div className="text-xs text-amber-300">{me.username}</div><Btn tone="ghost" className="w-full mt-3 !bg-white/10 !text-white !border-white/10" onClick={logout}>Keluar</Btn></div><footer className="bait-developer-footer"><div className="bait-developer-content"><div className="bait-powered">● Power by</div><div className="bait-name">Syech B@-it</div><div className="bait-copyright">Copyright © 2026</div></div></footer></aside><main className="flex-1 min-w-0"><div className="p-5 lg:p-8 max-w-7xl mx-auto"><div className="mb-6"><div className="text-xs font-mono text-amber-700 tracking-widest">DATABASE CONTROL CENTER</div><h1 className="font-display font-extrabold text-3xl text-slate-900">BIG SUPER ADMIN</h1><p className="text-sm text-slate-500 mt-1">Kelola akun dan kendalikan reset seluruh data aplikasi.</p></div>{active==='dashboard'&&<div className="fade-in"><div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">{[['bigsuperadmin','BIG SUPER ADMIN','🛡️'],['superadmin','SUPER ADMIN','👑'],['admin','ADMIN','🧑‍💼'],['driver','DRIVER','🚚'],['gudang','GUDANG','🏔️']].map(([r,l,i])=><Card key={r}><div className="text-3xl">{i}</div><div className="text-xs text-slate-500 mt-3">{l}</div><div className="text-3xl font-display font-bold mt-1">{counts[r]||0}</div></Card>)}</div><Card className="mt-5"><h2 className="font-bold text-lg">Kontrol Sistem</h2><div className="grid md:grid-cols-3 gap-4 mt-4"><div className="p-4 rounded-2xl bg-amber-50 border border-amber-200"><b>👥 Kelola semua user</b><p className="text-sm text-slate-600 mt-1">Lihat dan hapus Super Admin, Admin, Driver, dan Gudang.</p></div><div className="p-4 rounded-2xl bg-sky-50 border border-sky-200"><b>➕ Buat ulang user</b><p className="text-sm text-slate-600 mt-1">Buat user dari awal setelah reset database.</p></div><div className="p-4 rounded-2xl bg-rose-50 border border-rose-200"><b>⚠️ Reset database</b><p className="text-sm text-slate-600 mt-1">Hapus semua data Firebase dan pertahankan BIG SUPER ADMIN.</p></div></div></Card></div>}{active==='users'&&<div className="fade-in"><Card><div className="flex flex-wrap justify-between gap-3 mb-4"><div><b className="text-lg">Semua Pengguna</b><div className="text-xs text-slate-500 mt-1">BIG SUPER ADMIN dilindungi dan tidak dapat dihapus.</div></div><Pill tone="approved">{users.length} akun</Pill></div><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="text-left border-b text-slate-400"><th className="py-3">Nama</th><th>Username</th><th>Peran</th><th>Status</th><th className="text-right">Aksi</th></tr></thead><tbody>{users.sort((a,b)=>(a.role||'').localeCompare(b.role||'')).map(u=><tr key={u.id} className="border-b"><td className="py-3 font-semibold">{u.name}</td><td>@{u.username}</td><td><Pill>{ROLES[u.role]||u.role}</Pill></td><td>{u.active===false?<Pill tone="rejected">Nonaktif</Pill>:<Pill tone="done">Aktif</Pill>}</td><td className="text-right">{u.role==='bigsuperadmin'?<span className="text-xs font-bold text-amber-700">🔒 DILINDUNGI</span>:<Btn tone="danger" className="!py-1.5 !px-3 text-xs" onClick={()=>deleteUser(u)}>Hapus Permanen</Btn>}</td></tr>)}</tbody></table></div></Card></div>}{active==='create'&&<div className="fade-in"><Card className="max-w-3xl"><h2 className="font-display font-bold text-xl mb-1">Buat User Baru</h2><p className="text-sm text-slate-500 mb-5">Bisa membuat SUPER ADMIN, ADMIN, DRIVER atau GUDANG.</p><div className="grid md:grid-cols-2 gap-3"><Field label="Nama"><input className={inputCls} value={name} onChange={e=>setName(e.target.value)} placeholder="Nama pengguna"/></Field><Field label="Username"><input className={inputCls} value={username} onChange={e=>setUsername(e.target.value)} placeholder="username"/></Field><Field label="Password"><input type="password" className={inputCls} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password"/></Field><Field label="Peran"><select className={inputCls} value={role} onChange={e=>setRole(e.target.value)}><option value="superadmin">SUPER ADMIN</option><option value="admin">ADMIN</option><option value="driver">DRIVER</option><option value="gudang">GUDANG</option></select></Field></div><Btn tone="accent" onClick={addUser}>➕ Buat User</Btn></Card></div>}{active==='reset'&&<div className="fade-in"><Card className="max-w-3xl border-2 border-rose-200"><div className="text-5xl mb-3">⚠️</div><h2 className="font-display font-extrabold text-2xl text-rose-700">RESET SELURUH DATABASE</h2><p className="text-sm text-slate-600 mt-2">Semua data Firebase akan dihapus: transaksi, invoice, pelanggan, stok gudang, stok driver, permintaan, pengembalian, notifikasi, laporan, log, pengaturan perusahaan, dan seluruh akun selain BIG SUPER ADMIN.</p><div className="mt-5 p-4 rounded-2xl bg-rose-50 border border-rose-200"><b className="text-rose-800">Yang dipertahankan:</b><div className="text-sm mt-1">Hanya akun BIG SUPER ADMIN yang sedang login.</div></div><Field label="Ketik RESET SEMUA DATA untuk konfirmasi"><input className={inputCls+' border-rose-300'} value={confirmText} onChange={e=>setConfirmText(e.target.value)} placeholder="RESET SEMUA DATA"/></Field><Btn tone="danger" className="w-full md:w-auto" disabled={confirmText!=='RESET SEMUA DATA'} onClick={resetAll}>🔥 RESET DATABASE SEKARANG</Btn></Card></div>}</div></main></div>
+}
+
+function AdminApp({me,isSuper}){const tabs=[{key:'overview',label:'Ringkasan',icon:'📊'},{key:'approve',label:'Persetujuan Stok',icon:'✅'},{key:'deliveries',label:'Pengantaran',icon:'🧊'},{key:'invoiceCustomers',label:'Pelanggan & Penagihan',icon:'🧾'},{key:'reports',label:'Laporan',icon:'📑'},{key:'income',label:'Pendapatan',icon:'💰'},{key:'payments',label:'Invoice',icon:'💳'},{key:'users',label:'Driver & Gudang',icon:'👥'},...(isSuper?[{key:'admins',label:'Kelola Admin',icon:'🛡️'},{key:'settings',label:'Perusahaan & Harga',icon:'⚙️'}]:[])];const[a,setA]=useState('overview');return <Shell user={me} tabs={tabs} active={a} setActive={setA} onLogout={()=>{localStorage.removeItem('glasires_uid');location.reload()}}>{a==='overview'&&<><h2 className="font-display font-bold text-xl mb-5">Ringkasan {isSuper?'Super Admin':'Admin'}</h2><StockOverview/><DeliveriesTable/></>}{a==='approve'&&<ApproveRequests me={me}/>} {a==='deliveries'&&<><StockOverview/><DeliveriesTable/></>}{a==='invoiceCustomers'&&<InvoiceAdmin me={me}/>} {a==='reports'&&<Reports me={me}/>} {a==='income'&&<IncomeReport me={me}/>} {a==='payments'&&<PaymentManager/>}{a==='users'&&<ManageUsers me={me} roles={['driver','gudang']} title="Kelola Driver & Gudang"/>}{a==='admins'&&isSuper&&<ManageUsers me={me} roles={['admin']} title="Kelola Admin"/>}{a==='settings'&&isSuper&&<CompanySettings me={me}/>} {a==='bigadmin'&&isSuper&&<BigSuperAdminCreator me={me}/>}</Shell>}
+
+function DriverApp({me}){const tabs=[{key:'home',label:'Beranda',icon:'🏠'},{key:'request',label:'Minta Stok',icon:'📦'},{key:'invoiceCustomers',label:'Pelanggan Invoice',icon:'🧾'},{key:'collection',label:'Penagihan Saya',icon:'💰'},{key:'return',label:'Kembalikan Sisa',icon:'↩️'},{key:'reports',label:'Laporan Saya',icon:'📑'},{key:'income',label:'Pendapatan',icon:'💵'}], [a,setA]=useState('home');return <Shell user={me} tabs={tabs} active={a} setActive={setA} onLogout={()=>{localStorage.removeItem('glasires_uid');location.reload()}}>{a==='home'&&<DriverHome me={me}/>} {a==='request'&&<DriverRequest me={me}/>} {a==='invoiceCustomers'&&<InvoiceDriver me={me}/>} {a==='collection'&&<InvoiceCollectionDriver me={me}/>} {a==='return'&&<DriverReturn me={me}/>} {a==='reports'&&<Reports me={me}/>} {a==='income'&&<IncomeReport me={me}/>}</Shell>}
+
+function GudangApp({me}){const tabs=[{key:'home',label:'Stok Gudang',icon:'🏔️'},{key:'release',label:'Keluarkan ke Driver',icon:'🚚'},{key:'returns',label:'Terima Kembalian',icon:'↩️'},{key:'reports',label:'Laporan Gudang',icon:'📑'},{key:'income',label:'Pendapatan',icon:'💵'}],[a,setA]=useState('home');return <Shell user={me} tabs={tabs} active={a} setActive={setA} onLogout={()=>{localStorage.removeItem('glasires_uid');location.reload()}}>{a==='home'&&<GudangHome me={me}/>} {a==='release'&&<GudangRelease me={me}/>} {a==='returns'&&<GudangReceive me={me}/>} {a==='reports'&&<Reports me={me}/>} {a==='income'&&<IncomeReport me={me}/>}</Shell>}
+
+function App(){const[loading,setLoading]=useState(true),[has,setHas]=useState(true),[me,setMe]=useState(null);useEffect(()=>{(async()=>{try{const s=await db.ref('users').once('value');setHas(s.exists());const id=localStorage.getItem('glasires_uid');if(s.exists()&&id){const u=await db.ref('users/'+id).once('value');if(u.exists()&&u.val().active!==false)setMe({id,...u.val()});else localStorage.removeItem('glasires_uid')}}catch(e){console.error(e)}setLoading(false)})()},[]);if(loading)return <div className="min-h-screen flex items-center justify-center font-mono text-slate-400">Memuat GlasirEs…</div>;if(!has)return <SetupScreen onDone={()=>location.reload()}/>;if(!me)return <LoginScreen onLogin={setMe}/>;if(me.role==='bigsuperadmin')return <BigSuperAdminApp me={me}/>;if(me.role==='superadmin')return <AdminApp me={me} isSuper/>;if(me.role==='admin')return <AdminApp me={me}/>;if(me.role==='driver')return <DriverApp me={me}/>;if(me.role==='gudang')return <GudangApp me={me}/>;return <div className="p-8">Peran tidak dikenal.</div>}
+ReactDOM.createRoot(document.getElementById('root')).render(FIREBASE_INIT_ERROR?<div className="p-8 text-rose-600">Firebase error: {FIREBASE_INIT_ERROR}</div>:<App/>);
+
+// Anti-inspect ringan; tidak mengganggu aplikasi.
+document.addEventListener('contextmenu',e=>e.preventDefault());
 </script>
 </body>
 </html>
