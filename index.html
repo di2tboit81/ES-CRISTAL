@@ -17,7 +17,143 @@ tailwind.config={theme:{extend:{fontFamily:{display:['Sora','sans-serif'],body:[
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.13.0/firebase-database-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
-*{box-sizing:border-box}body{font-family:Inter,sans-serif;background:radial-gradient(circle at 20% 10%,rgba(127,224,240,.55),transparent 35%),radial-gradient(circle at 80% 0%,rgba(255,255,255,.9),transparent 30%),linear-gradient(135deg,#e9fbff,#c5eff8,#f8fdff);overflow-x:hidden}body:before{content:"";position:fixed;inset:-200px;background:radial-gradient(circle,rgba(255,255,255,.9) 2px,transparent 3px);background-size:90px 90px;animation:waterMove 35s linear infinite;opacity:.35;pointer-events:none;z-index:-1}@keyframes waterMove{to{transform:translateY(-250px)}}.glass{background:linear-gradient(135deg,rgba(255,255,255,.85),rgba(220,250,255,.55));backdrop-filter:blur(25px);border:1px solid rgba(255,255,255,.8);box-shadow:0 25px 60px rgba(0,120,180,.18),inset 0 0 40px rgba(255,255,255,.8);position:relative;overflow:hidden}.glass:before{content:"";position:absolute;width:250%;height:250%;top:-120%;left:-100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.8),transparent);transform:rotate(25deg);animation:iceShine 9s infinite;pointer-events:none}@keyframes iceShine{0%{transform:translateX(-100%) rotate(25deg)}50%,100%{transform:translateX(100%) rotate(25deg)}}button{position:relative;overflow:hidden;transition:.3s}button:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(0,180,220,.25)}.bg-glacier-900{background:linear-gradient(180deg,#031522,#075572,#021522);box-shadow:10px 0 50px rgba(0,150,200,.45)}.icebar-shell{background:linear-gradient(180deg,#001522,#06324b);border-radius:18px;padding:4px;box-shadow:inset 0 0 20px rgba(0,0,0,.4)}.icebar-fill{background:linear-gradient(180deg,#fff,#b9f5ff,#37bddd);box-shadow:0 0 30px rgba(80,220,255,.9);border-radius:14px;min-height:3px}.fade-in{animation:fadeCrystal .45s ease}@keyframes fadeCrystal{from{opacity:0;transform:translateY(15px) scale(.98)}to{opacity:1;transform:none}}::-webkit-scrollbar{width:10px}::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#7fe0f0,#1c4a73);border-radius:20px}.bait-developer-footer{position:relative;margin:12px;padding:10px 14px;border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(83,211,255,.06));border:1px solid rgba(180,240,255,.18);backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 18px rgba(0,190,255,.08);overflow:hidden}.bait-developer-content{position:relative;z-index:2;text-align:center}.bait-powered{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(210,245,255,.5)}.bait-name{margin-top:2px;font-size:12px;font-weight:800;letter-spacing:.08em;background:linear-gradient(90deg,#dffaff,#71e8ff,#fff,#55d9ff,#dffaff);background-size:250% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:baitTextShine 4s linear infinite}.bait-copyright{margin-top:2px;font-size:8px;letter-spacing:.12em;color:rgba(190,235,250,.3)}@keyframes baitTextShine{to{background-position:-250% center}}.login-copyright{position:fixed;left:0;right:0;bottom:14px;text-align:center;font-size:10px;letter-spacing:.08em;color:rgba(30,90,120,.45);z-index:9999}.login-copyright .bait-brand{font-weight:800;color:#1689b5}.report-page{background:#fff;color:#0a1b2e;padding:28px;border-radius:16px}.report-head{display:flex;align-items:center;gap:18px;border-bottom:3px solid var(--report-color,#1c4a73);padding-bottom:14px}.report-logo{width:72px;height:72px;object-fit:contain;border-radius:10px}.report-title{font-family:Sora,sans-serif}.sig{margin-top:35px;display:grid;grid-template-columns:1fr 1fr;gap:80px;text-align:center}.sigline{border-bottom:1px solid #334155;margin:45px 15px 8px}.print-only{display:none}@media print{body{background:#fff!important}.no-print{display:none!important}.print-only{display:block}.report-page{box-shadow:none!important;border-radius:0!important}.glass{box-shadow:none!important;background:#fff!important;border:0!important}.report-print-area{display:block!important;position:static!important}.report-page table{font-size:10px!important}@page{size:A4;margin:10mm}} 
+@media print{.report-print-area .admin-gudang-hide-print,.admin-gudang-hide-print{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important}}
+*{box-sizing:border-box}body{font-family:Inter,sans-serif;background:radial-gradient(circle at 20% 10%,rgba(127,224,240,.55),transparent 35%),radial-gradient(circle at 80% 0%,rgba(255,255,255,.9),transparent 30%),linear-gradient(135deg,#e9fbff,#c5eff8,#f8fdff);overflow-x:hidden}body:before{content:"";position:fixed;inset:-200px;background:radial-gradient(circle,rgba(255,255,255,.9) 2px,transparent 3px);background-size:90px 90px;animation:waterMove 35s linear infinite;opacity:.35;pointer-events:none;z-index:-1}@keyframes waterMove{to{transform:translateY(-250px)}}.glass{background:linear-gradient(135deg,rgba(255,255,255,.85),rgba(220,250,255,.55));backdrop-filter:blur(25px);border:1px solid rgba(255,255,255,.8);box-shadow:0 25px 60px rgba(0,120,180,.18),inset 0 0 40px rgba(255,255,255,.8);position:relative;overflow:hidden}.glass:before{content:"";position:absolute;width:250%;height:250%;top:-120%;left:-100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.8),transparent);transform:rotate(25deg);animation:iceShine 9s infinite;pointer-events:none}@keyframes iceShine{0%{transform:translateX(-100%) rotate(25deg)}50%,100%{transform:translateX(100%) rotate(25deg)}}button{position:relative;overflow:hidden;transition:.3s}button:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(0,180,220,.25)}.bg-glacier-900{background:linear-gradient(180deg,#031522,#075572,#021522);box-shadow:10px 0 50px rgba(0,150,200,.45)}.icebar-shell{background:linear-gradient(180deg,#001522,#06324b);border-radius:18px;padding:4px;box-shadow:inset 0 0 20px rgba(0,0,0,.4)}.icebar-fill{background:linear-gradient(180deg,#fff,#b9f5ff,#37bddd);box-shadow:0 0 30px rgba(80,220,255,.9);border-radius:14px;min-height:3px}.fade-in{animation:fadeCrystal .45s ease}@keyframes fadeCrystal{from{opacity:0;transform:translateY(15px) scale(.98)}to{opacity:1;transform:none}}::-webkit-scrollbar{width:10px}::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#7fe0f0,#1c4a73);border-radius:20px}.bait-developer-footer{position:relative;margin:12px;padding:10px 14px;border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(83,211,255,.06));border:1px solid rgba(180,240,255,.18);backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 18px rgba(0,190,255,.08);overflow:hidden}.bait-developer-content{position:relative;z-index:2;text-align:center}.bait-powered{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(210,245,255,.5)}.bait-name{margin-top:2px;font-size:12px;font-weight:800;letter-spacing:.08em;background:linear-gradient(90deg,#dffaff,#71e8ff,#fff,#55d9ff,#dffaff);background-size:250% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:baitTextShine 4s linear infinite}.bait-copyright{margin-top:2px;font-size:8px;letter-spacing:.12em;color:rgba(190,235,250,.3)}@keyframes baitTextShine{to{background-position:-250% center}}.login-copyright{position:fixed;left:0;right:0;bottom:14px;text-align:center;font-size:10px;letter-spacing:.08em;color:rgba(30,90,120,.45);z-index:9999}.login-copyright .bait-brand{font-weight:800;color:#1689b5}.report-page{background:#fff;color:#0a1b2e;padding:28px;border-radius:16px}.report-head{display:flex;align-items:center;gap:18px;border-bottom:3px solid var(--report-color,#1c4a73);padding-bottom:14px}.report-logo{width:72px;height:72px;object-fit:contain;border-radius:10px}.report-title{font-family:Sora,sans-serif}.sig{margin-top:35px;display:grid;grid-template-columns:1fr 1fr;gap:80px;text-align:center}.sigline{border-bottom:1px solid #334155;margin:45px 15px 8px}.print-only{display:none}@media print{
+html,body{background:#fff!important;margin:0!important;padding:0!important;width:100%!important;min-width:0!important;color:#0a1b2e!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+*{box-sizing:border-box!important}
+.no-print,.print-hide,.print-only-ui,aside,nav,header,.sticky{display:none!important}
+.print-only{display:block!important}
+main{display:block!important;width:100%!important;min-width:0!important;max-width:none!important;margin:0!important;padding:0!important;overflow:visible!important}
+main>div{max-width:none!important;width:100%!important;margin:0!important;padding:0!important;overflow:visible!important}
+.report-print-area,.report-page{display:block!important;position:static!important;float:none!important;clear:both!important;width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:10mm!important;background:#fff!important;box-shadow:none!important;border-radius:0!important;border:0!important;overflow:visible!important;transform:none!important}
+.report-page{break-inside:auto!important;page-break-inside:auto!important}
+.report-print-area *{box-sizing:border-box!important;overflow:visible!important}
+.report-print-area .glass,.report-print-area .bg-white{background:#fff!important;box-shadow:none!important}
+.report-print-area .rounded-2xl,.report-print-area .rounded-xl,.report-print-area .border,.report-print-area .card,.report-print-area .report-block,.report-print-area .chart-card{break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area .grid{display:grid!important;break-inside:auto!important;page-break-inside:auto!important}
+.report-print-area .grid>*,.report-print-area .flex>*,.report-print-area section{break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area table{width:100%!important;max-width:100%!important;border-collapse:collapse!important;border-spacing:0!important;font-size:9.5px!important;table-layout:auto!important}
+.report-print-area thead{display:table-header-group!important}
+.report-print-area tfoot{display:table-footer-group!important}
+.report-print-area tbody{display:table-row-group!important}
+.report-print-area tr{break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area td,.report-print-area th{padding:5px 4px!important;vertical-align:top!important;word-break:normal!important;overflow-wrap:anywhere!important}
+.report-print-area .overflow-x-auto,.report-print-area .overflow-auto,.report-print-area .overflow-hidden{overflow:visible!important}
+.report-print-area .report-head{break-inside:avoid!important;page-break-inside:avoid!important;border-bottom:2px solid var(--report-color,#1c4a73)!important}
+.report-print-area .report-logo{width:58px!important;height:58px!important;object-fit:contain!important}
+.report-page h1,.report-page h2,.report-page h3,.report-page h4{break-after:avoid!important;page-break-after:avoid!important;break-before:auto!important;page-break-before:auto!important}
+.report-page img,canvas,svg{max-width:100%!important}
+.report-print-area .sig{break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area .signature,.report-print-area .signatures{break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area .text-center.text-\[10px\]{margin-top:8mm!important}
+.report-print-area .no-break,.report-print-area .keep-together{break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area .page-break-before{break-before:page!important;page-break-before:always!important}
+.report-print-area .page-break-after{break-after:page!important;page-break-after:always!important}
+/* ===== PRINT FINAL: SEMUA USER / SEMUA JENIS LAPORAN ===== */
+@page{size:A4 portrait;margin:10mm}
+.report-print-area,.report-page{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  margin:0!important;padding:0!important;background:#fff!important;
+  box-shadow:none!important;border:0!important;border-radius:0!important;
+  break-inside:auto!important;page-break-inside:auto!important;
+}
+.report-print-area>div,.report-print-area>section{
+  max-width:100%!important;min-width:0!important;
+}
+/* Saat print, semua grid dibuat satu kolom agar diagram/kartu tidak terpotong. */
+.report-print-area .grid{
+  display:block!important;width:100%!important;
+}
+.report-print-area .grid>*,
+.report-print-area .flex>*,
+.report-print-area .card,
+.report-print-area .rounded-2xl,
+.report-print-area .rounded-xl,
+.report-print-area .report-block,
+.report-print-area .chart-card,
+.report-print-area .sig,
+.report-print-area .signature,
+.report-print-area .signatures{
+  width:100%!important;max-width:100%!important;
+  break-inside:avoid!important;page-break-inside:avoid!important;
+}
+/* Jarak antar blok supaya blok berikutnya boleh pindah ke halaman baru. */
+.report-print-area .grid>*,
+.report-print-area .card,
+.report-print-area .report-block,
+.report-print-area .chart-card{margin-bottom:6mm!important}
+/* Diagram tidak boleh terbelah. */
+.report-print-area canvas,
+.report-print-area svg,
+.report-print-area img{
+  max-width:100%!important;height:auto!important;
+  break-inside:avoid!important;page-break-inside:avoid!important;
+}
+.report-print-area table{
+  width:100%!important;max-width:100%!important;
+  table-layout:fixed!important;border-collapse:collapse!important;
+  break-inside:auto!important;page-break-inside:auto!important;
+}
+.report-print-area thead{display:table-header-group!important}
+.report-print-area tr{break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area td,.report-print-area th{
+  white-space:normal!important;overflow-wrap:anywhere!important;
+  word-break:normal!important;vertical-align:top!important;
+}
+/* Jangan biarkan judul menempel sendirian di dasar halaman. */
+.report-print-area h1,
+.report-print-area h2,
+.report-print-area h3,
+.report-print-area h4{
+  break-after:avoid!important;page-break-after:avoid!important;
+}
+/* Tanda tangan/footer tetap utuh; jika tidak cukup ruang, pindah ke halaman berikutnya. */
+.report-print-area .sig,
+.report-print-area .signature,
+.report-print-area .signatures{
+  break-before:auto!important;page-break-before:auto!important;
+  break-inside:avoid!important;page-break-inside:avoid!important;
+}
+} 
+</style>
+
+<style id="print-readability-fix">
+@media print {
+  .report-print-area .admin-gudang-hide-print { display:none !important; visibility:hidden !important; height:0 !important; min-height:0 !important; margin:0 !important; padding:0 !important; border:0 !important; }
+  @page { size: A4 portrait; margin: 10mm; }
+  html, body { font-size: 12pt !important; line-height: 1.4 !important; }
+  .report-print-area, .report-page { font-size: 12pt !important; line-height: 1.4 !important; width: 100% !important; max-width: none !important; padding: 0 !important; }
+  .report-print-area * { font-size: inherit; }
+  .report-print-area table { font-size: 10.5pt !important; }
+  .report-print-area th { font-size: 10pt !important; font-weight: 700 !important; padding: 7px 6px !important; }
+  .report-print-area td { font-size: 10.5pt !important; padding: 7px 6px !important; }
+  .report-print-area small, .report-print-area .text-xs { font-size: 9pt !important; }
+  .report-print-area .text-sm { font-size: 10.5pt !important; }
+  .report-print-area .text-lg { font-size: 15pt !important; }
+  .report-print-area .text-xl { font-size: 18pt !important; }
+  .report-print-area .text-2xl { font-size: 21pt !important; }
+  .report-print-area h1 { font-size: 20pt !important; line-height: 1.2 !important; }
+  .report-print-area h2 { font-size: 17pt !important; }
+  .report-print-area h3 { font-size: 14pt !important; }
+  .report-print-area .report-title { font-size: 20pt !important; }
+  .report-print-area .report-head { padding-bottom: 8mm !important; margin-bottom: 5mm !important; }
+  .report-print-area .report-logo { width: 20mm !important; height: 20mm !important; }
+  .report-print-area .grid > *, .report-print-area .card, .report-print-area .report-block, .report-print-area .chart-card { margin-bottom: 5mm !important; }
+  .report-print-area canvas, .report-print-area svg, .report-print-area img { max-width: 100% !important; }
+  .report-print-area .sig { margin-top: 18mm !important; }
+  .report-print-area .sigline { margin-top: 25mm !important; }
+}
+
+/* ===== BIG SUPER ADMIN ===== */
+.big-admin-card{background:linear-gradient(135deg,rgba(5,11,20,.97),rgba(7,85,114,.96));color:#fff;border:1px solid rgba(127,224,240,.35);box-shadow:0 25px 70px rgba(0,60,90,.30)}
+.big-danger-zone{border:1px solid rgba(244,63,94,.22);background:linear-gradient(135deg,rgba(255,241,242,.96),rgba(255,255,255,.92))}
+.big-action{min-height:78px;text-align:left;border-radius:18px;padding:14px 16px;transition:.25s}
+.big-action:hover{transform:translateY(-2px) scale(1.01)}
+@media(max-width:640px){
+  .big-admin-grid{grid-template-columns:1fr!important}
+  .big-admin-card{padding:18px!important}
+  .big-action{min-height:70px}
+}
 </style>
 </head>
 <body class="text-glacier-900">
@@ -51,7 +187,233 @@ const toList=o=>Object.entries(o||{}).map(([id,v])=>({id,...v}));
 function useDbList(path){const[d,setD]=useState({});useEffect(()=>{if(!db)return;const r=db.ref(path),cb=s=>setD(s.val()||{});r.on('value',cb);return()=>r.off('value',cb)},[path]);return d}
 function useDbValue(path,fb){const[d,setD]=useState(fb);useEffect(()=>{if(!db)return;const r=db.ref(path),cb=s=>setD(s.val()===null?fb:s.val());r.on('value',cb);return()=>r.off('value',cb)},[path]);return d}
 const ROLES={bigsuperadmin:'BIG SUPER ADMIN',superadmin:'Super Admin',admin:'Admin',driver:'Driver',gudang:'Gudang'};
-const BADGE={bigsuperadmin:'bg-amber-300 text-amber-950',superadmin:'bg-white/20 text-white',admin:'bg-blue-100 text-blue-800',driver:'bg-cyan-100 text-cyan-800',gudang:'bg-teal-100 text-teal-800'};
+const BADGE={bigsupperadmin:'bg-fuchsia-100 text-fuchsia-800',bigsuperadmin:'bg-fuchsia-100 text-fuchsia-800',superadmin:'bg-white/20 text-white',admin:'bg-blue-100 text-blue-800',driver:'bg-cyan-100 text-cyan-800',gudang:'bg-teal-100 text-teal-800'};
+const BIG_DEFAULT_USERNAME='bigsuperadmin';
+const BIG_DEFAULT_PASSWORD='BigSuperAdmin@2026';
+const BIG_DEFAULT_NAME='BIG SUPER ADMIN';
+
+async function ensureBigSuperAdmin(){
+  if(!db)return;
+  const snap=await db.ref('users').once('value');
+  const users=toList(snap.val());
+  const found=users.find(u=>u.role==='bigsuperadmin');
+  if(found)return found;
+  const ref=db.ref('users').push();
+  const user={
+    name:BIG_DEFAULT_NAME,
+    username:BIG_DEFAULT_USERNAME,
+    passwordHash:await sha256(BIG_DEFAULT_PASSWORD),
+    role:'bigsuperadmin',
+    active:true,
+    protected:true,
+    createdAt:Date.now()
+  };
+  await ref.set(user);
+  return {id:ref.key,...user};
+}
+
+function BigSuperAdmin({me}){
+  const keluarBig=()=>{localStorage.removeItem('glasires_uid');location.reload()};
+  const users=toList(useDbList('users'));
+  const deliveries=toList(useDbList('deliveries'));
+  const stockRequests=toList(useDbList('stockRequests'));
+  const returns=toList(useDbList('returnRequests'));
+  const invoices=toList(useDbList('invoiceCustomers'));
+  const notifications=toList(useDbList('notifications'));
+  const logs=toList(useDbList('logs'));
+  const warehouseHistory=toList(useDbList('warehouse/history'));
+  const driverStocks=toList(useDbList('driverStock'));
+  const [tab,setTab]=useState('dashboard');
+  const [password,setPassword]=useState('');
+  const [newPassword,setNewPassword]=useState('');
+  const [confirmPassword,setConfirmPassword]=useState('');
+  const [busy,setBusy]=useState(false);
+  const [toast,show]=useToast();
+
+  const verifyBig=async()=>{
+    if(!password)return false;
+    return (await sha256(password))===me.passwordHash;
+  };
+
+  const resetDatabase=async()=>{
+    if(busy)return;
+    if(!await verifyBig()){show('Password BIG SUPER ADMIN salah.','err');return}
+    const ok1=confirm('⚠️ RESET TOTAL DATABASE\\n\\nSEMUA DATA aplikasi akan dihapus: user Admin, Super Admin, Driver, Gudang, transaksi, stok driver, stok gudang, invoice, notifikasi, laporan, log, pengaturan, dan data lainnya.\\n\\nAkun BIG SUPER ADMIN akan dibuat kembali agar Anda tetap bisa masuk.\\n\\nLanjutkan?');
+    if(!ok1)return;
+    const ok2=prompt('Ketik RESET DATABASE untuk konfirmasi:');
+    if(ok2!=='RESET DATABASE'){show('Reset dibatalkan.','err');return}
+    setBusy(true);
+    try{
+      const big={name:BIG_DEFAULT_NAME,username:me.username||BIG_DEFAULT_USERNAME,passwordHash:me.passwordHash,role:'bigsuperadmin',active:true,protected:true,createdAt:me.createdAt||Date.now(),resetAt:Date.now()};
+      await db.ref('/').set({
+        users:{[me.id]:big},
+        config:{pricePerBag:15000,company:{name:'GlasirEs',address:'',phone:'',logo:'',reportColor:'#1c4a73'}},
+        warehouse:{stock:0},
+        driverStock:{},
+        customers:{},
+        deliveries:{},
+        stockRequests:{},
+        returnRequests:{},
+        invoiceCustomers:{},
+        notifications:{},
+        logs:{}
+      });
+      localStorage.setItem('glasires_uid',me.id);
+      setPassword('');
+      show('RESET TOTAL BERHASIL. Database kembali kosong dan BIG SUPER ADMIN tetap aktif.');
+      setTimeout(()=>location.reload(),900);
+    }catch(e){show('Reset gagal: '+e.message,'err')}
+    setBusy(false);
+  };
+
+  const deleteUser=async(u)=>{
+    if(u.id===me.id||u.role==='bigsuperadmin'||u.protected)return show('Akun BIG SUPER ADMIN dilindungi dan tidak dapat dihapus.','err');
+    if(!confirm(`Hapus pengguna ${u.name} (${ROLES[u.role]||u.role})?`))return;
+    try{
+      await db.ref('users/'+u.id).remove();
+      if(u.role==='driver'&&u.username)await db.ref('driverStock/'+u.username).remove();
+      await createAudit('big_user_deleted',`BIG SUPER ADMIN menghapus ${u.name} (${ROLES[u.role]||u.role})`,me);
+      show('Pengguna berhasil dihapus.');
+    }catch(e){show('Gagal menghapus: '+e.message,'err')}
+  };
+
+  const deleteNode=async(node,label)=>{
+    if(!await verifyBig()){show('Password BIG SUPER ADMIN salah.','err');return}
+    if(!confirm(`Hapus seluruh data ${label}? Tindakan ini tidak dapat dibatalkan.`))return;
+    try{await db.ref(node).remove();await createAudit('big_node_deleted',`BIG SUPER ADMIN menghapus node ${node}`,me);show(`${label} berhasil dihapus.`)}
+    catch(e){show('Gagal menghapus: '+e.message,'err')}
+  };
+
+  const changePassword=async()=>{
+    if(!newPassword||newPassword.length<8)return show('Password baru minimal 8 karakter.','err');
+    if(newPassword!==confirmPassword)return show('Konfirmasi password tidak sama.','err');
+    if(!await verifyBig())return show('Password saat ini salah.','err');
+    try{
+      const hash=await sha256(newPassword);
+      await db.ref('users/'+me.id).update({passwordHash:hash,passwordChangedAt:Date.now()});
+      show('Password BIG SUPER ADMIN berhasil diubah.');
+      setPassword('');setNewPassword('');setConfirmPassword('');
+    }catch(e){show('Gagal mengubah password: '+e.message,'err')}
+  };
+
+  const counts=[
+    ['Pengguna',users.length,'👥'],
+    ['Pengantaran',deliveries.length,'🧊'],
+    ['Permintaan Stok',stockRequests.length,'📦'],
+    ['Pengembalian',returns.length,'↩️'],
+    ['Invoice',invoices.length,'🧾'],
+    ['Notifikasi',notifications.length,'🔔'],
+    ['Log Audit',logs.length,'🛡️'],
+    ['Riwayat Gudang',warehouseHistory.length,'🏭']
+  ];
+
+  return <div className="fade-in">
+    {toast}
+    <div className="big-admin-card rounded-3xl p-6 lg:p-8 mb-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        <div>
+          <div className="text-xs tracking-[.22em] text-frost-300 font-bold">SYSTEM CONTROL CENTER</div>
+          <h2 className="font-display text-2xl lg:text-3xl font-extrabold mt-2">👑 BIG SUPER ADMIN</h2>
+          <p className="text-sm text-frost-200/75 mt-2 max-w-2xl">Akses tertinggi untuk reset database dan pengelolaan akun. Fitur ini dibuat terpisah agar fungsi Admin, Super Admin, Driver, dan Gudang yang sudah ada tetap berjalan seperti sebelumnya.</p>
+        </div>
+        <div className="rounded-2xl bg-white/10 border border-white/15 px-4 py-3 min-w-[220px]">
+          <div className="text-xs text-frost-200/60">AKUN AKTIF</div>
+          <b className="block text-white mt-1">{me.name}</b>
+          <span className="text-xs text-frost-300">@{me.username}</span>
+          <Btn tone="ghost" className="w-full mt-3 !bg-white/10 !text-white !border-white/15" onClick={keluarBig}>Keluar</Btn>
+        </div>
+      </div>
+    </div>
+
+    <div className="flex flex-wrap gap-2 mb-5">
+      {[
+        ['dashboard','📊 Dashboard'],
+        ['users','👥 Semua User'],
+        ['danger','☢️ Reset Database'],
+        ['security','🔐 Keamanan']
+      ].map(x=><button key={x[0]} onClick={()=>setTab(x[0])} className={'px-4 py-2.5 rounded-2xl text-sm font-semibold border transition '+(tab===x[0]?'bg-glacier-900 text-white border-glacier-900':'bg-white text-glacier-700 border-slate-200')}>{x[1]}</button>)}
+    </div>
+
+    {tab==='dashboard'&&<div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {counts.map(c=><Card key={c[0]}><div className="text-2xl">{c[2]}</div><div className="text-xs text-slate-400 mt-2">{c[0]}</div><b className="font-display text-2xl text-glacier-900">{c[1].toLocaleString('id-ID')}</b></Card>)}
+      <Card className="sm:col-span-2 lg:col-span-4">
+        <div className="font-semibold mb-3">Ringkasan Role</div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          {['bigsuperadmin','superadmin','admin','driver','gudang'].map(r=><div key={r} className="p-4 rounded-2xl bg-slate-50 border"><div className="text-xs text-slate-500">{ROLES[r]}</div><b className="text-xl">{users.filter(u=>u.role===r).length}</b></div>)}
+        </div>
+      </Card>
+    </div>}
+
+    {tab==='users'&&<Card>
+      <div className="flex flex-wrap justify-between gap-3 mb-4">
+        <div><b className="text-lg">Semua Pengguna</b><p className="text-xs text-slate-500 mt-1">BIG SUPER ADMIN dapat menghapus akun Admin, Super Admin, Driver, dan Gudang.</p></div>
+        <Pill>{users.length} user</Pill>
+      </div>
+      <div className="space-y-2">
+        {users.sort((a,b)=>(a.role==='bigsuperadmin'?-1:1)-(b.role==='bigsuperadmin'?-1:1)).map(u=><div key={u.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl border bg-white/70">
+          <div><b>{u.name}</b><div className="text-xs text-slate-500">@{u.username} · {ROLES[u.role]||u.role}</div></div>
+          <div className="flex items-center gap-2">{u.role==='bigsuperadmin'?<Pill tone="approved">DILINDUNGI</Pill>:<Btn tone="danger" className="!px-3 !py-2 text-xs" onClick={()=>deleteUser(u)}>🗑 Hapus</Btn>}</div>
+        </div>)}
+      </div>
+    </Card>}
+
+    {tab==='danger'&&<div className="space-y-5">
+      <Card className="big-danger-zone">
+        <div className="flex flex-col lg:flex-row gap-5 justify-between">
+          <div>
+            <h3 className="font-display font-extrabold text-xl text-rose-700">☢️ RESET TOTAL DATABASE</h3>
+            <p className="text-sm text-slate-600 mt-2 max-w-3xl">Menghapus seluruh isi database aplikasi dan membuat ulang struktur awal. Semua Admin, Super Admin, Driver, Gudang, pelanggan, transaksi, stok, invoice, notifikasi, laporan, dan log akan dihapus.</p>
+            <p className="text-xs text-rose-600 font-semibold mt-3">BIG SUPER ADMIN tetap dibuat kembali agar sistem tidak terkunci setelah reset.</p>
+          </div>
+          <div className="w-full lg:w-72">
+            <Field label="Password BIG SUPER ADMIN untuk menjalankan reset">
+              <input type="password" className={inputCls} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Masukkan password"/>
+            </Field>
+            <Btn tone="danger" className="w-full" disabled={busy} onClick={resetDatabase}>{busy?'⏳ Sedang mereset…':'☢️ RESET SEMUA DATA'}</Btn>
+          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <b className="block mb-4">Hapus Node Data Secara Terpisah</b>
+        <div className="grid big-admin-grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {[
+            ['deliveries','Riwayat Pengantaran'],
+            ['stockRequests','Permintaan Stok'],
+            ['returnRequests','Pengembalian Stok'],
+            ['invoiceCustomers','Data Invoice'],
+            ['notifications','Notifikasi'],
+            ['logs','Log Audit'],
+            ['customers','Data Pelanggan'],
+            ['warehouse/history','Riwayat Gudang'],
+            ['driverStock','Stok Driver']
+          ].map(([node,label])=><button key={node} className="big-action border bg-white hover:bg-rose-50" onClick={()=>deleteNode(node,label)}><div className="font-semibold text-slate-800">🗑 {label}</div><div className="text-xs text-slate-400 mt-1">Node: {node}</div></button>)}
+        </div>
+      </Card>
+    </div>}
+
+    {tab==='security'&&<div className="grid lg:grid-cols-2 gap-5">
+      <Card>
+        <h3 className="font-bold mb-1">🔐 Ganti Password BIG SUPER ADMIN</h3>
+        <p className="text-xs text-slate-500 mb-4">Disarankan mengganti password bawaan setelah login pertama.</p>
+        <Field label="Password saat ini"><input type="password" className={inputCls} value={password} onChange={e=>setPassword(e.target.value)}/></Field>
+        <Field label="Password baru"><input type="password" className={inputCls} value={newPassword} onChange={e=>setNewPassword(e.target.value)} placeholder="Minimal 8 karakter"/></Field>
+        <Field label="Ulangi password baru"><input type="password" className={inputCls} value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)}/></Field>
+        <Btn tone="accent" className="w-full" onClick={changePassword}>Simpan Password Baru</Btn>
+      </Card>
+      <Card>
+        <h3 className="font-bold mb-3">🛡️ Perlindungan BIG</h3>
+        <div className="space-y-3 text-sm">
+          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100">✓ Akun BIG tidak ikut terhapus saat reset total.</div>
+          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100">✓ BIG dapat menghapus akun role lain.</div>
+          <div className="p-3 rounded-xl bg-amber-50 border border-amber-100">⚠️ Reset total memerlukan password + konfirmasi kedua.</div>
+          <div className="p-3 rounded-xl bg-slate-50 border">Username bawaan: <b>{BIG_DEFAULT_USERNAME}</b></div>
+        </div>
+      </Card>
+    </div>}
+  </div>;
+}
+
 
 async function notify({title,message,type='info',toRole=null,toUser=null,fromUser=null,data={}}){
  try{await db.ref('notifications').push({title,message,type,toRole,toUser,fromUser,data,read:false,createdAt:Date.now()})}catch(e){console.error(e)}
@@ -79,135 +441,10 @@ function useToast(){const[t,setT]=useState(null);const show=(msg,tone='ok')=>{se
 function IceGauge({label,value,max,big}){const p=Math.max(0,Math.min(100,max?(value/max)*100:0));return <div className="flex items-end gap-4"><div className="icebar-shell" style={{width:big?54:38,height:big?140:96}}><div className="icebar-fill w-full" style={{height:p+'%'}}/></div><div><div className={'font-display font-bold text-glacier-900 '+(big?'text-3xl':'text-xl')}>{Math.round(value||0).toLocaleString('id-ID')}</div><div className="text-xs text-slate-500">kantong</div><div className="text-[11px] text-slate-500 mt-1">{label}</div></div></div>}
 
 function SetupScreen({onDone}){const[n,setN]=useState(''),[u,setU]=useState(''),[p,setP]=useState(''),[e,setE]=useState(''),[busy,setBusy]=useState(false);const go=async()=>{if(!n||!u||!p)return setE('Semua kolom wajib diisi.');setBusy(true);try{const r=db.ref('users').push();await r.set({name:n,username:u.trim(),passwordHash:await sha256(p),role:'superadmin',active:true,createdAt:Date.now()});await db.ref('config/pricePerBag').set(15000);await db.ref('warehouse/stock').set(0);await db.ref('config/company').set({name:'GlasirEs',address:'',phone:'',logo:'',reportColor:'#1c4a73'});onDone()}catch(x){setE(x.message)}setBusy(false)};return <div className="min-h-screen flex items-center justify-center p-6"><Card className="w-full max-w-md"><h1 className="font-display text-2xl font-bold mb-2">Setup Super Admin</h1><p className="text-sm text-slate-500 mb-5">Buat akun pertama GlasirEs.</p><Field label="Nama"><input className={inputCls} value={n} onChange={e=>setN(e.target.value)}/></Field><Field label="Username"><input className={inputCls} value={u} onChange={e=>setU(e.target.value)}/></Field><Field label="Password"><input type="password" className={inputCls} value={p} onChange={e=>setP(e.target.value)}/></Field>{e&&<p className="text-rose-600 text-sm mb-3">{e}</p>}<Btn tone="accent" className="w-full" onClick={go} disabled={busy}>{busy?'Menyimpan…':'Buat Super Admin'}</Btn></Card></div>}
-function LoginScreen({onLogin}){
-  const[u,setU]=useState(''),[p,setP]=useState(''),[e,setE]=useState(''),[busy,setB]=useState(false);
-  const[recover,setRecover]=useState(false);
-  const[ru,setRU]=useState(''),[rp,setRP]=useState('');
-  const[rn,setRN]=useState('BIG SUPER ADMIN'),[rbu,setRBU]=useState(''),[rbp,setRBP]=useState('');
-  const[re,setRE]=useState(''),[rbusy,setRBusy]=useState(false);
+function LoginScreen({onLogin}){const[u,setU]=useState(''),[p,setP]=useState(''),[e,setE]=useState(''),[busy,setB]=useState(false);const go=async()=>{setB(true);setE('');try{const s=await db.ref('users').once('value'),a=toList(s.val()),x=a.find(z=>z.username===u.trim());if(!x||x.active===false)throw Error('Username tidak ditemukan atau nonaktif.');if(await sha256(p)!==x.passwordHash)throw Error('Password salah.');localStorage.setItem('glasires_uid',x.id);onLogin({id:x.id,...x})}catch(z){setE(z.message)}setB(false)};return <div className="min-h-screen flex items-center justify-center p-6"><div className="w-full max-w-md"><div className="text-center mb-7"><div className="font-display font-extrabold text-3xl">GlasirEs</div><p className="text-sm text-slate-500">Sistem distribusi & stok es kristal</p></div><Card><Field label="Username"><input className={inputCls} value={u} onChange={e=>setU(e.target.value)} onKeyDown={e=>e.key==='Enter'&&go()}/></Field><Field label="Password"><input type="password" className={inputCls} value={p} onChange={e=>setP(e.target.value)} onKeyDown={e=>e.key==='Enter'&&go()}/></Field>{e&&<p className="text-rose-600 text-sm mb-3">{e}</p>}<Btn tone="accent" className="w-full" onClick={go} disabled={busy}>{busy?'Memeriksa…':'Masuk'}</Btn></Card></div><div className="login-copyright">Copyright © 2026 | Power by <span className="bait-brand">Syech B@-it</span></div></div>}
 
-  const go=async()=>{
-    setB(true);setE('');
-    try{
-      const s=await db.ref('users').once('value'),a=toList(s.val()),x=a.find(z=>z.username===u.trim());
-      if(!x||x.active===false)throw Error('Username tidak ditemukan atau nonaktif.');
-      if(await sha256(p)!==x.passwordHash)throw Error('Password salah.');
-      localStorage.setItem('glasires_uid',x.id);
-      onLogin({id:x.id,...x});
-    }catch(z){setE(z.message)}
-    setB(false)
-  };
-
-  const recoverBig=async()=>{
-    setRBusy(true);setRE('');
-    try{
-      if(!ru.trim()||!rp||!rbu.trim()||!rbp)throw Error('Semua kolom pemulihan wajib diisi.');
-      if(rbp.length<6)throw Error('Password BIG SUPER ADMIN minimal 6 karakter.');
-      const s=await db.ref('users').once('value'),a=toList(s.val());
-      const su=a.find(z=>z.username===ru.trim()&&z.role==='superadmin'&&z.active!==false);
-      if(!su)throw Error('Akun SUPER ADMIN tidak ditemukan atau tidak aktif.');
-      if(await sha256(rp)!==su.passwordHash)throw Error('Password SUPER ADMIN salah.');
-      if(a.some(z=>z.username===rbu.trim()&&z.role!=='bigsuperadmin'))throw Error('Username BIG baru sudah dipakai user lain.');
-
-      const big=a.find(z=>z.role==='bigsuperadmin');
-      const now=Date.now();
-      if(big){
-        await db.ref('users/'+big.id).update({
-          username:rbu.trim(),
-          passwordHash:await sha256(rbp),
-          name:rn.trim()||big.name||'BIG SUPER ADMIN',
-          active:true,
-          protected:true,
-          recoveredAt:now,
-          recoveredBy:su.id,
-          recoveredByName:su.name
-        });
-        await createAudit('bigadmin_recovered',`BIG SUPER ADMIN dipulihkan oleh ${su.name}`,su);
-      }else{
-        const r=db.ref('users').push();
-        await r.set({
-          name:rn.trim()||'BIG SUPER ADMIN',
-          username:rbu.trim(),
-          passwordHash:await sha256(rbp),
-          role:'bigsuperadmin',
-          active:true,
-          protected:true,
-          createdAt:now,
-          createdBy:su.id,
-          createdByName:su.name
-        });
-        await createAudit('bigadmin_recovered_created',`BIG SUPER ADMIN dibuat kembali oleh ${su.name}`,su);
-      }
-
-      setRU('');setRP('');setRBU('');setRBP('');
-      setRE('');setRecover(false);
-      setU(rbu.trim());setP('');
-      alert('BIG SUPER ADMIN berhasil dipulihkan. Silakan login menggunakan username baru dan password baru yang Anda buat.');
-    }catch(z){setRE(z.message)}
-    setRBusy(false)
-  };
-
-  return <div className="min-h-screen flex items-center justify-center p-6">
-    <div className="w-full max-w-md">
-      <div className="text-center mb-7">
-        <div className="font-display font-extrabold text-3xl">GlasirEs</div>
-        <p className="text-sm text-slate-500">Sistem distribusi & stok es kristal</p>
-      </div>
-
-      {!recover ? <Card>
-        <Field label="Username">
-          <input className={inputCls} value={u} onChange={e=>setU(e.target.value)} onKeyDown={e=>e.key==='Enter'&&go()}/>
-        </Field>
-        <Field label="Password">
-          <input type="password" className={inputCls} value={p} onChange={e=>setP(e.target.value)} onKeyDown={e=>e.key==='Enter'&&go()}/>
-        </Field>
-        {e&&<p className="text-rose-600 text-sm mb-3">{e}</p>}
-        <Btn tone="accent" className="w-full" onClick={go} disabled={busy}>{busy?'Memeriksa…':'Masuk'}</Btn>
-      </Card> : <Card className="border-2 border-amber-200">
-        <div className="flex items-start gap-3 mb-5">
-          <div className="text-3xl">🛡️</div>
-          <div>
-            <h2 className="font-display font-bold text-xl">Pemulihan BIG SUPER ADMIN</h2>
-            <p className="text-xs text-slate-500 mt-1">Hanya SUPER ADMIN yang aktif yang dapat memulihkan akun ini.</p>
-          </div>
-        </div>
-
-        <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 mb-4">
-          Masukkan kredensial SUPER ADMIN yang masih aktif, lalu tentukan username dan password BIG SUPER ADMIN yang baru.
-        </div>
-
-        <Field label="Username SUPER ADMIN">
-          <input className={inputCls} value={ru} onChange={e=>setRU(e.target.value)}/>
-        </Field>
-        <Field label="Password SUPER ADMIN">
-          <input type="password" className={inputCls} value={rp} onChange={e=>setRP(e.target.value)}/>
-        </Field>
-
-        <div className="border-t border-slate-200 my-4"></div>
-
-        <Field label="Nama BIG SUPER ADMIN">
-          <input className={inputCls} value={rn} onChange={e=>setRN(e.target.value)}/>
-        </Field>
-        <Field label="Username BIG SUPER ADMIN Baru">
-          <input className={inputCls} value={rbu} onChange={e=>setRBU(e.target.value)} placeholder="Contoh: bigsuperadmin"/>
-        </Field>
-        <Field label="Password BIG SUPER ADMIN Baru">
-          <input type="password" className={inputCls} value={rbp} onChange={e=>setRBP(e.target.value)} placeholder="Minimal 6 karakter"/>
-        </Field>
-
-        {re&&<p className="text-rose-600 text-sm mb-3">{re}</p>}
-
-        <div className="grid grid-cols-2 gap-2">
-          <Btn tone="ghost" onClick={()=>{setRecover(false);setRE('')}} disabled={rbusy}>Kembali</Btn>
-          <Btn tone="danger" onClick={recoverBig} disabled={rbusy}>{rbusy?'Memulihkan…':'Pulihkan Akun'}</Btn>
-        </div>
-      </Card>}
-    </div>
-    <div className="login-copyright">Copyright © 2026 | Power by <span className="bait-brand">Syech B@-it</span></div>
-  </div>
-}
 function NotificationPanel({user,onClose}){const ns=useNotifications(user);return <div className="absolute right-0 top-14 w-[min(390px,calc(100vw-30px))] max-h-[520px] overflow-hidden rounded-2xl shadow-2xl bg-white border z-[90]"><div className="flex justify-between p-4 border-b font-bold">🔔 Notifikasi <button onClick={onClose}>✕</button></div><div className="overflow-y-auto max-h-[460px]">{ns.length?ns.map(n=><div key={n.id} onClick={()=>markRead(n.id)} className={'p-4 border-b cursor-pointer '+(!n.read?'bg-blue-50':'')}><div className="font-semibold">{n.title}</div><div className="text-sm mt-1">{n.message}</div><div className="text-xs text-slate-400 mt-2">{waktu(n.createdAt)}</div></div>):<div className="p-8 text-center text-slate-400">Tidak ada notifikasi</div>}</div></div>}
-function Shell({user,tabs,active,setActive,onLogout,children}){const[mo,setMo]=useState(false),[sn,setSn]=useState(false);const ns=useNotifications(user);useNewNotificationSound(ns);const unread=ns.filter(n=>!n.read).length;return <div className="min-h-screen flex"><aside className={'fixed lg:static z-40 inset-y-0 left-0 w-64 bg-glacier-900 text-frost-200 flex flex-col transition-transform '+(mo?'translate-x-0':'-translate-x-full lg:translate-x-0')}><div className="px-5 py-5 border-b border-white/10"><span className="font-display font-extrabold text-xl text-white">GlasirEs</span></div><nav className="flex-1 p-3 space-y-1 overflow-y-auto">{tabs.map(t=><button key={t.key} onClick={()=>{setActive(t.key);setMo(false)}} className={'w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium '+(active===t.key?'bg-frost-400 text-glacier-900':'text-frost-200/80 hover:bg-white/5')}>{t.icon} {t.label}</button>)}</nav><div className="p-4 border-t border-white/10"><div className="text-xs text-frost-200/60">Masuk sebagai</div><div className="font-semibold text-white">{user.name}</div><span className={'inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 '+BADGE[user.role]}>{ROLES[user.role]}</span><Btn tone="ghost" className="w-full mt-3 !bg-white/5 !text-white !border-white/15" onClick={onLogout}>Keluar</Btn></div><footer className="bait-developer-footer"><div className="bait-developer-content"><div className="bait-powered">● Power by</div><div className="bait-name">Syech B@-it</div><div className="bait-copyright">Copyright © 2026</div></div></footer></aside>{mo&&<div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={()=>setMo(false)}/>}<main className="flex-1 min-w-0"><div className="lg:hidden sticky top-0 z-20 glass flex justify-between p-3"><button onClick={()=>setMo(true)}>☰</button><b>GlasirEs</b><span/></div><div className="p-5 lg:p-8 max-w-7xl mx-auto"><div className="flex justify-end mb-4 relative"><button onClick={()=>setSn(!sn)} className="bg-white border rounded-full w-11 h-11 shadow">🔔{unread>0&&<span className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full text-[10px] min-w-[18px] h-[18px] flex items-center justify-center">{unread}</span>}</button>{sn&&<NotificationPanel user={user} onClose={()=>setSn(false)}/>}</div>{children}</div></main></div>}
+function Shell({user,tabs,active,setActive,onLogout,children}){const[mo,setMo]=useState(false),[sn,setSn]=useState(false);const ns=useNotifications(user);useNewNotificationSound(ns);const unread=ns.filter(n=>!n.read).length;return <div className="min-h-screen flex"><aside className={'print-hide fixed lg:static z-40 inset-y-0 left-0 w-64 bg-glacier-900 text-frost-200 flex flex-col transition-transform '+(mo?'translate-x-0':'-translate-x-full lg:translate-x-0')}><div className="px-5 py-5 border-b border-white/10"><span className="font-display font-extrabold text-xl text-white">GlasirEs</span></div><nav className="flex-1 p-3 space-y-1 overflow-y-auto">{tabs.map(t=><button key={t.key} onClick={()=>{setActive(t.key);setMo(false)}} className={'w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium '+(active===t.key?'bg-frost-400 text-glacier-900':'text-frost-200/80 hover:bg-white/5')}>{t.icon} {t.label}</button>)}</nav><div className="p-4 border-t border-white/10"><div className="text-xs text-frost-200/60">Masuk sebagai</div><div className="font-semibold text-white">{user.name}</div><span className={'inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 '+BADGE[user.role]}>{ROLES[user.role]}</span><Btn tone="ghost" className="w-full mt-3 !bg-white/5 !text-white !border-white/15" onClick={onLogout}>Keluar</Btn></div><footer className="bait-developer-footer"><div className="bait-developer-content"><div className="bait-powered">● Power by</div><div className="bait-name">Syech B@-it</div><div className="bait-copyright">Copyright © 2026</div></div></footer></aside>{mo&&<div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={()=>setMo(false)}/>}<main className="flex-1 min-w-0"><div className="print-hide lg:hidden sticky top-0 z-20 glass flex justify-between p-3"><button onClick={()=>setMo(true)}>☰</button><b>GlasirEs</b><span/></div><div className="p-5 lg:p-8 max-w-7xl mx-auto"><div className="print-hide flex justify-end mb-4 relative"><button onClick={()=>setSn(!sn)} className="bg-white border rounded-full w-11 h-11 shadow">🔔{unread>0&&<span className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full text-[10px] min-w-[18px] h-[18px] flex items-center justify-center">{unread}</span>}</button>{sn&&<NotificationPanel user={user} onClose={()=>setSn(false)}/>}</div>{children}</div></main></div>}
 
 function StockOverview(){const ws=useDbValue('warehouse/stock',0),ds=useDbList('driverStock'),us=toList(useDbList('users')),drivers=us.filter(u=>u.role==='driver'),car=Object.values(ds).reduce((a,b)=>a+(+b||0),0);return <div className="grid md:grid-cols-2 gap-5 mb-6"><Card><div className="text-xs font-mono text-slate-400 mb-3">STOK GUDANG</div><IceGauge label="Sisa es di gudang" value={ws} max={Math.max(ws,car,100)} big/></Card><Card><div className="text-xs font-mono text-slate-400 mb-3">DIBAWA DRIVER</div><IceGauge label="Total sedang dibawa" value={car} max={Math.max(ws,car,100)} big/><div className="mt-4 space-y-2">{drivers.map(d=><div key={d.id} className="flex justify-between text-sm"><span>{d.name}</span><b>{ds[d.username]||0} kantong</b></div>)}</div></Card></div>}
 
@@ -240,34 +477,291 @@ function CompanySettings({me}){const cfg=useDbValue('config/company',{}),price=u
 
 function PaymentManager(){const ds=toList(useDbList('deliveries')).filter(d=>d.paymentMethod==='invoice'&&d.paymentStatus!=='paid'),[toast,show]=useToast();const pay=async d=>{await db.ref('deliveries/'+d.id).update({paymentStatus:'paid',paidAt:Date.now()});await notify({title:'Invoice lunas',message:`Invoice ${d.customerName} sebesar ${rupiah(d.total)} sudah lunas.`,toRole:'admin'});show('Invoice ditandai lunas.')};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">Pembayaran Invoice</h2><Card><div className="space-y-2">{ds.map(d=><div key={d.id} className="flex justify-between items-center p-4 border rounded-xl"><div><b>{d.customerName}</b><div className="text-xs">{d.driverName} · {waktu(d.timestamp)}</div></div><div className="text-right"><b>{rupiah(d.total)}</b><br/><Btn tone="accent" className="!py-1 !px-3 text-xs mt-1" onClick={()=>pay(d)}>Tandai Lunas</Btn></div></div>)}{!ds.length&&<div className="text-center text-slate-400 py-6">Tidak ada invoice belum lunas.</div>}</div></Card></div>}
 
-function Reports({me}){const ds=toList(useDbList('deliveries')),us=toList(useDbList('users')),cfg=useDbValue('config/company',{}),[period,setPeriod]=useState('month'),[date,setDate]=useState(new Date().toISOString().slice(0,10)),[userId,setUserId]=useState(''),[pay,setPay]=useState(''),[toast,show]=useToast();const start=new Date(date);let end=new Date(date);if(period==='day'){start.setHours(0,0,0,0);end.setHours(23,59,59,999)}else if(period==='month'){start.setDate(1);end=new Date(start.getFullYear(),start.getMonth()+1,0,23,59,59,999)}else{start.setMonth(0,1);start.setHours(0,0,0,0);end=new Date(start.getFullYear(),11,31,23,59,59,999)}const rows=ds.filter(d=>d.timestamp>=start.getTime()&&d.timestamp<=end.getTime()&&(!userId||d.driverId===userId)&&(!pay||d.paymentMethod===pay));const cash=rows.filter(d=>d.paymentMethod==='cash').reduce((a,d)=>a+d.total,0),inv=rows.filter(d=>d.paymentMethod==='invoice').reduce((a,d)=>a+d.total,0),paid=rows.filter(d=>d.paymentMethod==='invoice'&&d.paymentStatus==='paid').reduce((a,d)=>a+d.total,0),unpaid=inv-paid;const print=()=>window.print();const exportPdf=()=>{try{const {jsPDF}=window.jspdf;const pdf=new jsPDF();pdf.setFont('helvetica','bold');pdf.setFontSize(18);pdf.text(cfg.name||'GlasirEs',15,18);pdf.setFontSize(10);pdf.setFont('helvetica','normal');pdf.text(cfg.address||'',15,25);pdf.text(cfg.phone||'',15,31);pdf.text('LAPORAN '+period.toUpperCase(),15,42);pdf.text(`Periode: ${start.toLocaleDateString('id-ID')} - ${end.toLocaleDateString('id-ID')}`,15,48);pdf.text(`Total transaksi: ${rows.length}`,15,58);pdf.text(`Total kantong: ${rows.reduce((a,d)=>a+d.qty,0)}`,15,65);pdf.text(`CASH: ${rupiah(cash)}`,15,72);pdf.text(`INVOICE: ${rupiah(inv)}`,15,79);pdf.text(`LUNAS: ${rupiah(paid)}`,15,86);pdf.text(`BELUM LUNAS: ${rupiah(unpaid)}`,15,93);let y=104;pdf.setFontSize(8);rows.slice(0,35).forEach((d,i)=>{pdf.text(`${i+1}. ${new Date(d.timestamp).toLocaleDateString('id-ID')} | ${d.driverName} | ${d.customerName} | ${d.qty} | ${rupiah(d.total)} | ${d.paymentMethod}`,15,y);y+=6});if(rows.length>35)pdf.text(`... dan ${rows.length-35} transaksi lainnya.`,15,y);pdf.save('laporan-glasires.pdf')}catch(e){show('PDF gagal: '+e.message,'err')}};return <div className="fade-in"><div className="no-print"><h2 className="font-display font-bold text-xl mb-5">Laporan</h2><Card className="mb-5"><div className="grid md:grid-cols-5 gap-3"><Field label="Periode"><select className={inputCls} value={period} onChange={e=>setPeriod(e.target.value)}><option value="day">Harian</option><option value="month">Bulanan</option><option value="year">Tahunan</option></select></Field><Field label="Tanggal acuan"><input type="date" className={inputCls} value={date} onChange={e=>setDate(e.target.value)}/></Field><Field label="User / Driver"><select className={inputCls} value={userId} onChange={e=>setUserId(e.target.value)}><option value="">Semua</option>{us.filter(u=>u.role==='driver'||u.role==='gudang').map(u=><option value={u.id} key={u.id}>{u.name} — {ROLES[u.role]}</option>)}</select></Field><Field label="Pembayaran"><select className={inputCls} value={pay} onChange={e=>setPay(e.target.value)}><option value="">Semua</option><option value="cash">CASH</option><option value="invoice">INVOICE</option></select></Field><div className="flex items-end gap-2 mb-3"><Btn tone="accent" onClick={print}>🖨 Print / PDF</Btn><Btn tone="ghost" onClick={exportPdf}>PDF</Btn></div></div></Card></div><div className="report-page report-print-area" style={{'--report-color':cfg.reportColor||'#1c4a73'}}><div className="report-head">{cfg.logo&&<img className="report-logo" src={cfg.logo}/>}<div><div className="report-title text-2xl font-bold">{cfg.name||'GlasirEs'}</div><div className="text-sm">{cfg.address||'Alamat perusahaan belum diatur'}</div><div className="text-sm">{cfg.phone||''}</div></div></div><h1 className="text-xl font-bold mt-6">LAPORAN TRANSAKSI</h1><p className="text-sm">Periode: {start.toLocaleDateString('id-ID')} s/d {end.toLocaleDateString('id-ID')}</p><div className="grid grid-cols-2 md:grid-cols-4 gap-3 my-5"><div className="p-3 border rounded-xl"><small>Transaksi</small><b className="block text-xl">{rows.length}</b></div><div className="p-3 border rounded-xl"><small>Kantong</small><b className="block text-xl">{rows.reduce((a,d)=>a+d.qty,0)}</b></div><div className="p-3 border rounded-xl"><small>CASH</small><b className="block">{rupiah(cash)}</b></div><div className="p-3 border rounded-xl"><small>INVOICE</small><b className="block">{rupiah(inv)}</b></div></div><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b text-left"><th>No</th><th>Tanggal</th><th>Driver</th><th>Pelanggan</th><th>Qty</th><th>Total</th><th>Bayar</th></tr></thead><tbody>{rows.map((d,i)=><tr key={d.id} className="border-b"><td className="py-2">{i+1}</td><td>{new Date(d.timestamp).toLocaleDateString('id-ID')}</td><td>{d.driverName}</td><td>{d.customerName}</td><td>{d.qty}</td><td>{rupiah(d.total)}</td><td>{d.paymentMethod==='invoice'?`INVOICE (${d.paymentStatus==='paid'?'LUNAS':'BELUM'})`:'CASH'}</td></tr>)}</tbody></table></div><div className="mt-5 text-right"><b>Total CASH: {rupiah(cash)}</b><br/><b>Total INVOICE: {rupiah(inv)}</b><br/><b>Invoice Lunas: {rupiah(paid)}</b><br/><b>Invoice Belum Lunas: {rupiah(unpaid)}</b></div><div className="sig"><div>Mengetahui,<div className="sigline"></div><b>{cfg.name||'Perusahaan'}</b></div><div>Dibuat oleh,<div className="sigline"></div><b>{me.name}</b><div className="text-xs">{ROLES[me.role]}</div></div></div><div className="text-center text-[10px] text-slate-400 mt-8">Power by Syech B@-it · Copyright © 2026</div></div></div>}
+function Reports({me}){const ds=toList(useDbList('deliveries')),us=toList(useDbList('users')),wh=toList(useDbList('warehouse/history')),rr=toList(useDbList('returnRequests')),cfg=useDbValue('config/company',{}),[period,setPeriod]=useState('month'),[date,setDate]=useState(new Date().toISOString().slice(0,10)),[userId,setUserId]=useState(''),[pay,setPay]=useState(''),[toast,show]=useToast();const start=new Date(date);let end=new Date(date);if(period==='day'){start.setHours(0,0,0,0);end.setHours(23,59,59,999)}else if(period==='month'){start.setDate(1);end=new Date(start.getFullYear(),start.getMonth()+1,0,23,59,59,999)}else{start.setMonth(0,1);start.setHours(0,0,0,0);end=new Date(start.getFullYear(),11,31,23,59,59,999)}const selectedUser=us.find(u=>u.id===userId);const warehouseRows=wh.filter(x=>x.timestamp>=start.getTime()&&x.timestamp<=end.getTime()&&(!userId||x.by===userId));const returnRows=rr.filter(x=>(x.receivedAt||x.requestedAt||0)>=start.getTime()&&(x.receivedAt||x.requestedAt||0)<=end.getTime()&&(!userId||x.receivedBy===userId));const rows=ds.filter(d=>d.timestamp>=start.getTime()&&d.timestamp<=end.getTime()&&(!userId||selectedUser?.role!=='gudang'&&d.driverId===userId)&&(!pay||d.paymentMethod===pay));const isGudang=selectedUser?.role==='gudang';const cash=isGudang?0:rows.filter(d=>d.paymentMethod==='cash').reduce((a,d)=>a+d.total,0),inv=isGudang?0:rows.filter(d=>d.paymentMethod==='invoice').reduce((a,d)=>a+d.total,0),paid=isGudang?0:rows.filter(d=>d.paymentMethod==='invoice'&&d.paymentStatus==='paid').reduce((a,d)=>a+d.total,0),unpaid=inv-paid;const print=()=>window.print();const exportPdf=()=>{try{const {jsPDF}=window.jspdf;const pdf=new jsPDF();pdf.setFont('helvetica','bold');pdf.setFontSize(18);pdf.text(cfg.name||'GlasirEs',15,18);pdf.setFontSize(10);pdf.setFont('helvetica','normal');pdf.text(cfg.address||'',15,25);pdf.text(cfg.phone||'',15,31);pdf.text('LAPORAN '+period.toUpperCase(),15,42);pdf.text(`Periode: ${start.toLocaleDateString('id-ID')} - ${end.toLocaleDateString('id-ID')}`,15,48);pdf.text(`User: ${selectedUser?selectedUser.name+' ('+ROLES[selectedUser.role]+')':'Semua'}`,15,58);if(isGudang){const mi=warehouseRows.filter(x=>x.type==='masuk').reduce((a,x)=>a+(+x.qty||0),0),ke=warehouseRows.filter(x=>x.type==='keluar').reduce((a,x)=>a+(+x.qty||0),0),kb=returnRows.filter(x=>x.status==='received').reduce((a,x)=>a+(+x.qty||0),0);pdf.text(`Aktivitas gudang: ${warehouseRows.length+returnRows.filter(x=>x.status==='received').length}`,15,64);pdf.text(`Masuk: ${mi} | Keluar: ${ke} | Kembali: ${kb}`,15,71)}else{pdf.text(`Total transaksi: ${rows.length}`,15,64);pdf.text(`Total kantong: ${rows.reduce((a,d)=>a+d.qty,0)}`,15,71);pdf.text(`CASH: ${rupiah(cash)}`,15,78);pdf.text(`INVOICE: ${rupiah(inv)}`,15,85);pdf.text(`LUNAS: ${rupiah(paid)}`,15,92);pdf.text(`BELUM LUNAS: ${rupiah(unpaid)}`,15,99)}let y=isGudang?82:110;pdf.setFontSize(8);if(isGudang){warehouseRows.slice(0,35).forEach((x,i)=>{pdf.text(`${i+1}. ${new Date(x.timestamp).toLocaleDateString('id-ID')} | ${x.type.toUpperCase()} | ${x.qty} | ${x.driverName||x.note||'-'}`,15,y);y+=6});returnRows.filter(x=>x.status==='received').slice(0,35).forEach((x,i)=>{if(y>285){pdf.addPage();y=18}pdf.text(`${i+1}. ${new Date(x.receivedAt||x.requestedAt).toLocaleDateString('id-ID')} | KEMBALI | ${x.qty} | ${x.driverName||'-'}`,15,y);y+=6})}else{rows.slice(0,35).forEach((d,i)=>{pdf.text(`${i+1}. ${new Date(d.timestamp).toLocaleDateString('id-ID')} | ${d.driverName} | ${d.customerName} | ${d.qty} | ${rupiah(d.total)} | ${d.paymentMethod}`,15,y);y+=6})}pdf.save('laporan-glasires.pdf')}catch(e){show('PDF gagal: '+e.message,'err')}};return <div className="fade-in"><div className="no-print"><h2 className="font-display font-bold text-xl mb-5">Laporan {selectedUser?`— ${selectedUser.name}`:''}</h2><Card className="mb-5"><div className="grid md:grid-cols-5 gap-3"><Field label="Periode"><select className={inputCls} value={period} onChange={e=>setPeriod(e.target.value)}><option value="day">Harian</option><option value="month">Bulanan</option><option value="year">Tahunan</option></select></Field><Field label="Tanggal acuan"><input type="date" className={inputCls} value={date} onChange={e=>setDate(e.target.value)}/></Field><Field label="User / Driver"><select className={inputCls} value={userId} onChange={e=>setUserId(e.target.value)}><option value="">Semua</option>{us.filter(u=>u.role==='driver'||u.role==='gudang').map(u=><option value={u.id} key={u.id}>{u.name} — {ROLES[u.role]}</option>)}</select></Field><Field label="Pembayaran"><select className={inputCls} value={pay} onChange={e=>setPay(e.target.value)}><option value="">Semua</option><option value="cash">CASH</option><option value="invoice">INVOICE</option></select></Field><div className="flex items-end gap-2 mb-3"><Btn tone="accent" onClick={print}>🖨 Print / PDF</Btn><Btn tone="ghost" onClick={exportPdf}>PDF</Btn></div></div></Card></div><div className="report-page report-print-area" style={{'--report-color':cfg.reportColor||'#1c4a73'}}><div className="report-head">{cfg.logo&&<img className="report-logo" src={cfg.logo}/>}<div><div className="report-title text-2xl font-bold">{cfg.name||'GlasirEs'}</div><div className="text-sm">{cfg.address||'Alamat perusahaan belum diatur'}</div><div className="text-sm">{cfg.phone||''}</div></div></div><h1 className="text-xl font-bold mt-6">{isGudang?'LAPORAN AKTIVITAS GUDANG':'LAPORAN TRANSAKSI'}</h1><p className="text-sm">Periode: {start.toLocaleDateString('id-ID')} s/d {end.toLocaleDateString('id-ID')}</p><div className={`grid grid-cols-2 md:grid-cols-4 gap-3 my-5 ${isGudang?'admin-gudang-hide-print report-finance-summary':''}`}><div className="p-3 border rounded-xl"><small>Transaksi</small><b className="block text-xl">{rows.length}</b></div><div className="p-3 border rounded-xl"><small>Kantong</small><b className="block text-xl">{rows.reduce((a,d)=>a+d.qty,0)}</b></div><div className="p-3 border rounded-xl"><small>CASH</small><b className="block">{rupiah(cash)}</b></div><div className="p-3 border rounded-xl"><small>INVOICE</small><b className="block">{rupiah(inv)}</b></div></div>{isGudang?<><div className="grid grid-cols-2 md:grid-cols-4 gap-3 my-5"><div className="p-3 border rounded-xl"><small>MASUK</small><b className="block text-xl text-emerald-700">{warehouseRows.filter(x=>x.type==='masuk').reduce((a,x)=>a+(+x.qty||0),0)}</b></div><div className="p-3 border rounded-xl"><small>KELUAR</small><b className="block text-xl text-rose-700">{warehouseRows.filter(x=>x.type==='keluar').reduce((a,x)=>a+(+x.qty||0),0)}</b></div><div className="p-3 border rounded-xl"><small>KEMBALI</small><b className="block text-xl text-violet-700">{returnRows.filter(x=>x.status==='received').reduce((a,x)=>a+(+x.qty||0),0)}</b></div><div className="p-3 border rounded-xl"><small>AKTIVITAS</small><b className="block text-xl">{warehouseRows.length+returnRows.filter(x=>x.status==='received').length}</b></div></div><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b text-left"><th>No</th><th>Tanggal</th><th>Jenis</th><th>Jumlah</th><th>Keterangan</th></tr></thead><tbody>{warehouseRows.map((x,i)=><tr key={x.id} className="border-b"><td className="py-2">{i+1}</td><td>{new Date(x.timestamp).toLocaleDateString('id-ID')}</td><td>{x.type.toUpperCase()}</td><td>{x.qty} kantong</td><td>{x.driverName||x.note||'-'}</td></tr>)}{returnRows.filter(x=>x.status==='received').map((x,i)=><tr key={'ret'+x.id} className="border-b"><td className="py-2">{warehouseRows.length+i+1}</td><td>{new Date(x.receivedAt||x.requestedAt).toLocaleDateString('id-ID')}</td><td>KEMBALI</td><td>{x.qty} kantong</td><td>{x.driverName||'-'}</td></tr>)}</tbody></table></div></>:<><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b text-left"><th>No</th><th>Tanggal</th><th>Driver</th><th>Pelanggan</th><th>Qty</th><th>Total</th><th>Bayar</th></tr></thead><tbody>{rows.map((d,i)=><tr key={d.id} className="border-b"><td className="py-2">{i+1}</td><td>{new Date(d.timestamp).toLocaleDateString('id-ID')}</td><td>{d.driverName}</td><td>{d.customerName}</td><td>{d.qty}</td><td>{rupiah(d.total)}</td><td>{d.paymentMethod==='invoice'?`INVOICE (${d.paymentStatus==='paid'?'LUNAS':'BELUM'})`:'CASH'}</td></tr>)}</tbody></table></div><div className="mt-5 text-right"><b>Total CASH: {rupiah(cash)}</b><br/><b>Total INVOICE: {rupiah(inv)}</b><br/><b>Invoice Lunas: {rupiah(paid)}</b><br/><b>Invoice Belum Lunas: {rupiah(unpaid)}</b></div></>}<div className="sig"><div>Mengetahui,<div className="sigline"></div><b>{cfg.name||'Perusahaan'}</b></div><div>Dibuat oleh,<div className="sigline"></div><b>{me.name}</b><div className="text-xs">{ROLES[me.role]}</div></div></div><div className="text-center text-[10px] text-slate-400 mt-8">Power by Syech B@-it · Copyright © 2026</div></div></div>}
 
-function IncomeReport({me}){const ds=toList(useDbList('deliveries')),us=toList(useDbList('users')),cfg=useDbValue('config/company',{}),[period,setPeriod]=useState('month'),[date,setDate]=useState(new Date().toISOString().slice(0,10)),[driverId,setDriverId]=useState(''),[payment,setPayment]=useState(''),[toast,show]=useToast();const start=new Date(date);let end=new Date(date);if(period==='day'){start.setHours(0,0,0,0);end.setHours(23,59,59,999)}else if(period==='month'){start.setDate(1);start.setHours(0,0,0,0);end=new Date(start.getFullYear(),start.getMonth()+1,0,23,59,59,999)}else{start.setMonth(0,1);start.setHours(0,0,0,0);end=new Date(start.getFullYear(),11,31,23,59,59,999)}const own=me.role==='driver'?me.id:driverId;const rows=ds.filter(d=>d.timestamp>=start.getTime()&&d.timestamp<=end.getTime()&&(!own||d.driverId===own)&&(!payment||d.paymentMethod===payment));const total=rows.reduce((a,d)=>a+(+d.total||0),0),cash=rows.filter(d=>d.paymentMethod==='cash').reduce((a,d)=>a+(+d.total||0),0),inv=rows.filter(d=>d.paymentMethod==='invoice').reduce((a,d)=>a+(+d.total||0),0),paid=rows.filter(d=>d.paymentMethod==='invoice'&&d.paymentStatus==='paid').reduce((a,d)=>a+(+d.total||0),0),unpaid=inv-paid,qty=rows.reduce((a,d)=>a+(+d.qty||0),0),cashPct=total?cash/total*100:0,invPct=total?inv/total*100:0;const print=()=>window.print();const exportPdf=()=>{try{const {jsPDF}=window.jspdf;const pdf=new jsPDF();pdf.setFont('helvetica','bold');pdf.setFontSize(18);pdf.text(cfg.name||'GlasirEs',15,18);pdf.setFontSize(10);pdf.setFont('helvetica','normal');pdf.text(cfg.address||'',15,25);pdf.text(cfg.phone||'',15,31);pdf.text('LAPORAN PENDAPATAN',15,42);pdf.text(`Periode: ${start.toLocaleDateString('id-ID')} - ${end.toLocaleDateString('id-ID')}`,15,48);pdf.text(`Transaksi: ${rows.length}`,15,58);pdf.text(`Kantong: ${qty}`,15,65);pdf.text(`Total pendapatan: ${rupiah(total)}`,15,72);pdf.text(`CASH: ${rupiah(cash)} (${cashPct.toFixed(1)}%)`,15,79);pdf.text(`INVOICE: ${rupiah(inv)} (${invPct.toFixed(1)}%)`,15,86);pdf.text(`Invoice lunas: ${rupiah(paid)}`,15,93);pdf.text(`Invoice belum lunas: ${rupiah(unpaid)}`,15,100);let y=111;pdf.setFontSize(8);rows.slice(0,35).forEach((d,i)=>{pdf.text(`${i+1}. ${new Date(d.timestamp).toLocaleDateString('id-ID')} | ${d.driverName||'-'} | ${d.customerName||'-'} | ${d.qty||0} | ${rupiah(d.total||0)} | ${(d.paymentMethod||'cash').toUpperCase()}`,15,y);y+=6});if(rows.length>35)pdf.text(`... dan ${rows.length-35} transaksi lainnya.`,15,y);pdf.save('laporan-pendapatan-glasires.pdf')}catch(e){show('PDF gagal: '+e.message,'err')}};return <div className="fade-in">{toast}<div className="no-print"><h2 className="font-display font-bold text-xl mb-5">Laporan Pendapatan</h2><Card className="mb-5"><div className="grid md:grid-cols-5 gap-3"><Field label="Periode"><select className={inputCls} value={period} onChange={e=>setPeriod(e.target.value)}><option value="day">Harian</option><option value="month">Bulanan</option><option value="year">Tahunan</option></select></Field><Field label="Tanggal acuan"><input type="date" className={inputCls} value={date} onChange={e=>setDate(e.target.value)}/></Field>{me.role!=='driver'&&<Field label="Driver"><select className={inputCls} value={driverId} onChange={e=>setDriverId(e.target.value)}><option value="">Semua Driver</option>{us.filter(u=>u.role==='driver').map(u=><option value={u.id} key={u.id}>{u.name}</option>)}</select></Field>}<Field label="Pembayaran"><select className={inputCls} value={payment} onChange={e=>setPayment(e.target.value)}><option value="">Semua</option><option value="cash">CASH</option><option value="invoice">INVOICE</option></select></Field><div className="flex items-end gap-2 mb-3"><Btn tone="accent" onClick={print}>🖨 Print</Btn><Btn tone="ghost" onClick={exportPdf}>PDF</Btn></div></div></Card></div><div className="report-page report-print-area" style={{'--report-color':cfg.reportColor||'#1c4a73'}}><div className="report-head">{cfg.logo&&<img className="report-logo" src={cfg.logo}/>}<div><div className="report-title text-2xl font-bold">{cfg.name||'GlasirEs'}</div><div className="text-sm">{cfg.address||'Alamat perusahaan belum diatur'}</div><div className="text-sm">{cfg.phone||''}</div></div></div><h1 className="text-xl font-bold mt-6">LAPORAN PENDAPATAN</h1><p className="text-sm">Periode: {start.toLocaleDateString('id-ID')} s/d {end.toLocaleDateString('id-ID')}</p><div className="grid grid-cols-2 md:grid-cols-6 gap-3 my-5"><div className="p-3 border rounded-xl"><small>Transaksi</small><b className="block text-xl">{rows.length}</b></div><div className="p-3 border rounded-xl"><small>Kantong</small><b className="block text-xl">{qty}</b></div><div className="p-3 border rounded-xl"><small>Total</small><b className="block">{rupiah(total)}</b></div><div className="p-3 border rounded-xl"><small>CASH</small><b className="block">{rupiah(cash)} <span className="text-xs">({cashPct.toFixed(1)}%)</span></b></div><div className="p-3 border rounded-xl"><small>INVOICE</small><b className="block">{rupiah(inv)} <span className="text-xs">({invPct.toFixed(1)}%)</span></b></div><div className="p-3 border rounded-xl"><small>LUNAS</small><b className="block">{rupiah(paid)}</b></div></div><div className="grid md:grid-cols-2 gap-5 mb-5"><div className="p-5 border rounded-2xl"><h3 className="font-bold mb-3">Komposisi Pendapatan</h3><div className="flex items-center gap-4"><div className="w-32 h-32 rounded-full" style={{background:`conic-gradient(#16a34a 0 ${cashPct}%, #2563eb ${cashPct}% 100%)`}}></div><div className="text-sm"><div><span className="inline-block w-3 h-3 rounded mr-2 bg-green-600"></span>CASH — {cashPct.toFixed(1)}%</div><div><span className="inline-block w-3 h-3 rounded mr-2 bg-blue-600"></span>INVOICE — {invPct.toFixed(1)}%</div></div></div></div><div className="p-5 border rounded-2xl"><h3 className="font-bold mb-3">Status Invoice</h3><div className="h-6 rounded-full overflow-hidden bg-slate-100"><div className="h-full bg-emerald-500" style={{width:`${inv?paid/inv*100:0}%`}}></div></div><div className="flex justify-between text-sm mt-2"><span>Lunas: {rupiah(paid)}</span><span>Belum: {rupiah(unpaid)}</span></div></div></div><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b text-left"><th>No</th><th>Tanggal</th><th>Driver</th><th>Pelanggan</th><th>Qty</th><th>Total</th><th>Bayar</th></tr></thead><tbody>{rows.map((d,i)=><tr key={d.id} className="border-b"><td className="py-2">{i+1}</td><td>{new Date(d.timestamp).toLocaleDateString('id-ID')}</td><td>{d.driverName||'-'}</td><td>{d.customerName||'-'}</td><td>{d.qty||0}</td><td>{rupiah(d.total||0)}</td><td>{d.paymentMethod==='invoice'?`INVOICE (${d.paymentStatus==='paid'?'LUNAS':'BELUM'})`:'CASH'}</td></tr>)}</tbody></table></div><div className="mt-5 text-right"><b>Total Pendapatan: {rupiah(total)}</b><br/><b>CASH: {rupiah(cash)} ({cashPct.toFixed(1)}%)</b><br/><b>INVOICE: {rupiah(inv)} ({invPct.toFixed(1)}%)</b><br/><b>Invoice Lunas: {rupiah(paid)}</b><br/><b>Invoice Belum Lunas: {rupiah(unpaid)}</b></div><div className="sig"><div>Mengetahui,<div className="sigline"></div><b>{cfg.name||'Perusahaan'}</b></div><div>Dibuat oleh,<div className="sigline"></div><b>{me.name}</b><div className="text-xs">{ROLES[me.role]}</div></div></div><div className="text-center text-[10px] text-slate-400 mt-8">Power by Syech B@-it · Copyright © 2026</div></div></div>}
 function PaymentReport({me}){return <Reports me={me}/>}
-function BigSuperAdminCreator({me}){const users=toList(useDbList('users')),existing=users.find(u=>u.role==='bigsuperadmin'),[name,setName]=useState('BIG SUPER ADMIN'),[un,setUn]=useState('bigsuperadmin'),[pw,setPw]=useState(''),[toast,show]=useToast();const save=async()=>{if(existing)return show('BIG SUPER ADMIN sudah ada. Login menggunakan akun tersebut.','err');if(!name.trim()||!un.trim()||!pw)return show('Lengkapi nama, username dan password.','err');if(users.some(u=>u.username===un.trim()))return show('Username sudah dipakai.','err');await db.ref('users').push({name:name.trim(),username:un.trim(),passwordHash:await sha256(pw),role:'bigsuperadmin',active:true,protected:true,createdAt:Date.now(),createdBy:me.id,createdByName:me.name});await createAudit('bigadmin_created',`BIG SUPER ADMIN dibuat oleh ${me.name}`,me);show('BIG SUPER ADMIN berhasil dibuat. Jika lupa kredensial, gunakan tombol Pemulihan BIG SUPER ADMIN di halaman login dengan akun SUPER ADMIN yang masih aktif.');setPw('')};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">BIG SUPER ADMIN</h2><Card className="max-w-2xl">{existing?<div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200"><b>✓ BIG SUPER ADMIN sudah tersedia</b><p className="text-sm mt-1">Username: <b>{existing.username}</b>. Akun ini dapat login dan memiliki menu reset database.</p></div>:<><p className="text-sm text-slate-500 mb-5">Buat akun khusus yang memiliki akses tertinggi. Setelah dibuat, logout lalu login menggunakan akun BIG SUPER ADMIN tersebut.</p><div className="grid md:grid-cols-2 gap-3"><Field label="Nama"><input className={inputCls} value={name} onChange={e=>setName(e.target.value)}/></Field><Field label="Username"><input className={inputCls} value={un} onChange={e=>setUn(e.target.value)}/></Field><Field label="Password"><input type="password" className={inputCls} value={pw} onChange={e=>setPw(e.target.value)}/></Field></div><Btn tone="danger" onClick={save}>🛡️ Buat BIG SUPER ADMIN</Btn></>}</Card></div>}
 
-function BigSuperAdminApp({me}){
-  const users=toList(useDbList('users'));
-  const [active,setActive]=useState('dashboard');
-  const [name,setName]=useState(''),[username,setUsername]=useState(''),[password,setPassword]=useState(''),[role,setRole]=useState('superadmin');
-  const [confirmText,setConfirmText]=useState('');
-  const [toast,show]=useToast();
-  const counts=useMemo(()=>({bigsuperadmin:users.filter(u=>u.role==='bigsuperadmin').length,superadmin:users.filter(u=>u.role==='superadmin').length,admin:users.filter(u=>u.role==='admin').length,driver:users.filter(u=>u.role==='driver').length,gudang:users.filter(u=>u.role==='gudang').length}),[users]);
-  const addUser=async()=>{if(!name.trim()||!username.trim()||!password)return show('Nama, username dan password wajib diisi.','err');if(users.some(u=>u.username===username.trim()))return show('Username sudah dipakai.','err');await db.ref('users').push({name:name.trim(),username:username.trim(),passwordHash:await sha256(password),role,active:true,createdAt:Date.now(),createdBy:me.id,createdByName:me.name});if(role==='driver')await db.ref('driverStock/'+username.trim()).set(0);await createAudit('bigadmin_user_created',`BIG SUPER ADMIN membuat ${name.trim()} (${ROLES[role]})`,me);setName('');setUsername('');setPassword('');show('User berhasil dibuat.')};
-  const deleteUser=async(u)=>{if(u.id===me.id||u.role==='bigsuperadmin')return show('Akun BIG SUPER ADMIN tidak dapat dihapus dari menu ini.','err');if(!confirm(`Hapus permanen user ${u.name} (${ROLES[u.role]})?`))return;await db.ref('users/'+u.id).remove();if(u.role==='driver'&&u.username)await db.ref('driverStock/'+u.username).remove();await createAudit('bigadmin_user_deleted',`BIG SUPER ADMIN menghapus ${u.name} (${ROLES[u.role]})`,me);show('User dihapus permanen.')};
-  const resetAll=async()=>{if(confirmText!=='RESET SEMUA DATA')return show('Ketik RESET SEMUA DATA persis untuk melanjutkan.','err');if(!confirm('PERINGATAN TERAKHIR: semua data Firebase akan dihapus dan hanya akun BIG SUPER ADMIN ini yang dipertahankan. Lanjutkan?'))return;try{const keep={...me};delete keep.id;await db.ref().set({users:{[me.id]:keep}});localStorage.setItem('glasires_uid',me.id);setConfirmText('');show('Database berhasil di-reset. Hanya BIG SUPER ADMIN yang dipertahankan.');setTimeout(()=>location.reload(),900)}catch(e){show('Reset gagal: '+e.message,'err')}};
-  const logout=()=>{localStorage.removeItem('glasires_uid');location.reload()};
-  const nav=[{key:'dashboard',label:'Dashboard',icon:'🛡️'},{key:'users',label:'Kelola Semua User',icon:'👥'},{key:'create',label:'Buat User Baru',icon:'➕'},{key:'reset',label:'RESET DATABASE',icon:'⚠️'}];
-  return <div className="min-h-screen flex bg-slate-50">{toast}<aside className="fixed lg:static z-40 inset-y-0 left-0 w-72 bg-gradient-to-b from-slate-950 via-slate-900 to-amber-950 text-white flex flex-col shadow-2xl"><div className="px-5 py-6 border-b border-white/10"><div className="text-xs tracking-[.25em] text-amber-300 font-bold">SYSTEM CONTROL</div><div className="font-display font-extrabold text-xl mt-1">BIG SUPER ADMIN</div><div className="text-xs text-white/50 mt-1">Akses penuh & reset database</div></div><nav className="flex-1 p-3 space-y-2">{nav.map(n=><button key={n.key} onClick={()=>setActive(n.key)} className={'w-full text-left px-4 py-3 rounded-xl text-sm font-semibold '+(active===n.key?'bg-amber-300 text-slate-950':'text-white/80 hover:bg-white/10')}>{n.icon} {n.label}</button>)}</nav><div className="p-4 border-t border-white/10"><div className="text-xs text-white/50">Masuk sebagai</div><div className="font-bold">{me.name}</div><div className="text-xs text-amber-300">{me.username}</div><Btn tone="ghost" className="w-full mt-3 !bg-white/10 !text-white !border-white/10" onClick={logout}>Keluar</Btn></div><footer className="bait-developer-footer"><div className="bait-developer-content"><div className="bait-powered">● Power by</div><div className="bait-name">Syech B@-it</div><div className="bait-copyright">Copyright © 2026</div></div></footer></aside><main className="flex-1 min-w-0"><div className="p-5 lg:p-8 max-w-7xl mx-auto"><div className="mb-6"><div className="text-xs font-mono text-amber-700 tracking-widest">DATABASE CONTROL CENTER</div><h1 className="font-display font-extrabold text-3xl text-slate-900">BIG SUPER ADMIN</h1><p className="text-sm text-slate-500 mt-1">Kelola akun dan kendalikan reset seluruh data aplikasi.</p></div>{active==='dashboard'&&<div className="fade-in"><div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">{[['bigsuperadmin','BIG SUPER ADMIN','🛡️'],['superadmin','SUPER ADMIN','👑'],['admin','ADMIN','🧑‍💼'],['driver','DRIVER','🚚'],['gudang','GUDANG','🏔️']].map(([r,l,i])=><Card key={r}><div className="text-3xl">{i}</div><div className="text-xs text-slate-500 mt-3">{l}</div><div className="text-3xl font-display font-bold mt-1">{counts[r]||0}</div></Card>)}</div><Card className="mt-5"><h2 className="font-bold text-lg">Kontrol Sistem</h2><div className="grid md:grid-cols-3 gap-4 mt-4"><div className="p-4 rounded-2xl bg-amber-50 border border-amber-200"><b>👥 Kelola semua user</b><p className="text-sm text-slate-600 mt-1">Lihat dan hapus Super Admin, Admin, Driver, dan Gudang.</p></div><div className="p-4 rounded-2xl bg-sky-50 border border-sky-200"><b>➕ Buat ulang user</b><p className="text-sm text-slate-600 mt-1">Buat user dari awal setelah reset database.</p></div><div className="p-4 rounded-2xl bg-rose-50 border border-rose-200"><b>⚠️ Reset database</b><p className="text-sm text-slate-600 mt-1">Hapus semua data Firebase dan pertahankan BIG SUPER ADMIN.</p></div></div></Card></div>}{active==='users'&&<div className="fade-in"><Card><div className="flex flex-wrap justify-between gap-3 mb-4"><div><b className="text-lg">Semua Pengguna</b><div className="text-xs text-slate-500 mt-1">BIG SUPER ADMIN dilindungi dan tidak dapat dihapus.</div></div><Pill tone="approved">{users.length} akun</Pill></div><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="text-left border-b text-slate-400"><th className="py-3">Nama</th><th>Username</th><th>Peran</th><th>Status</th><th className="text-right">Aksi</th></tr></thead><tbody>{users.sort((a,b)=>(a.role||'').localeCompare(b.role||'')).map(u=><tr key={u.id} className="border-b"><td className="py-3 font-semibold">{u.name}</td><td>@{u.username}</td><td><Pill>{ROLES[u.role]||u.role}</Pill></td><td>{u.active===false?<Pill tone="rejected">Nonaktif</Pill>:<Pill tone="done">Aktif</Pill>}</td><td className="text-right">{u.role==='bigsuperadmin'?<span className="text-xs font-bold text-amber-700">🔒 DILINDUNGI</span>:<Btn tone="danger" className="!py-1.5 !px-3 text-xs" onClick={()=>deleteUser(u)}>Hapus Permanen</Btn>}</td></tr>)}</tbody></table></div></Card></div>}{active==='create'&&<div className="fade-in"><Card className="max-w-3xl"><h2 className="font-display font-bold text-xl mb-1">Buat User Baru</h2><p className="text-sm text-slate-500 mb-5">Bisa membuat SUPER ADMIN, ADMIN, DRIVER atau GUDANG.</p><div className="grid md:grid-cols-2 gap-3"><Field label="Nama"><input className={inputCls} value={name} onChange={e=>setName(e.target.value)} placeholder="Nama pengguna"/></Field><Field label="Username"><input className={inputCls} value={username} onChange={e=>setUsername(e.target.value)} placeholder="username"/></Field><Field label="Password"><input type="password" className={inputCls} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password"/></Field><Field label="Peran"><select className={inputCls} value={role} onChange={e=>setRole(e.target.value)}><option value="superadmin">SUPER ADMIN</option><option value="admin">ADMIN</option><option value="driver">DRIVER</option><option value="gudang">GUDANG</option></select></Field></div><Btn tone="accent" onClick={addUser}>➕ Buat User</Btn></Card></div>}{active==='reset'&&<div className="fade-in"><Card className="max-w-3xl border-2 border-rose-200"><div className="text-5xl mb-3">⚠️</div><h2 className="font-display font-extrabold text-2xl text-rose-700">RESET SELURUH DATABASE</h2><p className="text-sm text-slate-600 mt-2">Semua data Firebase akan dihapus: transaksi, invoice, pelanggan, stok gudang, stok driver, permintaan, pengembalian, notifikasi, laporan, log, pengaturan perusahaan, dan seluruh akun selain BIG SUPER ADMIN.</p><div className="mt-5 p-4 rounded-2xl bg-rose-50 border border-rose-200"><b className="text-rose-800">Yang dipertahankan:</b><div className="text-sm mt-1">Hanya akun BIG SUPER ADMIN yang sedang login.</div></div><Field label="Ketik RESET SEMUA DATA untuk konfirmasi"><input className={inputCls+' border-rose-300'} value={confirmText} onChange={e=>setConfirmText(e.target.value)} placeholder="RESET SEMUA DATA"/></Field><Btn tone="danger" className="w-full md:w-auto" disabled={confirmText!=='RESET SEMUA DATA'} onClick={resetAll}>🔥 RESET DATABASE SEKARANG</Btn></Card></div>}</div></main></div>
+function SuperReports({me}){
+ const ds=toList(useDbList('deliveries')),
+       us=toList(useDbList('users')),
+       wh=toList(useDbList('warehouse/history')),
+       rr=toList(useDbList('returnRequests')),
+       cfg=useDbValue('config/company',{}),
+       [period,setPeriod]=useState('month'),
+       [date,setDate]=useState(new Date().toISOString().slice(0,10)),
+       [driverId,setDriverId]=useState(''),
+       [report,setReport]=useState('revenue'),
+       [selectedUsers,setSelectedUsers]=useState([]),
+       [toast,show]=useToast();
+
+ const range=useMemo(()=>{
+   const base=new Date(date+'T00:00:00');
+   let a=new Date(base), b=new Date(base);
+   if(period==='day'){a.setHours(0,0,0,0);b.setHours(23,59,59,999)}
+   else if(period==='month'){a=new Date(base.getFullYear(),base.getMonth(),1);b=new Date(base.getFullYear(),base.getMonth()+1,0,23,59,59,999)}
+   else {a=new Date(base.getFullYear(),0,1);b=new Date(base.getFullYear(),11,31,23,59,59,999)}
+   return {start:a.getTime(),end:b.getTime(),a,b}
+ },[period,date]);
+
+ const inRange=x=>{const t=+x||0;return t>=range.start&&t<=range.end};
+ const rows=ds.filter(d=>inRange(d.timestamp)&&(!driverId||d.driverId===driverId));
+ const warehouse=wh.filter(x=>inRange(x.timestamp));
+ const returns=rr.filter(x=>inRange(x.requestedAt||x.receivedAt));
+
+ const revenue=rows.reduce((a,d)=>a+(+d.total||0),0);
+ const cash=rows.filter(d=>d.paymentMethod==='cash').reduce((a,d)=>a+(+d.total||0),0);
+ const invoice=rows.filter(d=>d.paymentMethod==='invoice').reduce((a,d)=>a+(+d.total||0),0);
+ const paid=rows.filter(d=>d.paymentMethod==='invoice'&&d.paymentStatus==='paid').reduce((a,d)=>a+(+d.total||0),0);
+ const unpaid=Math.max(0,invoice-paid);
+ const qty=rows.reduce((a,d)=>a+(+d.qty||0),0);
+ const masuk=warehouse.filter(x=>x.type==='masuk').reduce((a,x)=>a+(+x.qty||0),0);
+ const keluar=warehouse.filter(x=>x.type==='keluar').reduce((a,x)=>a+(+x.qty||0),0);
+ const kembali=returns.filter(x=>x.status==='received').reduce((a,x)=>a+(+x.qty||0),0);
+ const currentStock=useDbValue('warehouse/stock',0);
+
+ const drivers=us.filter(u=>u.role==='driver'&&u.active!==false);
+ const driverStats=drivers.map(u=>{
+   const r=rows.filter(d=>d.driverId===u.id);
+   const q=r.reduce((a,d)=>a+(+d.qty||0),0);
+   const val=r.reduce((a,d)=>a+(+d.total||0),0);
+   const p=r.filter(d=>d.paymentStatus==='paid'||d.paymentMethod==='cash').reduce((a,d)=>a+(+d.total||0),0);
+   return {u,count:r.length,qty:q,value:val,paid:p,unpaid:Math.max(0,val-p)};
+ }).sort((a,b)=>b.value-a.value);
+
+ const maxDriver=Math.max(1,...driverStats.map(x=>x.value));
+ const pct=(v,total)=>total?Math.round(v/total*100):0;
+ const periodLabel=period==='day'?'HARIAN':period==='month'?'BULANAN':'TAHUNAN';
+ const money=n=>rupiah(n||0);
+
+ const print=()=>window.print();
+
+ const exportPdf=()=>{
+   try{
+     const {jsPDF}=window.jspdf;
+     const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+     const title=report==='revenue'?'LAPORAN PENDAPATAN':report==='warehouse'?'LAPORAN GUDANG':'LAPORAN KINERJA DRIVER';
+     pdf.setFont('helvetica','bold');pdf.setFontSize(17);pdf.text(cfg.name||'GlasirEs',15,16);
+     pdf.setFont('helvetica','normal');pdf.setFontSize(9);
+     pdf.text(cfg.address||'',15,22);pdf.text(cfg.phone||'',15,27);
+     pdf.setFont('helvetica','bold');pdf.setFontSize(13);pdf.text(title,15,38);
+     pdf.setFont('helvetica','normal');pdf.setFontSize(9);
+     pdf.text(`Periode ${periodLabel}: ${range.a.toLocaleDateString('id-ID')} s/d ${range.b.toLocaleDateString('id-ID')}`,15,44);
+     let y=54;
+     if(report==='revenue'){
+       pdf.text(`Pendapatan: ${money(revenue)}`,15,y);y+=6;
+       pdf.text(`CASH: ${money(cash)} (${pct(cash,revenue)}%)`,15,y);y+=6;
+       pdf.text(`INVOICE: ${money(invoice)} (${pct(invoice,revenue)}%)`,15,y);y+=6;
+       pdf.text(`LUNAS: ${money(paid)} (${pct(paid,invoice)}% dari invoice)`,15,y);y+=6;
+       pdf.text(`BELUM LUNAS: ${money(unpaid)} (${pct(unpaid,invoice)}% dari invoice)`,15,y);y+=9;
+       pdf.text(`Transaksi: ${rows.length} | Kantong: ${qty}`,15,y);y+=7;pdf.setFillColor(14,165,233);pdf.rect(15,y,70*(revenue?cash/revenue:0),5,'F');pdf.setFillColor(34,197,94);pdf.rect(15+70*(revenue?cash/revenue:0),y,70*(revenue?invoice/revenue:0),5,'F');y+=9;pdf.text(`Diagram CASH ${pct(cash,revenue)}% · INVOICE ${pct(invoice,revenue)}%`,15,y);y+=7;
+     }else if(report==='warehouse'){
+       pdf.text(`Stok saat ini: ${currentStock} kantong`,15,y);y+=6;
+       pdf.text(`Masuk: ${masuk} kantong`,15,y);y+=6;
+       pdf.text(`Keluar: ${keluar} kantong`,15,y);y+=6;
+       pdf.text(`Kembali diterima: ${kembali} kantong`,15,y);y+=7;const wt=masuk+keluar+kembali||1;pdf.setFillColor(34,197,94);pdf.rect(15,y,70*masuk/wt,5,'F');pdf.setFillColor(239,68,68);pdf.rect(15+70*masuk/wt,y,70*keluar/wt,5,'F');pdf.setFillColor(139,92,246);pdf.rect(15+70*(masuk+keluar)/wt,y,70*kembali/wt,5,'F');y+=7;pdf.text(`Diagram arus: Masuk ${pct(masuk,wt)}% · Keluar ${pct(keluar,wt)}% · Kembali ${pct(kembali,wt)}%`,15,y);y+=9;
+     }else{
+       pdf.text(`Total driver aktif: ${driverStats.length}`,15,y);y+=7;driverStats.slice(0,10).forEach((d,i)=>{const w=60*(maxDriver?d.value/maxDriver:0);pdf.setFillColor(14,165,233);pdf.rect(15,y,w,4,'F');pdf.setFontSize(7);pdf.setTextColor(30,41,59);pdf.text(`${d.u.name} ${pct(d.value,revenue)}%`,78,y+3);y+=6});pdf.setTextColor(0,0,0);y+=4;
+     }
+     pdf.setFont('helvetica','bold');pdf.text('RINGKASAN',15,y);y+=6;
+     pdf.setFont('helvetica','normal');pdf.setFontSize(8);
+     if(report==='driver'){
+       driverStats.slice(0,22).forEach((d,i)=>{
+         pdf.text(`${i+1}. ${d.u.name} | ${d.count} trx | ${d.qty} kantong | ${money(d.value)} | ${pct(d.value,revenue)}%`,15,y);
+         y+=5;if(y>282){pdf.addPage();y=18}
+       });
+     }else if(report==='warehouse'){
+       warehouse.slice().sort((a,b)=>(b.timestamp||0)-(a.timestamp||0)).slice(0,32).forEach((x,i)=>{
+         pdf.text(`${i+1}. ${new Date(x.timestamp).toLocaleDateString('id-ID')} | ${x.type.toUpperCase()} | ${x.qty} | ${x.byName||x.driverName||'-'}`,15,y);
+         y+=5;if(y>282){pdf.addPage();y=18}
+       });
+     }else{
+       rows.slice().sort((a,b)=>b.timestamp-a.timestamp).slice(0,30).forEach((d,i)=>{
+         pdf.text(`${i+1}. ${new Date(d.timestamp).toLocaleDateString('id-ID')} | ${d.driverName} | ${d.customerName} | ${d.qty} | ${money(d.total)}`,15,y);
+         y+=5;if(y>282){pdf.addPage();y=18}
+       });
+     }
+     pdf.save(`glasires-${report}-${period}.pdf`);
+   }catch(e){show('PDF gagal: '+e.message,'err')}
+ };
+
+ const sendReport=async()=>{
+   if(!selectedUsers.length)return show('Pilih minimal satu user penerima.','err');
+   const title=report==='revenue'?'Laporan Pendapatan':report==='warehouse'?'Laporan Gudang':'Laporan Kinerja Driver';
+   const message=report==='revenue'
+     ? `${title} ${periodLabel}: ${money(revenue)} | CASH ${money(cash)} | INVOICE ${money(invoice)} | LUNAS ${money(paid)} | BELUM ${money(unpaid)}.`
+     : report==='warehouse'
+     ? `${title} ${periodLabel}: Stok ${currentStock} kantong | Masuk ${masuk} | Keluar ${keluar} | Kembali ${kembali}.`
+     : `${title} ${periodLabel}: ${driverStats.length} driver | ${qty} kantong | ${money(revenue)}.`;
+   for(const uid of selectedUsers){
+     await notify({title,message,type:'report',toUser:uid,fromUser:me.id,data:{
+       report,period,periodStart:range.start,periodEnd:range.end,
+       revenue,cash,invoice,paid,unpaid,qty,masuk,keluar,kembali,currentStock,
+       driverCount:driverStats.length
+     }});
+   }
+   show(`Laporan berhasil dikirim ke ${selectedUsers.length} user.`);
+ };
+
+ const toggleUser=id=>setSelectedUsers(v=>v.includes(id)?v.filter(x=>x!==id):[...v,id]);
+ const doughnut=(a,b)=>{
+   const total=(+a||0)+(+b||0),pa=total?pct(a,total):50;
+   return {background:`conic-gradient(#0ea5e9 0 ${pa}%, #22c55e ${pa}% 100%)`};
+ };
+
+ return <div className="fade-in">
+   {toast}
+   <div className="no-print">
+     <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+       <div><h2 className="font-display font-bold text-2xl">📊 Super Admin Analytics</h2><p className="text-sm text-slate-500">Pendapatan, gudang, stok dan kinerja seluruh driver.</p></div>
+       <div className="flex gap-2"><Btn tone="accent" onClick={print}>🖨 Print / PDF</Btn><Btn tone="ghost" onClick={exportPdf}>📄 Export PDF</Btn></div>
+     </div>
+     <Card className="mb-5">
+       <div className="grid lg:grid-cols-5 md:grid-cols-3 gap-3">
+         <Field label="Jenis Laporan"><select className={inputCls} value={report} onChange={e=>setReport(e.target.value)}><option value="revenue">💰 Pendapatan</option><option value="warehouse">📦 Gudang & Stok</option><option value="driver">🚚 Kinerja Driver</option></select></Field>
+         <Field label="Periode"><select className={inputCls} value={period} onChange={e=>setPeriod(e.target.value)}><option value="day">Harian</option><option value="month">Bulanan</option><option value="year">Tahunan</option></select></Field>
+         <Field label="Tanggal Acuan"><input type="date" className={inputCls} value={date} onChange={e=>setDate(e.target.value)}/></Field>
+         <Field label="Driver"><select className={inputCls} value={driverId} onChange={e=>setDriverId(e.target.value)}><option value="">Semua Driver</option>{drivers.map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select></Field>
+         <div className="flex items-end"><div className="w-full rounded-xl bg-slate-50 border p-3 text-xs"><b>Periode aktif</b><div>{range.a.toLocaleDateString('id-ID')} — {range.b.toLocaleDateString('id-ID')}</div></div></div>
+       </div>
+     </Card>
+   </div>
+
+   <div className="report-page report-print-area" style={{'--report-color':cfg.reportColor||'#1c4a73'}}>
+     <div className="report-head">
+       {cfg.logo&&<img className="report-logo" src={cfg.logo}/>}
+       <div><div className="report-title text-2xl font-bold">{cfg.name||'GlasirEs'}</div><div className="text-sm">{cfg.address||'Alamat perusahaan belum diatur'}</div><div className="text-sm">{cfg.phone||''}</div></div>
+     </div>
+     <div className="mt-6 flex flex-wrap justify-between gap-3">
+       <div><h1 className="text-2xl font-display font-bold">{report==='revenue'?'LAPORAN PENDAPATAN':report==='warehouse'?'LAPORAN GUDANG & STOK':'LAPORAN KINERJA DRIVER'}</h1><p className="text-sm">Periode {periodLabel}: {range.a.toLocaleDateString('id-ID')} s/d {range.b.toLocaleDateString('id-ID')}</p></div>
+       <div className="text-right text-xs text-slate-500">Dibuat oleh<br/><b>{me.name}</b> · Super Admin</div>
+     </div>
+
+     {report==='revenue'&&<div>
+       <div className="grid md:grid-cols-4 gap-3 my-5">
+         <div className="p-4 rounded-2xl bg-sky-50 border border-sky-100"><small>PENDAPATAN</small><b className="block text-xl text-sky-700">{money(revenue)}</b><span className="text-xs">{rows.length} transaksi · {qty} kantong</span></div>
+         <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100"><small>CASH</small><b className="block text-xl text-emerald-700">{money(cash)}</b><span className="text-xs">{pct(cash,revenue)}% dari pendapatan</span></div>
+         <div className="p-4 rounded-2xl bg-violet-50 border border-violet-100"><small>INVOICE</small><b className="block text-xl text-violet-700">{money(invoice)}</b><span className="text-xs">{pct(invoice,revenue)}% dari pendapatan</span></div>
+         <div className="p-4 rounded-2xl bg-amber-50 border border-amber-100"><small>BELUM LUNAS</small><b className="block text-xl text-amber-700">{money(unpaid)}</b><span className="text-xs">{pct(unpaid,invoice)}% dari invoice</span></div>
+       </div>
+       <div className="grid md:grid-cols-2 gap-5">
+         <Card><h3 className="font-bold mb-4">Diagram Pendapatan</h3><div className="flex items-center gap-6"><div className="w-40 h-40 rounded-full relative" style={doughnut(cash,invoice)}><div className="absolute inset-5 bg-white rounded-full flex items-center justify-center text-xs font-bold text-center">TOTAL<br/>{money(revenue)}</div></div><div className="space-y-3 text-sm"><div><span className="inline-block w-3 h-3 rounded-full bg-sky-500 mr-2"></span>CASH <b>{pct(cash,revenue)}%</b><br/><span className="ml-5">{money(cash)}</span></div><div><span className="inline-block w-3 h-3 rounded-full bg-green-500 mr-2"></span>INVOICE <b>{pct(invoice,revenue)}%</b><br/><span className="ml-5">{money(invoice)}</span></div></div></div></Card>
+         <Card><h3 className="font-bold mb-4">Status Invoice</h3><div className="space-y-4"><div><div className="flex justify-between text-sm"><span>Lunas</span><b>{money(paid)} · {pct(paid,invoice)}%</b></div><div className="h-3 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500" style={{width:`${pct(paid,invoice)}%`}}/></div></div><div><div className="flex justify-between text-sm"><span>Belum Lunas</span><b>{money(unpaid)} · {pct(unpaid,invoice)}%</b></div><div className="h-3 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-amber-500" style={{width:`${pct(unpaid,invoice)}%`}}/></div></div></div></Card>
+       </div>
+     </div>}
+
+     {report==='warehouse'&&<div>
+       <div className="grid md:grid-cols-4 gap-3 my-5">
+         <div className="p-4 rounded-2xl bg-cyan-50 border"><small>STOK SAAT INI</small><b className="block text-2xl text-cyan-700">{currentStock}</b><span className="text-xs">kantong</span></div>
+         <div className="p-4 rounded-2xl bg-emerald-50 border"><small>GUDANG MASUK</small><b className="block text-2xl text-emerald-700">{masuk}</b><span className="text-xs">kantong · {pct(masuk,masuk+keluar)}%</span></div>
+         <div className="p-4 rounded-2xl bg-rose-50 border"><small>GUDANG KELUAR</small><b className="block text-2xl text-rose-700">{keluar}</b><span className="text-xs">kantong · {pct(keluar,masuk+keluar)}%</span></div>
+         <div className="p-4 rounded-2xl bg-violet-50 border"><small>KEMBALI DITERIMA</small><b className="block text-2xl text-violet-700">{kembali}</b><span className="text-xs">kantong</span></div>
+       </div>
+       <div className="grid md:grid-cols-2 gap-5">
+         <Card><h3 className="font-bold mb-4">Diagram Arus Gudang</h3><div className="flex items-center gap-6"><div className="w-40 h-40 rounded-full" style={doughnut(masuk,keluar)}/><div className="text-sm space-y-2"><div>🟢 Masuk: <b>{masuk}</b> ({pct(masuk,masuk+keluar)}%)</div><div>🔵 Keluar: <b>{keluar}</b> ({pct(keluar,masuk+keluar)}%)</div><div>🟣 Kembali: <b>{kembali}</b></div></div></div></Card>
+         <Card><h3 className="font-bold mb-4">Aktivitas Gudang</h3><div className="space-y-3">{warehouse.slice().sort((a,b)=>(b.timestamp||0)-(a.timestamp||0)).slice(0,12).map(x=><div key={x.id} className="flex justify-between border-b pb-2 text-sm"><span>{x.type==='masuk'?'🟢':'🔴'} {x.type.toUpperCase()}<br/><small>{x.byName||x.driverName||'-'}</small></span><b>{x.qty} kantong</b></div>)}{!warehouse.length&&<div className="text-slate-400">Belum ada aktivitas periode ini.</div>}</div></Card>
+       </div>
+     </div>}
+
+     {report==='driver'&&<div>
+       <div className="grid md:grid-cols-4 gap-3 my-5">
+         <div className="p-4 rounded-2xl bg-sky-50 border"><small>DRIVER AKTIF</small><b className="block text-2xl text-sky-700">{driverStats.length}</b></div>
+         <div className="p-4 rounded-2xl bg-cyan-50 border"><small>TOTAL KANTONG</small><b className="block text-2xl text-cyan-700">{qty}</b></div>
+         <div className="p-4 rounded-2xl bg-emerald-50 border"><small>NILAI PENJUALAN</small><b className="block text-xl text-emerald-700">{money(revenue)}</b></div>
+         <div className="p-4 rounded-2xl bg-violet-50 border"><small>RATA-RATA / DRIVER</small><b className="block text-xl text-violet-700">{money(driverStats.length?revenue/driverStats.length:0)}</b></div>
+       </div>
+       <Card className="mb-5"><h3 className="font-bold mb-4">Diagram Batang Kinerja Driver</h3><div className="space-y-4">{driverStats.map((d,i)=><div key={d.u.id}><div className="flex justify-between text-sm mb-1"><span><b>{i+1}. {d.u.name}</b> · {d.count} transaksi · {d.qty} kantong</span><b>{money(d.value)} · {pct(d.value,revenue)}%</b></div><div className="h-5 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-sky-500 to-violet-500 rounded-full" style={{width:`${Math.max(2,Math.round(d.value/maxDriver*100))}%`}}/></div></div>)}{!driverStats.length&&<div className="text-slate-400">Belum ada data driver.</div>}</div></Card>
+       <div className="overflow-x-auto"><table className="w-full text-sm border-separate border-spacing-0"><thead><tr className="bg-slate-100"><th className="p-3 text-left">Driver</th><th className="p-3">Transaksi</th><th className="p-3">Kantong</th><th className="p-3">Nilai</th><th className="p-3">Kontribusi</th><th className="p-3">Tertagih</th></tr></thead><tbody>{driverStats.map(d=><tr key={d.u.id} className="border-b"><td className="p-3 font-semibold">{d.u.name}</td><td className="p-3 text-center">{d.count}</td><td className="p-3 text-center">{d.qty}</td><td className="p-3 text-right">{money(d.value)}</td><td className="p-3 text-center">{pct(d.value,revenue)}%</td><td className="p-3 text-right">{money(d.paid)}</td></tr>)}</tbody></table></div>
+     </div>}
+
+     <div className="mt-8 sig"><div>Mengetahui,<div className="sigline"></div><b>{cfg.name||'Perusahaan'}</b></div><div>Dibuat oleh,<div className="sigline"></div><b>{me.name}</b><div className="text-xs">Super Admin</div></div></div>
+     <div className="text-center text-[10px] text-slate-400 mt-8">Power by Syech B@-it · Copyright © 2026</div>
+   </div>
+
+   <div className="no-print mt-6">
+     <Card>
+       <div className="flex flex-wrap items-center justify-between gap-3 mb-4"><div><h3 className="font-bold">📨 Kirim Laporan ke User</h3><p className="text-xs text-slate-500">User penerima akan mendapat notifikasi berisi ringkasan laporan dan nilai uang.</p></div><Btn tone="accent" onClick={sendReport}>📨 Kirim ke {selectedUsers.length||0} User</Btn></div>
+       <div className="grid md:grid-cols-3 gap-2">{us.filter(u=>u.active!==false&&u.id!==me.id).map(u=><label key={u.id} className={`border rounded-xl p-3 cursor-pointer flex items-center gap-3 ${selectedUsers.includes(u.id)?'ring-2 ring-sky-400 bg-sky-50':''}`}><input type="checkbox" checked={selectedUsers.includes(u.id)} onChange={()=>toggleUser(u.id)}/><span><b>{u.name}</b><small className="block text-slate-500">{ROLES[u.role]}</small></span></label>)}</div>
+     </Card>
+   </div>
+ </div>
 }
 
-function AdminApp({me,isSuper}){const tabs=[{key:'overview',label:'Ringkasan',icon:'📊'},{key:'approve',label:'Persetujuan Stok',icon:'✅'},{key:'deliveries',label:'Pengantaran',icon:'🧊'},{key:'invoiceCustomers',label:'Pelanggan & Penagihan',icon:'🧾'},{key:'reports',label:'Laporan',icon:'📑'},{key:'income',label:'Pendapatan',icon:'💰'},{key:'payments',label:'Invoice',icon:'💳'},{key:'users',label:'Driver & Gudang',icon:'👥'},...(isSuper?[{key:'admins',label:'Kelola Admin',icon:'🛡️'},{key:'settings',label:'Perusahaan & Harga',icon:'⚙️'}]:[])];const[a,setA]=useState('overview');return <Shell user={me} tabs={tabs} active={a} setActive={setA} onLogout={()=>{localStorage.removeItem('glasires_uid');location.reload()}}>{a==='overview'&&<><h2 className="font-display font-bold text-xl mb-5">Ringkasan {isSuper?'Super Admin':'Admin'}</h2><StockOverview/><DeliveriesTable/></>}{a==='approve'&&<ApproveRequests me={me}/>} {a==='deliveries'&&<><StockOverview/><DeliveriesTable/></>}{a==='invoiceCustomers'&&<InvoiceAdmin me={me}/>} {a==='reports'&&<Reports me={me}/>} {a==='income'&&<IncomeReport me={me}/>} {a==='payments'&&<PaymentManager/>}{a==='users'&&<ManageUsers me={me} roles={['driver','gudang']} title="Kelola Driver & Gudang"/>}{a==='admins'&&isSuper&&<ManageUsers me={me} roles={['admin']} title="Kelola Admin"/>}{a==='settings'&&isSuper&&<CompanySettings me={me}/>} {a==='bigadmin'&&isSuper&&<BigSuperAdminCreator me={me}/>}</Shell>}
+function AdminApp({me,isSuper}){const tabs=[{key:'overview',label:'Ringkasan',icon:'📊'},{key:'approve',label:'Persetujuan Stok',icon:'✅'},{key:'deliveries',label:'Pengantaran',icon:'🧊'},{key:'invoiceCustomers',label:'Pelanggan & Penagihan',icon:'🧾'},{key:'reports',label:'Laporan',icon:'📑'},{key:'payments',label:'Invoice',icon:'💳'},{key:'users',label:'Driver & Gudang',icon:'👥'},...(isSuper?[{key:'admins',label:'Kelola Admin',icon:'🛡️'},{key:'settings',label:'Perusahaan & Harga',icon:'⚙️'}]:[])];const[a,setA]=useState('overview');return <Shell user={me} tabs={tabs} active={a} setActive={setA} onLogout={()=>{localStorage.removeItem('glasires_uid');location.reload()}}>{a==='overview'&&<><h2 className="font-display font-bold text-xl mb-5">Ringkasan {isSuper?'Super Admin':'Admin'}</h2><StockOverview/><DeliveriesTable/></>}{a==='approve'&&<ApproveRequests me={me}/>} {a==='deliveries'&&<><StockOverview/><DeliveriesTable/></>}{a==='invoiceCustomers'&&<InvoiceAdmin me={me}/>} {a==='reports'&&(isSuper?<SuperReports me={me}/>:<Reports me={me}/>)} {a==='payments'&&<PaymentManager/>}{a==='users'&&<ManageUsers me={me} roles={['driver','gudang']} title="Kelola Driver & Gudang"/>}{a==='admins'&&isSuper&&<ManageUsers me={me} roles={['admin']} title="Kelola Admin"/>}{a==='settings'&&isSuper&&<CompanySettings me={me}/>}</Shell>}
 
-function DriverApp({me}){const tabs=[{key:'home',label:'Beranda',icon:'🏠'},{key:'request',label:'Minta Stok',icon:'📦'},{key:'invoiceCustomers',label:'Pelanggan Invoice',icon:'🧾'},{key:'collection',label:'Penagihan Saya',icon:'💰'},{key:'return',label:'Kembalikan Sisa',icon:'↩️'},{key:'reports',label:'Laporan Saya',icon:'📑'},{key:'income',label:'Pendapatan',icon:'💵'}], [a,setA]=useState('home');return <Shell user={me} tabs={tabs} active={a} setActive={setA} onLogout={()=>{localStorage.removeItem('glasires_uid');location.reload()}}>{a==='home'&&<DriverHome me={me}/>} {a==='request'&&<DriverRequest me={me}/>} {a==='invoiceCustomers'&&<InvoiceDriver me={me}/>} {a==='collection'&&<InvoiceCollectionDriver me={me}/>} {a==='return'&&<DriverReturn me={me}/>} {a==='reports'&&<Reports me={me}/>} {a==='income'&&<IncomeReport me={me}/>}</Shell>}
+function DriverOwnReport({me}){
+ const ds=toList(useDbList('deliveries')).filter(d=>d.driverId===me.id),
+       cfg=useDbValue('config/company',{}),
+       [period,setPeriod]=useState('day'),
+       [date,setDate]=useState(new Date().toISOString().slice(0,10)),
+       [toast,show]=useToast();
+ const start=new Date(date+'T00:00:00'); let end=new Date(start);
+ if(period==='day'){start.setHours(0,0,0,0);end.setHours(23,59,59,999)}
+ else if(period==='month'){start.setDate(1);start.setHours(0,0,0,0);end=new Date(start.getFullYear(),start.getMonth()+1,0,23,59,59,999)}
+ else {start.setMonth(0,0);start.setHours(0,0,0,0);end=new Date(start.getFullYear(),11,31,23,59,59,999)}
+ const rows=ds.filter(d=>d.timestamp>=start.getTime()&&d.timestamp<=end.getTime()).sort((a,b)=>b.timestamp-a.timestamp);
+ const cash=rows.filter(d=>d.paymentMethod==='cash').reduce((a,d)=>a+(+d.total||0),0);
+ const inv=rows.filter(d=>d.paymentMethod==='invoice').reduce((a,d)=>a+(+d.total||0),0);
+ const paid=rows.filter(d=>d.paymentMethod==='invoice'&&d.paymentStatus==='paid').reduce((a,d)=>a+(+d.total||0),0);
+ const unpaid=Math.max(0,inv-paid),qty=rows.reduce((a,d)=>a+(+d.qty||0),0),total=cash+inv;
+ const pct=(v,t)=>t?Math.round(v/t*100):0;
+ const print=()=>window.print();
+ const pdf=()=>{try{const {jsPDF}=window.jspdf,p=new jsPDF();p.setFont('helvetica','bold');p.setFontSize(17);p.text(cfg.name||'GlasirEs',15,17);p.setFontSize(10);p.setFont('helvetica','normal');p.text(cfg.address||'',15,24);p.text(cfg.phone||'',15,30);p.setFont('helvetica','bold');p.setFontSize(14);p.text('LAPORAN DRIVER',15,42);p.setFont('helvetica','normal');p.setFontSize(9);p.text(`Driver: ${me.name}`,15,48);p.text(`Periode: ${start.toLocaleDateString('id-ID')} - ${end.toLocaleDateString('id-ID')}`,15,54);p.text(`Transaksi: ${rows.length}`,15,63);p.text(`Kantong: ${qty}`,15,69);p.text(`Total: ${rupiah(total)}`,15,75);p.text(`CASH: ${rupiah(cash)} (${pct(cash,total)}%)`,15,81);p.text(`INVOICE: ${rupiah(inv)} (${pct(inv,total)}%)`,15,87);p.text(`LUNAS: ${rupiah(paid)}`,15,93);p.text(`BELUM LUNAS: ${rupiah(unpaid)}`,15,99);let y=110;p.setFontSize(8);rows.slice(0,32).forEach((d,i)=>{p.text(`${i+1}. ${new Date(d.timestamp).toLocaleDateString('id-ID')} | ${d.customerName} | ${d.qty} | ${rupiah(d.total)} | ${d.paymentMethod}`,15,y);y+=6;if(y>285){p.addPage();y=18}});p.save(`laporan-driver-${me.username}-${period}.pdf`)}catch(e){show('PDF gagal: '+e.message,'err')}};
+ const dough=(a,b)=>{const t=a+b||1,pa=pct(a,t);return {background:`conic-gradient(#0ea5e9 0 ${pa}%, #8b5cf6 ${pa}% 100%)`}};
+ return <div className="fade-in">{toast}
+   <div className="no-print">
+    <div className="flex flex-wrap justify-between items-center gap-3 mb-5"><div><h2 className="font-display font-bold text-xl">📑 Laporan Saya</h2><p className="text-sm text-slate-500">Laporan khusus <b>{me.name}</b>. Anda hanya dapat melihat data pengantaran milik sendiri.</p></div></div>
+    <Card className="mb-5"><div className="grid sm:grid-cols-2 gap-3"><Field label="Periode"><select className={inputCls} value={period} onChange={e=>setPeriod(e.target.value)}><option value="day">Harian</option><option value="month">Bulanan</option><option value="year">Tahunan</option></select></Field><Field label="Tanggal Acuan"><input type="date" className={inputCls} value={date} onChange={e=>setDate(e.target.value)}/></Field></div></Card>
+   </div>
+   <div className="report-page report-print-area" style={{'--report-color':cfg.reportColor||'#1c4a73'}}>
+    <div className="report-head">{cfg.logo&&<img className="report-logo" src={cfg.logo}/>}<div><div className="report-title text-2xl font-bold">{cfg.name||'GlasirEs'}</div><div className="text-sm">{cfg.address||''}</div><div className="text-sm">{cfg.phone||''}</div></div></div>
+    <div className="mt-6 flex justify-between gap-3"><div><h1 className="text-2xl font-display font-bold">LAPORAN KINERJA DRIVER</h1><p className="text-sm">Driver: <b>{me.name}</b> · @{me.username}</p><p className="text-sm">Periode: {start.toLocaleDateString('id-ID')} s/d {end.toLocaleDateString('id-ID')}</p></div><div className="text-right text-xs text-slate-500">Khusus akun ini<br/>Tidak menampilkan driver lain</div></div>
+    <div className="grid md:grid-cols-4 gap-3 my-5"><div className="p-4 rounded-2xl bg-sky-50 border"><small>TRANSAKSI</small><b className="block text-2xl text-sky-700">{rows.length}</b></div><div className="p-4 rounded-2xl bg-cyan-50 border"><small>KANTONG</small><b className="block text-2xl text-cyan-700">{qty}</b></div><div className="p-4 rounded-2xl bg-emerald-50 border"><small>NILAI PENJUALAN</small><b className="block text-xl text-emerald-700">{rupiah(total)}</b></div><div className="p-4 rounded-2xl bg-amber-50 border"><small>BELUM LUNAS</small><b className="block text-xl text-amber-700">{rupiah(unpaid)}</b></div></div>
+    <div className="grid md:grid-cols-2 gap-5 mb-5"><Card><h3 className="font-bold mb-4">Diagram Pembayaran</h3><div className="flex items-center gap-6"><div className="w-40 h-40 rounded-full relative" style={dough(cash,inv)}><div className="absolute inset-5 bg-white rounded-full flex items-center justify-center text-xs text-center font-bold">{rupiah(total)}</div></div><div className="text-sm space-y-3"><div>🔵 CASH <b>{pct(cash,total)}%</b><br/><span className="ml-5">{rupiah(cash)}</span></div><div>🟣 INVOICE <b>{pct(inv,total)}%</b><br/><span className="ml-5">{rupiah(inv)}</span></div></div></div></Card><Card><h3 className="font-bold mb-4">Status Invoice</h3><div className="space-y-4"><div><div className="flex justify-between text-sm"><span>Sudah Lunas</span><b>{rupiah(paid)} · {pct(paid,inv)}%</b></div><div className="h-3 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500" style={{width:`${pct(paid,inv)}%`}}/></div></div><div><div className="flex justify-between text-sm"><span>Belum Lunas</span><b>{rupiah(unpaid)} · {pct(unpaid,inv)}%</b></div><div className="h-3 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-amber-500" style={{width:`${pct(unpaid,inv)}%`}}/></div></div></div></Card></div>
+    <Card><h3 className="font-bold mb-4">Detail Pengantaran Saya</h3><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b text-left"><th className="py-2">No</th><th>Tanggal</th><th>Pelanggan</th><th>Kantong</th><th>Total</th><th>Pembayaran</th></tr></thead><tbody>{rows.map((d,i)=><tr key={d.id} className="border-b"><td className="py-2">{i+1}</td><td>{new Date(d.timestamp).toLocaleDateString('id-ID')}</td><td>{d.customerName}</td><td>{d.qty}</td><td>{rupiah(d.total)}</td><td>{d.paymentMethod==='invoice'?`INVOICE · ${d.paymentStatus==='paid'?'LUNAS':'BELUM LUNAS'}`:'CASH'}</td></tr>)}{!rows.length&&<tr><td colSpan="6" className="py-8 text-center text-slate-400">Belum ada transaksi pada periode ini.</td></tr>}</tbody></table></div></Card>
+    <div className="sig"><div>Mengetahui,<div className="sigline"></div><b>{cfg.name||'Perusahaan'}</b></div><div>Dibuat oleh,<div className="sigline"></div><b>{me.name}</b><div className="text-xs">Driver</div></div></div><div className="text-center text-[10px] text-slate-400 mt-8">Power by Syech B@-it · Copyright © 2026</div>
+   </div>
+ </div>
+}
 
-function GudangApp({me}){const tabs=[{key:'home',label:'Stok Gudang',icon:'🏔️'},{key:'release',label:'Keluarkan ke Driver',icon:'🚚'},{key:'returns',label:'Terima Kembalian',icon:'↩️'},{key:'reports',label:'Laporan Gudang',icon:'📑'},{key:'income',label:'Pendapatan',icon:'💵'}],[a,setA]=useState('home');return <Shell user={me} tabs={tabs} active={a} setActive={setA} onLogout={()=>{localStorage.removeItem('glasires_uid');location.reload()}}>{a==='home'&&<GudangHome me={me}/>} {a==='release'&&<GudangRelease me={me}/>} {a==='returns'&&<GudangReceive me={me}/>} {a==='reports'&&<Reports me={me}/>} {a==='income'&&<IncomeReport me={me}/>}</Shell>}
+function GudangOwnReport({me}){
+ const wh=toList(useDbList('warehouse/history')).filter(x=>x.by===me.id),
+       returns=toList(useDbList('returnRequests')).filter(x=>x.receivedBy===me.id),
+       cfg=useDbValue('config/company',{}),
+       stock=useDbValue('warehouse/stock',0),
+       [period,setPeriod]=useState('day'),
+       [date,setDate]=useState(new Date().toISOString().slice(0,10)),
+       [toast,show]=useToast();
+ const start=new Date(date+'T00:00:00');let end=new Date(start);
+ if(period==='day'){start.setHours(0,0,0,0);end.setHours(23,59,59,999)}
+ else if(period==='month'){start.setDate(1);start.setHours(0,0,0,0);end=new Date(start.getFullYear(),start.getMonth()+1,0,23,59,59,999)}
+ else {start.setMonth(0,0);start.setHours(0,0,0,0);end=new Date(start.getFullYear(),11,31,23,59,59,999)}
+ const rows=wh.filter(x=>x.timestamp>=start.getTime()&&x.timestamp<=end.getTime()).sort((a,b)=>b.timestamp-a.timestamp);
+ const ret=returns.filter(x=>(x.receivedAt||0)>=start.getTime()&&(x.receivedAt||0)<=end.getTime());
+ const masuk=rows.filter(x=>x.type==='masuk').reduce((a,x)=>a+(+x.qty||0),0);
+ const keluar=rows.filter(x=>x.type==='keluar').reduce((a,x)=>a+(+x.qty||0),0);
+ const kembali=ret.reduce((a,x)=>a+(+x.qty||0),0);
+ const pct=(v,t)=>t?Math.round(v/t*100):0;
+ const print=()=>window.print();
+ const pdf=()=>{try{const {jsPDF}=window.jspdf,p=new jsPDF();p.setFont('helvetica','bold');p.setFontSize(17);p.text(cfg.name||'GlasirEs',15,17);p.setFontSize(10);p.setFont('helvetica','normal');p.text(cfg.address||'',15,24);p.text(cfg.phone||'',15,30);p.setFont('helvetica','bold');p.setFontSize(14);p.text('LAPORAN GUDANG',15,42);p.setFont('helvetica','normal');p.setFontSize(9);p.text(`Petugas: ${me.name}`,15,48);p.text(`Periode: ${start.toLocaleDateString('id-ID')} - ${end.toLocaleDateString('id-ID')}`,15,54);p.text(`Stok saat ini: ${stock} kantong`,15,63);p.text(`Masuk: ${masuk} kantong (${pct(masuk,masuk+keluar)}%)`,15,69);p.text(`Keluar: ${keluar} kantong (${pct(keluar,masuk+keluar)}%)`,15,75);p.text(`Kembali diterima: ${kembali} kantong`,15,81);let y=92;p.setFontSize(8);rows.slice(0,35).forEach((x,i)=>{p.text(`${i+1}. ${new Date(x.timestamp).toLocaleDateString('id-ID')} | ${x.type.toUpperCase()} | ${x.qty} | ${x.byName||x.driverName||'-'}`,15,y);y+=6;if(y>285){p.addPage();y=18}});p.save(`laporan-gudang-${me.username}-${period}.pdf`)}catch(e){show('PDF gagal: '+e.message,'err')}};
+ const dough=(a,b,c)=>{const t=(+a||0)+(+b||0)+(+c||0)||1,pa=(+a||0)/t*100,pb=((+a||0)+(+b||0))/t*100;return {background:`conic-gradient(#22c55e 0 ${pa}%, #ef4444 ${pa}% ${pb}%, #8b5cf6 ${pb}% 100%)`}};
+ return <div className="fade-in">{toast}
+  <div className="no-print"><div className="flex flex-wrap justify-between items-center gap-3 mb-5"><div><h2 className="font-display font-bold text-xl">📦 Laporan Gudang Saya</h2><p className="text-sm text-slate-500">Laporan khusus <b>{me.name}</b>. Hanya aktivitas gudang yang dilakukan akun ini.</p></div></div><Card className="mb-5"><div className="grid sm:grid-cols-2 gap-3"><Field label="Periode"><select className={inputCls} value={period} onChange={e=>setPeriod(e.target.value)}><option value="day">Harian</option><option value="month">Bulanan</option><option value="year">Tahunan</option></select></Field><Field label="Tanggal Acuan"><input type="date" className={inputCls} value={date} onChange={e=>setDate(e.target.value)}/></Field></div></Card></div>
+  <div className="report-page report-print-area" style={{'--report-color':cfg.reportColor||'#1c4a73'}}>
+   <div className="report-head">{cfg.logo&&<img className="report-logo" src={cfg.logo}/>}<div><div className="report-title text-2xl font-bold">{cfg.name||'GlasirEs'}</div><div className="text-sm">{cfg.address||''}</div><div className="text-sm">{cfg.phone||''}</div></div></div>
+   <div className="mt-6 flex justify-between"><div><h1 className="text-2xl font-display font-bold">LAPORAN AKTIVITAS GUDANG</h1><p className="text-sm">Petugas: <b>{me.name}</b> · @{me.username}</p><p className="text-sm">Periode: {start.toLocaleDateString('id-ID')} s/d {end.toLocaleDateString('id-ID')}</p></div><div className="text-right text-xs text-slate-500">Khusus akun gudang ini<br/>Tidak menampilkan gudang/user lain</div></div>
+   <div className="grid md:grid-cols-4 gap-3 my-5"><div className="p-4 rounded-2xl bg-cyan-50 border"><small>STOK SAAT INI</small><b className="block text-2xl text-cyan-700">{stock}</b><span className="text-xs">kantong</span></div><div className="p-4 rounded-2xl bg-emerald-50 border"><small>MASUK</small><b className="block text-2xl text-emerald-700">{masuk}</b><span className="text-xs">{pct(masuk,masuk+keluar)}%</span></div><div className="p-4 rounded-2xl bg-rose-50 border"><small>KELUAR</small><b className="block text-2xl text-rose-700">{keluar}</b><span className="text-xs">{pct(keluar,masuk+keluar)}%</span></div><div className="p-4 rounded-2xl bg-violet-50 border"><small>KEMBALI DITERIMA</small><b className="block text-2xl text-violet-700">{kembali}</b><span className="text-xs">kantong</span></div></div>
+   <div className="grid md:grid-cols-2 gap-5 mb-5"><Card><h3 className="font-bold mb-4">Diagram Masuk vs Keluar</h3><div className="flex items-center gap-6"><div className="w-40 h-40 rounded-full relative" style={dough(masuk,keluar,kembali)}><div className="absolute inset-5 bg-white rounded-full flex items-center justify-center text-xs text-center font-bold">{masuk+keluar}<br/>aktivitas</div></div><div className="text-sm space-y-3"><div>🟢 MASUK <b>{pct(masuk,masuk+keluar+kembali)}%</b><br/><span className="ml-5">{masuk} kantong</span></div><div>🔴 KELUAR <b>{pct(keluar,masuk+keluar+kembali)}%</b><br/><span className="ml-5">{keluar} kantong</span></div><div>🟣 KEMBALI <b>{pct(kembali,masuk+keluar+kembali)}%</b><br/><span className="ml-5">{kembali} kantong</span></div></div></div></Card><Card><h3 className="font-bold mb-4">Ringkasan Periode</h3><div className="space-y-3 text-sm"><div className="flex justify-between border-b pb-2"><span>Stok saat ini</span><b>{stock} kantong</b></div><div className="flex justify-between border-b pb-2"><span>Masuk periode ini</span><b className="text-emerald-600">{masuk} kantong</b></div><div className="flex justify-between border-b pb-2"><span>Keluar periode ini</span><b className="text-rose-600">{keluar} kantong</b></div><div className="flex justify-between"><span>Kembali diterima</span><b>{kembali} kantong</b></div></div></Card></div>
+   <Card><h3 className="font-bold mb-4">Detail Aktivitas Gudang Saya</h3><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b text-left"><th className="py-2">No</th><th>Tanggal</th><th>Jenis</th><th>Jumlah</th><th>Driver / Keterangan</th></tr></thead><tbody>{rows.map((x,i)=><tr key={x.id} className="border-b"><td className="py-2">{i+1}</td><td>{new Date(x.timestamp).toLocaleDateString('id-ID')}</td><td>{x.type==='masuk'?'🟢 MASUK':'🔴 KELUAR'}</td><td>{x.qty} kantong</td><td>{x.driverName||x.note||'-'}</td></tr>)}{ret.map((x,i)=><tr key={'r'+x.id} className="border-b"><td className="py-2">{rows.length+i+1}</td><td>{new Date(x.receivedAt).toLocaleDateString('id-ID')}</td><td>🟣 KEMBALI</td><td>{x.qty} kantong</td><td>{x.driverName||'-'}</td></tr>)}{!rows.length&&!ret.length&&<tr><td colSpan="5" className="py-8 text-center text-slate-400">Belum ada aktivitas pada periode ini.</td></tr>}</tbody></table></div></Card>
+   <div className="sig"><div>Mengetahui,<div className="sigline"></div><b>{cfg.name||'Perusahaan'}</b></div><div>Dibuat oleh,<div className="sigline"></div><b>{me.name}</b><div className="text-xs">Gudang</div></div></div><div className="text-center text-[10px] text-slate-400 mt-8">Power by Syech B@-it · Copyright © 2026</div>
+  </div>
+ </div>
+}
 
-function App(){const[loading,setLoading]=useState(true),[has,setHas]=useState(true),[me,setMe]=useState(null);useEffect(()=>{(async()=>{try{const s=await db.ref('users').once('value');setHas(s.exists());const id=localStorage.getItem('glasires_uid');if(s.exists()&&id){const u=await db.ref('users/'+id).once('value');if(u.exists()&&u.val().active!==false)setMe({id,...u.val()});else localStorage.removeItem('glasires_uid')}}catch(e){console.error(e)}setLoading(false)})()},[]);if(loading)return <div className="min-h-screen flex items-center justify-center font-mono text-slate-400">Memuat GlasirEs…</div>;if(!has)return <SetupScreen onDone={()=>location.reload()}/>;if(!me)return <LoginScreen onLogin={setMe}/>;if(me.role==='bigsuperadmin')return <BigSuperAdminApp me={me}/>;if(me.role==='superadmin')return <AdminApp me={me} isSuper/>;if(me.role==='admin')return <AdminApp me={me}/>;if(me.role==='driver')return <DriverApp me={me}/>;if(me.role==='gudang')return <GudangApp me={me}/>;return <div className="p-8">Peran tidak dikenal.</div>}
+function DriverApp({me}){const tabs=[{key:'home',label:'Beranda',icon:'🏠'},{key:'request',label:'Minta Stok',icon:'📦'},{key:'invoiceCustomers',label:'Pelanggan Invoice',icon:'🧾'},{key:'collection',label:'Penagihan Saya',icon:'💰'},{key:'return',label:'Kembalikan Sisa',icon:'↩️'},{key:'reports',label:'Laporan Saya',icon:'📑'}], [a,setA]=useState('home');return <Shell user={me} tabs={tabs} active={a} setActive={setA} onLogout={()=>{localStorage.removeItem('glasires_uid');location.reload()}}>{a==='home'&&<DriverHome me={me}/>} {a==='request'&&<DriverRequest me={me}/>} {a==='invoiceCustomers'&&<InvoiceDriver me={me}/>} {a==='collection'&&<InvoiceCollectionDriver me={me}/>} {a==='return'&&<DriverReturn me={me}/>} {a==='reports'&&<DriverOwnReport me={me}/>}</Shell>}
+
+function GudangApp({me}){const tabs=[{key:'home',label:'Stok Gudang',icon:'🏔️'},{key:'release',label:'Keluarkan ke Driver',icon:'🚚'},{key:'returns',label:'Terima Kembalian',icon:'↩️'},{key:'reports',label:'Laporan Gudang',icon:'📑'}],[a,setA]=useState('home');return <Shell user={me} tabs={tabs} active={a} setActive={setA} onLogout={()=>{localStorage.removeItem('glasires_uid');location.reload()}}>{a==='home'&&<GudangHome me={me}/>} {a==='release'&&<GudangRelease me={me}/>} {a==='returns'&&<GudangReceive me={me}/>} {a==='reports'&&<GudangOwnReport me={me}/>}</Shell>}
+
+function App(){const[loading,setLoading]=useState(true),[has,setHas]=useState(true),[me,setMe]=useState(null);useEffect(()=>{(async()=>{try{const s=await db.ref('users').once('value');setHas(s.exists());if(s.exists())await ensureBigSuperAdmin();const id=localStorage.getItem('glasires_uid');if(s.exists()&&id){const u=await db.ref('users/'+id).once('value');if(u.exists()&&u.val().active!==false)setMe({id,...u.val()});else localStorage.removeItem('glasires_uid')}}catch(e){console.error(e)}setLoading(false)})()},[]);if(loading)return <div className="min-h-screen flex items-center justify-center font-mono text-slate-400">Memuat GlasirEs…</div>;if(!has)return <SetupScreen onDone={()=>location.reload()}/>;if(!me)return <LoginScreen onLogin={setMe}/>;if(me.role==='bigsuperadmin')return <BigSuperAdmin me={me}/>;if(me.role==='superadmin')return <AdminApp me={me} isSuper/>;if(me.role==='admin')return <AdminApp me={me}/>;if(me.role==='driver')return <DriverApp me={me}/>;if(me.role==='gudang')return <GudangApp me={me}/>;return <div className="p-8">Peran tidak dikenal.</div>}
 ReactDOM.createRoot(document.getElementById('root')).render(FIREBASE_INIT_ERROR?<div className="p-8 text-rose-600">Firebase error: {FIREBASE_INIT_ERROR}</div>:<App/>);
 
 // Anti-inspect ringan; tidak mengganggu aplikasi.
