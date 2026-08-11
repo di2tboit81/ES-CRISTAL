@@ -216,49 +216,43 @@ async function ensureBigSuperAdmin(){
 
 function AdminDataCompany({me}){
   const invoiceCustomers=toList(useDbList('invoiceCustomers')).filter(b=>b.approvalStatus==='approved'&&b.status!=='rejected').sort((a,b)=>(a.customerName||'').localeCompare(b.customerName||''));
-  const [products,setProducts]=useState([{name:'',standardPrice:'',offers:[]}]);
-  const [note,setNote]=useState('');const [toast,show]=useToast();
-  const addProduct=()=>setProducts(p=>[...p,{name:'',standardPrice:'',offers:[]}]);
+  const [products,setProducts]=useState([{name:'',standardPrice:''}]);
+  const [offers,setOffers]=useState([{productName:'',customerId:'',price:''}]);
+  const [note,setNote]=useState('');
+  const [toast,show]=useToast();
+  const addProduct=()=>setProducts(p=>[...p,{name:'',standardPrice:''}]);
   const removeProduct=i=>setProducts(p=>p.length===1?p:p.filter((_,x)=>x!==i));
   const updateProduct=(i,key,val)=>setProducts(p=>p.map((x,n)=>n===i?{...x,[key]:val}:x));
-  const addOffer=i=>setProducts(p=>p.map((x,n)=>n===i?{...x,offers:[...(x.offers||[]),{customerId:'',price:''}]}:x));
-  const removeOffer=(i,j)=>setProducts(p=>p.map((x,n)=>n===i?{...x,offers:(x.offers||[]).filter((_,k)=>k!==j)}:x));
-  const updateOffer=(i,j,key,val)=>setProducts(p=>p.map((x,n)=>n===i?{...x,offers:(x.offers||[]).map((o,k)=>k===j?{...o,[key]:val}:o)}:x));
+  const addOffer=()=>setOffers(o=>[...o,{productName:'',customerId:'',price:''}]);
+  const removeOffer=i=>setOffers(o=>o.length===1?o:o.filter((_,x)=>x!==i));
+  const updateOffer=(i,key,val)=>setOffers(o=>o.map((x,n)=>n===i?{...x,[key]:val}:x));
   const submit=async()=>{
-    const clean=products.map(x=>({name:String(x.name||'').trim(),standardPrice:+x.standardPrice||0,customerPrices:Object.fromEntries((x.offers||[]).filter(o=>o.customerId&&o.price!==''&&+o.price>=0).map(o=>[o.customerId,+o.price]))})).filter(x=>x.name);
-    if(!clean.length)return show('Minimal satu jenis produk harus diisi.','err');
-    if(clean.some(x=>x.standardPrice<=0))return show('Harga standar setiap produk wajib diisi.','err');
+    const cleanProducts=products.map(x=>({name:String(x.name||'').trim(),standardPrice:+x.standardPrice||0})).filter(x=>x.name);
+    const cleanOffers=offers.map(x=>({productName:String(x.productName||'').trim(),customerId:x.customerId||'',price:+x.price||0})).filter(x=>x.productName&&x.customerId&&x.price>0);
+    if(!cleanProducts.length)return show('Minimal satu jenis produk dan harga standar harus diisi.','err');
+    if(cleanProducts.some(x=>x.standardPrice<=0))return show('Harga standar setiap produk wajib diisi.','err');
+    if(offers.some(x=>(x.productName||x.customerId||x.price) && !(x.productName&&x.customerId&&+x.price>0)))return show('Harga penawaran yang diisi harus lengkap: produk, pelanggan, dan harga.','err');
+    const merged=cleanProducts.map(pr=>({name:pr.name,standardPrice:pr.standardPrice,customerPrices:Object.fromEntries(cleanOffers.filter(o=>o.productName.toLowerCase()===pr.name.toLowerCase()).map(o=>[o.customerId,o.price]))}));
     const r=db.ref('dataRequests').push();
-    await r.set({type:'product_prices',title:'Data Produk & Harga',products:clean,note:note.trim(),status:'pending',submittedBy:me.id,submittedByName:me.name,submittedAt:Date.now()});
-    await notify({title:'Permintaan data produk & harga',message:`${me.name} mengirim ${clean.length} jenis produk untuk diperiksa.`,toRole:'superadmin',fromUser:me.id,data:{requestId:r.key}});
-    await createAudit('data_request_submit',`${me.name} mengirim ${clean.length} produk untuk ACC Super Admin`,me);
-    setProducts([{name:'',standardPrice:'',offers:[]}]);setNote('');show('Data berhasil dikirim ke Super Admin untuk ACC.');
+    await r.set({type:'product_prices',title:'Data Produk & Harga',products:merged,note:note.trim(),status:'pending',submittedBy:me.id,submittedByName:me.name,submittedAt:Date.now()});
+    await notify({title:'Permintaan data produk & harga',message:`${me.name} mengirim ${cleanProducts.length} jenis produk dan harga penawaran untuk diperiksa.`,toRole:'superadmin',fromUser:me.id,data:{requestId:r.key}});
+    await createAudit('data_request_submit',`${me.name} mengirim ${cleanProducts.length} produk dan harga penawaran untuk ACC Super Admin`,me);
+    setProducts([{name:'',standardPrice:''}]);setOffers([{productName:'',customerId:'',price:''}]);setNote('');show('Data berhasil dikirim ke Super Admin untuk ACC.');
   };
   return <div>{toast}<h2 className="font-display font-bold text-xl mb-2">INPUT DATA PERUSAHAAN</h2>
-    <p className="text-sm text-slate-500 mb-5">Admin dapat membuat jenis produk sesuai kebutuhan perusahaan, menentukan harga standar, lalu menambahkan harga penawaran khusus untuk pelanggan invoice.</p>
+    <p className="text-sm text-slate-500 mb-5">Pisahkan harga standar perusahaan dan harga penawaran khusus pelanggan invoice. Semua data menunggu ACC Super Admin.</p>
     <Card className="mb-5">
-      <div className="flex justify-between items-center mb-4"><div><b>HARGA STANDAR BERDASARKAN JENIS PRODUK</b><div className="text-xs text-slate-500 mt-1">Harga standar otomatis dipakai untuk CASH dan WAIT CASH.</div></div><Btn tone="ghost" onClick={addProduct}>＋ Tambah Jenis Produk</Btn></div>
-      <div className="space-y-5">{products.map((pr,i)=><div key={i} className="p-4 rounded-2xl border bg-white/70">
-        <div className="grid md:grid-cols-[1fr_260px_auto] gap-3 items-end">
-          <Field label="Jenis Produk"><input className={inputCls} value={pr.name} onChange={e=>updateProduct(i,'name',e.target.value)} placeholder="Contoh: Es Kristal, Es Balok, dll"/></Field>
-          <Field label="Harga Standar Perusahaan"><input type="number" min="0" className={inputCls} value={pr.standardPrice} onChange={e=>updateProduct(i,'standardPrice',e.target.value)} placeholder="Masukkan harga"/></Field>
-          <Btn tone="danger" className="!px-3" onClick={()=>removeProduct(i)}>Hapus</Btn>
-        </div>
-        <div className="mt-5 pt-4 border-t">
-          <div className="flex flex-wrap justify-between items-center gap-2 mb-3"><div><b>HARGA PENAWARAN KHUSUS PELANGGAN INVOICE</b><div className="text-xs text-slate-500 mt-1">Pilih nama pelanggan dari dropdown, kemudian isi harga penawaran produk ini.</div></div><Btn tone="ghost" onClick={()=>addOffer(i)} disabled={!invoiceCustomers.length}>＋ Tambah Pelanggan Invoice</Btn></div>
-          {(pr.offers||[]).map((o,j)=><div key={j} className="grid md:grid-cols-[1fr_260px_auto] gap-3 items-end p-3 rounded-xl bg-sky-50 border border-sky-100 mb-2">
-            <Field label="Pilih Nama Pelanggan Invoice"><select className={inputCls} value={o.customerId} onChange={e=>updateOffer(i,j,'customerId',e.target.value)}><option value="">Pilih nama pelanggan</option>{invoiceCustomers.map(c=><option key={c.id} value={c.id}>{c.customerName}</option>)}</select></Field>
-            <Field label="Harga Penawaran"><input type="number" min="0" className={inputCls} value={o.price} onChange={e=>updateOffer(i,j,'price',e.target.value)} placeholder="Masukkan harga penawaran"/></Field>
-            <Btn tone="danger" className="!px-3" onClick={()=>removeOffer(i,j)}>Hapus</Btn>
-          </div>)}
-          {!invoiceCustomers.length&&<div className="p-3 rounded-xl bg-amber-50 border text-sm text-amber-700">Belum ada pelanggan invoice yang sudah ACC. Setelah pelanggan invoice disetujui, namanya otomatis muncul di dropdown.</div>}
-        </div>
-      </div>)}</div>
-      <Field label="Catatan untuk Super Admin"><textarea className={inputCls} rows="3" value={note} onChange={e=>setNote(e.target.value)} placeholder="Keterangan kebutuhan produk atau perubahan harga"/></Field>
-      <Btn tone="accent" className="w-full sm:w-auto" onClick={submit}>📨 SIMPAN & KIRIM KE SUPER ADMIN</Btn>
+      <div className="flex justify-between items-center mb-4"><div><b>1. HARGA STANDAR PERUSAHAAN</b><div className="text-xs text-slate-500 mt-1">Tentukan harga berdasarkan jenis produk.</div></div><Btn tone="ghost" onClick={addProduct}>＋ Tambah Produk</Btn></div>
+      <div className="space-y-3">{products.map((pr,i)=><div key={i} className="grid md:grid-cols-[1fr_260px_auto] gap-3 items-end p-4 rounded-2xl border bg-white/70"><Field label="Jenis Produk"><input className={inputCls} value={pr.name} onChange={e=>updateProduct(i,'name',e.target.value)} placeholder="Contoh: Es Kristal"/></Field><Field label="Harga Standar Perusahaan"><input type="number" min="0" className={inputCls} value={pr.standardPrice} onChange={e=>updateProduct(i,'standardPrice',e.target.value)} placeholder="Rp"/></Field><Btn tone="danger" className="!px-3" onClick={()=>removeProduct(i)}>Hapus</Btn></div>)}</div>
     </Card>
+    <Card className="mb-5">
+      <div className="flex justify-between items-center mb-4"><div><b>2. HARGA PENAWARAN PELANGGAN INVOICE</b><div className="text-xs text-slate-500 mt-1">Pilih nama pelanggan dari dropdown, pilih produk, lalu masukkan harga penawaran.</div></div><Btn tone="ghost" onClick={addOffer}>＋ Tambah Penawaran</Btn></div>
+      {!invoiceCustomers.length?<div className="p-4 rounded-xl bg-amber-50 border text-sm text-amber-800">Belum ada pelanggan invoice yang sudah ACC. Tambahkan/ACC pelanggan invoice terlebih dahulu.</div>:<div className="space-y-3">{offers.map((o,i)=><div key={i} className="grid md:grid-cols-[1fr_1fr_220px_auto] gap-3 items-end p-4 rounded-2xl border bg-white/70"><Field label="Jenis Produk"><select className={inputCls} value={o.productName} onChange={e=>updateOffer(i,'productName',e.target.value)}><option value="">Pilih produk</option>{products.filter(p=>p.name.trim()).map((p,n)=><option key={n} value={p.name.trim()}>{p.name.trim()}</option>)}</select></Field><Field label="Pelanggan Invoice"><select className={inputCls} value={o.customerId} onChange={e=>updateOffer(i,'customerId',e.target.value)}><option value="">Pilih nama pelanggan</option>{invoiceCustomers.map(c=><option key={c.id} value={c.id}>{c.customerName}</option>)}</select></Field><Field label="Harga Penawaran"><input type="number" min="0" className={inputCls} value={o.price} onChange={e=>updateOffer(i,'price',e.target.value)} placeholder="Rp"/></Field><Btn tone="danger" className="!px-3" onClick={()=>removeOffer(i)}>Hapus</Btn></div>)}</div>}
+    </Card>
+    <Card><Field label="Catatan untuk Super Admin"><textarea className={inputCls} rows="3" value={note} onChange={e=>setNote(e.target.value)} placeholder="Keterangan perubahan harga / kebutuhan perusahaan"/></Field><Btn tone="accent" className="w-full sm:w-auto" onClick={submit}>📨 SIMPAN & KIRIM KE SUPER ADMIN</Btn></Card>
   </div>
 }
+
 function SuperDataRequests({me}){
   const requests=toList(useDbList('dataRequests')).sort((a,b)=>(b.submittedAt||0)-(a.submittedAt||0));
   const [editing,setEditing]=useState({});
@@ -1176,7 +1170,6 @@ function GudangOwnReport({me}){
  const dough=(a,b,c)=>{const t=(+a||0)+(+b||0)+(+c||0)||1,pa=(+a||0)/t*100,pb=((+a||0)+(+b||0))/t*100;return {background:`conic-gradient(#22c55e 0 ${pa}%, #ef4444 ${pa}% ${pb}%, #8b5cf6 ${pb}% 100%)`}};
  return <div className="fade-in">{toast}
   <div className="no-print"><div className="flex flex-wrap justify-between items-center gap-3 mb-5"><div><h2 className="font-display font-bold text-xl">📦 Laporan Gudang Saya</h2><p className="text-sm text-slate-500">Laporan khusus <b>{me.name}</b>. Hanya aktivitas gudang yang dilakukan akun ini.</p></div></div><Card className="mb-5"><div className="grid sm:grid-cols-2 gap-3"><Field label="Periode"><select className={inputCls} value={period} onChange={e=>setPeriod(e.target.value)}><option value="day">Harian</option><option value="month">Bulanan</option><option value="year">Tahunan</option></select></Field><Field label="Tanggal Acuan"><input type="date" className={inputCls} value={date} onChange={e=>setDate(e.target.value)}/></Field></div></Card></div>
-  <WaitCashAnalytics startTs={start.getTime()} endTs={end.getTime()} compact/>
    <div className="report-page report-print-area" style={{'--report-color':cfg.reportColor||'#1c4a73'}}>
    <div className="report-head">{cfg.logo&&<img className="report-logo" src={cfg.logo}/>}<div><div className="report-title text-2xl font-bold">{cfg.name||'GlasirEs'}</div><div className="text-sm">{cfg.address||''}</div><div className="text-sm">{cfg.phone||''}</div></div></div>
    <div className="mt-6 flex justify-between"><div><h1 className="text-2xl font-display font-bold">LAPORAN AKTIVITAS GUDANG</h1><p className="text-sm">Petugas: <b>{me.name}</b> · @{me.username}</p><p className="text-sm">Periode: {start.toLocaleDateString('id-ID')} s/d {end.toLocaleDateString('id-ID')}</p></div><div className="text-right text-xs text-slate-500">Khusus akun gudang ini<br/>Tidak menampilkan gudang/user lain</div></div>
@@ -1187,6 +1180,22 @@ function GudangOwnReport({me}){
   </div>
  </div>
 }
+
+
+function DriverRequest({me}){
+  const rs=toList(useDbList('stockRequests')).filter(r=>r.driverId===me.id).sort((a,b)=>(b.requestedForDate||'').localeCompare(a.requestedForDate||'')||(b.requestedAt-a.requestedAt)),
+        [q,setQ]=useState(''),[neededDate,setNeededDate]=useState(tanggalLokal()),[toast,show]=useToast();
+  const send=async()=>{
+    const n=+q;if(n<1)return show('Jumlah tidak valid.','err');
+    if(!neededDate)return show('Tanggal kebutuhan wajib dipilih.','err');
+    const r=await db.ref('stockRequests').push({driverId:me.id,driverName:me.name,qtyRequested:n,requestedForDate:neededDate,status:'pending',requestedAt:Date.now()});
+    await notify({title:'Permintaan stok baru',message:`${me.name} meminta ${n} kantong untuk tanggal ${new Date(neededDate+'T00:00:00').toLocaleDateString('id-ID')}.`,toRole:'admin',fromUser:me.id,data:{requestId:r.key,requestedForDate:neededDate}});
+    await notify({title:'Permintaan stok baru',message:`${me.name} meminta ${n} kantong untuk tanggal ${new Date(neededDate+'T00:00:00').toLocaleDateString('id-ID')}.`,toRole:'superadmin',fromUser:me.id,data:{requestId:r.key,requestedForDate:neededDate}});
+    setQ('');show('Permintaan dikirim ke Admin untuk ACC.');
+  };
+  return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">Minta Stok Es</h2><Card className="mb-5"><div className="grid sm:grid-cols-2 gap-3"><Field label="Tanggal Dibutuhkan"><input type="date" min={tanggalLokal()} className={inputCls} value={neededDate} onChange={e=>setNeededDate(e.target.value)}/></Field><Field label="Jumlah Kantong"><input type="number" min="1" className={inputCls} value={q} onChange={e=>setQ(e.target.value)}/></Field></div><Btn tone="accent" onClick={send}>Kirim Permintaan</Btn></Card><Card><b>Riwayat Permintaan</b><div className="mt-4 space-y-2">{rs.map(r=><div key={r.id} className="p-4 rounded-xl border"><div className="flex justify-between gap-3"><span><b>{r.qtyRequested} kantong</b><br/><small>Dibutuhkan: {r.requestedForDate?new Date(r.requestedForDate+'T00:00:00').toLocaleDateString('id-ID'):'-'}</small><br/><small>Diminta: {waktu(r.requestedAt)}</small></span><Pill tone={r.status==='pending'?'pending':r.status==='approved'||r.status==='fulfilled'?'approved':'rejected'}>{r.status}</Pill></div>{r.approvedAt&&<div className="text-xs text-slate-500 mt-2">ACC: {waktu(r.approvedAt)} oleh {r.approvedByName||'-'}{r.fulfilledAt?` · Dikeluarkan: ${waktu(r.fulfilledAt)}`:''}</div>}</div>)}{!rs.length&&<div className="text-center text-slate-400 py-6">Belum ada permintaan.</div>}</div></Card></div>}
+
+function DriverReturn({me}){const stock=useDbValue('driverStock/'+me.username,0),[q,setQ]=useState(''),[toast,show]=useToast();const send=async()=>{const n=+q;if(n<1||n>stock)return show('Jumlah tidak valid.','err');const r=await db.ref('returnRequests').push({driverId:me.id,driverName:me.name,qty:n,status:'pending',requestedAt:Date.now()});await notify({title:'Pengembalian stok',message:`${me.name} mengirim permintaan pengembalian ${n} kantong.`,toRole:'gudang',fromUser:me.id,data:{returnId:r.key}});setQ('');show('Permintaan pengembalian dikirim.')};return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">Kembalikan Sisa Es</h2><Card className="mb-5"><IceGauge label="Sisa yang dibawa" value={stock} max={Math.max(stock,50)}/></Card><Card><Field label="Jumlah yang dikembalikan"><input type="number" className={inputCls} value={q} onChange={e=>setQ(e.target.value)}/></Field><Btn tone="accent" onClick={send}>Kirim ke Gudang</Btn></Card></div>}
 
 function DriverApp({me}){const tabs=[{key:'home',label:'Beranda',icon:'🏠'},{key:'waitCash',label:'WAIT CASH',icon:'💵'},{key:'request',label:'Minta Stok',icon:'📦'},{key:'invoiceCustomers',label:'Pelanggan Invoice',icon:'🧾'},{key:'collection',label:'Penagihan Saya',icon:'💰'},{key:'return',label:'Kembalikan Sisa',icon:'↩️'},{key:'reports',label:'Laporan Saya',icon:'📑'}], [a,setA]=useState('home');return <Shell user={me} tabs={tabs} active={a} setActive={setA} onLogout={()=>{localStorage.removeItem('glasires_uid');location.reload()}}>{a==='home'&&<DriverHome me={me}/>} {a==='waitCash'&&<WaitCashDriver me={me}/>} {a==='request'&&<DriverRequest me={me}/>}  {a==='invoiceCustomers'&&<InvoiceDriver me={me}/>} {a==='collection'&&<InvoiceCollectionDriver me={me}/>} {a==='return'&&<DriverReturn me={me}/>} {a==='reports'&&<DriverOwnReport me={me}/>}</Shell>}
 
