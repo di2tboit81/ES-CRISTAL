@@ -381,19 +381,6 @@ main>div{max-width:none!important;width:100%!important;margin:0!important;paddin
   white-space: pre-wrap !important;
 }
 </style>
-<style id="admin-new-product-full-name-fix">
-/* KHUSUS ADMIN > INPUT DATA PERUSAHAAN > NEW PRODUCT */
-.product-name-input{
-  width:100% !important;
-  min-width:0 !important;
-  white-space:pre-wrap !important;
-  overflow:visible !important;
-  text-overflow:clip !important;
-  word-break:normal !important;
-  overflow-wrap:normal !important;
-  text-transform:none !important;
-}
-</style>
 </head>
 <body class="text-glacier-900">
 <div id="root"></div>
@@ -457,38 +444,11 @@ function DateReportFilter({period,setPeriod,date,setDate}){return <Card classNam
 function DateRange({period,setPeriod,date,setDate}){return <Card className="mb-5"><div className="grid md:grid-cols-3 gap-3"><Field label="Periode"><select className={inputCls} value={period} onChange={e=>setPeriod(e.target.value)}><option value="day">HARIAN</option><option value="month">BULANAN</option><option value="year">TAHUNAN</option></select></Field><Field label="Tanggal Acuan"><input type="date" className={inputCls} value={date} onChange={e=>setDate(e.target.value)}/></Field><div className="flex items-end"><Btn tone="accent" onClick={()=>window.print()}>🖨 PRINT / PDF</Btn></div></div></Card>}
 function periodRange(period,date){const b=new Date((date||tanggalLokal())+'T00:00:00');let a,e;if(period==='day'){a=new Date(b);a.setHours(0,0,0,0);e=new Date(b);e.setHours(23,59,59,999)}else if(period==='month'){a=new Date(b.getFullYear(),b.getMonth(),1);e=new Date(b.getFullYear(),b.getMonth()+1,0,23,59,59,999)}else{a=new Date(b.getFullYear(),0,1);e=new Date(b.getFullYear(),11,31,23,59,59,999)}return {start:a.getTime(),end:e.getTime(),a,e}}
 function AdminNewProducts({me}){
-  const requests=toList(useDbList('dataRequests')).filter(r=>r.type==='product_master'&&r.submittedBy===me.id).sort((a,b)=>(b.submittedAt||0)-(a.submittedAt||0));
-  const [rows,setRows]=useState([{name:''}]),[note,setNote]=useState(''),[toast,show]=useToast();
-  const add=()=>setRows(x=>[...x,{name:''}]);
-  const del=i=>setRows(x=>x.length===1?x:x.filter((_,n)=>n!==i));
-  const changeProductName=(i,value)=>setRows(current=>current.map((x,n)=>n===i?{...x,name:String(value)}:x));
-
-  const submit=async()=>{
-    const names=[...new Set(rows.map(x=>String(x.name??'').replace(/\s+/g,' ').trim()).filter(Boolean))];
-    if(!names.length)return show('Minimal satu jenis produk harus diisi.','err');
-    const active=toList((await db.ref('config/products').once('value')).val());
-    const pending=toList((await db.ref('dataRequests').once('value')).val()).filter(r=>r.type==='product_master'&&r.status==='pending').flatMap(r=>r.products||[]);
-    const dup=names.find(n=>active.some(p=>String(p.name||'').trim().toLowerCase()===n.toLowerCase())||pending.some(p=>String(p.name||'').trim().toLowerCase()===n.toLowerCase()));
-    if(dup)return show(`Jenis produk ${dup} sudah ada atau sedang menunggu ACC.`,'err');
-    const r=db.ref('dataRequests').push();
-    await r.set({type:'product_master',title:'New Product',products:names.map(name=>({name})),note:note.trim(),status:'pending',submittedBy:me.id,submittedByName:me.name,submittedAt:Date.now()});
-    await notify({title:'Permintaan jenis produk baru',message:`${me.name} mengajukan ${names.length} jenis produk baru untuk diperiksa.`,toRole:'superadmin',fromUser:me.id,data:{requestId:r.key}});
-    await createAudit('product_master_submit',`${me.name} mengajukan jenis produk: ${names.join(', ')}`,me);
-    setRows([{name:''}]);setNote('');
-    show('Jenis produk berhasil disimpan dan dikirim ke Super Admin. Setelah disimpan, pengajuan ini tidak dapat diedit Admin.');
-  };
-
-  return <div>{toast}
-    <h2 className="font-display font-bold text-xl mb-2">NEW PRODUCT</h2>
-    <p className="text-sm text-slate-500 mb-5">Masukkan jenis produk satu per satu. Tombol Edit hanya untuk memeriksa sebelum disimpan. Setelah disimpan, data terkunci dan menunggu ACC Super Admin.</p>
-    <Card className="mb-5">
-      <div className="flex justify-between items-center mb-4"><div><b>DAFTAR JENIS PRODUK BARU</b><div className="text-xs text-slate-500 mt-1">Belum dikirim = masih bisa diedit atau dihapus.</div></div><Btn tone="ghost" onClick={add}>＋ Tambah Produk</Btn></div>
-      <div className="space-y-3">{rows.map((r,i)=><div key={i} className="grid md:grid-cols-[1fr_auto] gap-3 items-end p-4 rounded-2xl border bg-white/70"><Field label={`Jenis Produk ${i+1}`}><input className={inputCls+' product-name-input'} value={r.name} onInput={e=>changeProductName(i,e.currentTarget.value)} onChange={e=>changeProductName(i,e.currentTarget.value)} placeholder="Contoh: Es Kristal" autoComplete="off" spellCheck="false"/></Field><Btn tone="danger" className="!px-4" onClick={()=>del(i)}>Hapus</Btn></div>)}</div>
-      <div className="mt-4 flex flex-wrap gap-2"><Btn tone="ghost" onClick={()=>show('Periksa kembali nama produk dan pastikan tidak ada kesalahan. Anda masih dapat mengedit atau menghapus sebelum tombol Simpan ditekan.')}>✏️ Edit / Periksa</Btn><Btn tone="accent" onClick={submit}>💾 Simpan & Kirim ke Super Admin</Btn></div>
-    </Card>
-    <Card><Field label="Catatan"><textarea className={inputCls} rows="3" value={note} onChange={e=>setNote(e.target.value)} placeholder="Keterangan tambahan untuk Super Admin"/></Field></Card>
-    <ProductRequestHistory requests={requests}/>
-  </div>
+ const requests=toList(useDbList('dataRequests')).filter(r=>r.type==='product_master'&&r.submittedBy===me.id).sort((a,b)=>(b.submittedAt||0)-(a.submittedAt||0));
+ const [rows,setRows]=useState([{name:''}]),[note,setNote]=useState(''),[toast,show]=useToast();
+ const add=()=>setRows(x=>[...x,{name:''}]); const del=i=>setRows(x=>x.length===1?x:x.filter((_,n)=>n!==i));
+ const submit=async()=>{const names=[...new Set(rows.map(x=>String(x.name||'').trim()).filter(Boolean).map(x=>x.replace(/\s+/g,' ')))];if(!names.length)return show('Minimal satu jenis produk harus diisi.','err');const active=toList((await db.ref('config/products').once('value')).val());const pending=toList((await db.ref('dataRequests').once('value')).val()).filter(r=>r.type==='product_master'&&r.status==='pending').flatMap(r=>r.products||[]);const dup=names.find(n=>active.some(p=>(p.name||'').toLowerCase()===n.toLowerCase())||pending.some(p=>(p.name||'').toLowerCase()===n.toLowerCase()));if(dup)return show(`Jenis produk ${dup} sudah ada atau sedang menunggu ACC.`,'err');const r=db.ref('dataRequests').push();await r.set({type:'product_master',title:'New Product',products:names.map(name=>({name})),note:note.trim(),status:'pending',submittedBy:me.id,submittedByName:me.name,submittedAt:Date.now()});await notify({title:'Permintaan jenis produk baru',message:`${me.name} mengajukan ${names.length} jenis produk baru untuk diperiksa.`,toRole:'superadmin',fromUser:me.id,data:{requestId:r.key}});await createAudit('product_master_submit',`${me.name} mengajukan jenis produk: ${names.join(', ')}`,me);setRows([{name:''}]);setNote('');show('Jenis produk berhasil disimpan dan dikirim ke Super Admin. Setelah disimpan, pengajuan ini tidak dapat diedit Admin.');};
+ return <div>{toast}<h2 className="font-display font-bold text-xl mb-2">NEW PRODUCT</h2><p className="text-sm text-slate-500 mb-5">Masukkan jenis produk satu per satu. Tombol Edit hanya untuk memeriksa sebelum disimpan. Setelah disimpan, data terkunci dan menunggu ACC Super Admin.</p><Card className="mb-5"><div className="flex justify-between items-center mb-4"><div><b>DAFTAR JENIS PRODUK BARU</b><div className="text-xs text-slate-500 mt-1">Belum dikirim = masih bisa diedit atau dihapus.</div></div><Btn tone="ghost" onClick={add}>＋ Tambah Produk</Btn></div><div className="space-y-3">{rows.map((r,i)=><div key={i} className="grid md:grid-cols-[1fr_auto] gap-3 items-end p-4 rounded-2xl border bg-white/70"><Field label={`Jenis Produk ${i+1}`}><input className={inputCls} value={r.name} onChange={e=>setRows(v=>v.map((x,n)=>n===i?{...x,name:e.target.value}:x))} placeholder="Contoh: Es Kristal"/></Field><Btn tone="danger" className="!px-4" onClick={()=>del(i)}>Hapus</Btn></div>)}</div><div className="mt-4 flex flex-wrap gap-2"><Btn tone="ghost" onClick={()=>show('Periksa kembali nama produk dan pastikan tidak ada kesalahan. Anda masih dapat mengedit atau menghapus sebelum tombol Simpan ditekan.')}>✏️ Edit / Periksa</Btn><Btn tone="accent" onClick={submit}>💾 Simpan & Kirim ke Super Admin</Btn></div></Card><Card><Field label="Catatan"><textarea className={inputCls} rows="3" value={note} onChange={e=>setNote(e.target.value)} placeholder="Keterangan tambahan untuk Super Admin"/></Field></Card><ProductRequestHistory requests={requests}/></div>
 }
 function ProductRequestHistory({requests}){return <Card className="mt-5"><div className="flex justify-between mb-4"><div><b>LAPORAN PENGAJUAN JENIS PRODUK</b><div className="text-xs text-slate-500 mt-1">Riwayat lengkap pengajuan dan hasil pemeriksaan.</div></div><Pill>{requests.length} pengajuan</Pill></div><div className="space-y-3">{requests.map(r=><div key={r.id} className="p-4 rounded-2xl border bg-white/70"><div className="flex justify-between gap-3"><div><b>{(r.products||[]).map(p=>p.name).join(', ')||'-'}</b><div className="text-xs text-slate-500">{waktu(r.submittedAt)}</div></div><Pill tone={r.status==='approved'?'done':r.status==='rejected'?'rejected':'pending'}>{r.status==='approved'?'ACC / APPROVE':r.status==='rejected'?'DITOLAK':'MENUNGGU ACC'}</Pill></div>{r.note&&<div className="text-sm mt-2">Catatan: {r.note}</div>}{r.status==='approved'&&<div className="text-xs text-emerald-700 mt-2">Disetujui {waktu(r.approvedAt)} oleh {r.approvedByName||'-'}</div>}{r.status==='rejected'&&<div className="text-xs text-rose-700 mt-2">Ditolak {waktu(r.rejectedAt)} oleh {r.rejectedByName||'-'}{r.rejectNote?` · ${r.rejectNote}`:''}</div>}</div>)}{!requests.length&&<div className="text-center text-slate-400 py-6">Belum ada pengajuan jenis produk.</div>}</div></Card>}
 function AdminCompanyPrice({me}){
@@ -620,6 +580,21 @@ function BigSuperAdmin({me}){
     try{await db.ref('warehouse/stock').set(0);show('Stok gudang berhasil dikosongkan oleh BIG SUPER ADMIN. PERUBAHAN INI TIDAK DICATAT DI RIWAYAT GUDANG ATAU AUDIT LOG.')}catch(e){show('Gagal menghapus stok: '+e.message,'err')}
   };
 
+  const deleteAllProducts=async()=>{
+    if(!await verifyBig()){show('Password BIG SUPER ADMIN salah.','err');return}
+    const snap=await db.ref('config/products').once('value');
+    const products=toList(snap.val());
+    if(!products.length)return show('Tidak ada jenis produk untuk dihapus.','err');
+    if(!confirm(`⚠️ HAPUS SEMUA JENIS PRODUK\n\nAkan menghapus langsung ${products.length} jenis produk dari Firebase Database.\n\nData produk aktif/nonaktif di config/products akan dihapus permanen.\n\nLanjutkan?`))return;
+    const ok=prompt('Ketik HAPUS PRODUK untuk konfirmasi:');
+    if(ok!=='HAPUS PRODUK'){show('Penghapusan jenis produk dibatalkan.','err');return}
+    try{
+      await db.ref('config/products').remove();
+      await createAudit('big_products_deleted',`BIG SUPER ADMIN menghapus seluruh jenis produk (${products.length} produk) dari database`,me);
+      show(`${products.length} jenis produk berhasil dihapus langsung dari database.`);
+    }catch(e){show('Gagal menghapus jenis produk: '+e.message,'err')}
+  };
+
   const changePassword=async()=>{
     if(!newPassword||newPassword.length<8)return show('Password baru minimal 8 karakter.','err');
     if(newPassword!==confirmPassword)return show('Konfirmasi password tidak sama.','err');
@@ -665,8 +640,7 @@ function BigSuperAdmin({me}){
       {[
         ['dashboard','📊 Dashboard'],
         ['users','👥 Semua User'],
-        ['reports','🗑 Hapus Laporan'],
-        ['danger','☢️ Reset Database'],
+                ['danger','☢️ Reset Database'],
         ['security','🔐 Keamanan']
       ].map(x=><button key={x[0]} onClick={()=>setTab(x[0])} className={'px-4 py-2.5 rounded-2xl text-sm font-semibold border transition '+(tab===x[0]?'bg-glacier-900 text-white border-glacier-900':'bg-white text-glacier-700 border-slate-200')}>{x[1]}</button>)}
     </div>
@@ -693,33 +667,6 @@ function BigSuperAdmin({me}){
         </div>)}
       </div>
     </Card>}
-
-    {tab==='reports'&&<div className="space-y-5">
-      <Card>
-        <div className="flex flex-wrap justify-between gap-3 mb-4">
-          <div><b className="text-lg">PENGHAPUSAN LAPORAN</b><p className="text-xs text-slate-500 mt-1">Khusus BIG SUPER ADMIN. Penghapusan dilakukan pada sumber data laporan dan tidak mengubah menu maupun hak akses user lain.</p></div>
-          <Pill>KHUSUS BIG SUPER ADMIN</Pill>
-        </div>
-        <div className="grid big-admin-grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {[
-            ['deliveries','Laporan Pengantaran / Pendapatan'],
-            ['stockRequests','Laporan Permintaan Stok'],
-            ['returnRequests','Laporan Pengembalian Stok'],
-            ['invoiceCustomers','Laporan Data Invoice / Pelanggan Invoice'],
-            ['warehouse/history','Laporan Aktivitas Gudang'],
-            ['driverStock','Data Stok Driver yang menjadi sumber laporan'],
-            ['dataRequests','Laporan ACC / TOLAK Permintaan Data'],
-            ['priceChangeLogs','Laporan Perubahan Produk & Harga'],
-            ['logs','Laporan / Log Audit'],
-            ['notifications','Riwayat Notifikasi']
-          ].map(([node,label])=><button key={node} className="big-action border bg-white hover:bg-rose-50" onClick={()=>deleteNode(node,label)}><div className="font-semibold text-slate-800">🗑 {label}</div><div className="text-xs text-slate-400 mt-1">Sumber data: {node}</div></button>)}
-        </div>
-      </Card>
-      <Card className="big-danger-zone">
-        <b className="block text-rose-700 mb-2">⚠️ PERHATIAN</b>
-        <p className="text-sm text-slate-600">Tombol di atas menghapus data sumber laporan secara permanen dari Firebase. Hanya BIG SUPER ADMIN yang dapat menjalankannya dan setiap tindakan tetap meminta password serta konfirmasi.</p>
-      </Card>
-    </div>}
 
     {tab==='danger'&&<div className="space-y-5">
       <Card className="big-danger-zone">
@@ -753,6 +700,18 @@ function BigSuperAdmin({me}){
             ['driverStock','Stok Driver'],
             ['priceChangeLogs','Laporan Perubahan Produk & Harga']
           ].map(([node,label])=><button key={node} className="big-action border bg-white hover:bg-rose-50" onClick={()=>deleteNode(node,label)}><div className="font-semibold text-slate-800">🗑 {label}</div><div className="text-xs text-slate-400 mt-1">Node: {node}</div></button>)}
+        </div>
+      </Card>
+
+      <Card className="big-danger-zone">
+        <div className="flex flex-col lg:flex-row gap-5 justify-between">
+          <div>
+            <h3 className="font-display font-extrabold text-xl text-rose-700">🧊 HAPUS SEMUA JENIS PRODUK</h3>
+            <p className="text-sm text-slate-600 mt-2 max-w-3xl">Khusus BIG SUPER ADMIN. Menghapus langsung seluruh node <b>config/products</b> dari Firebase Database. Data produk tidak lagi tersedia untuk Admin, Super Admin, Driver, atau Gudang sampai dibuat kembali.</p>
+          </div>
+          <div className="w-full lg:w-72">
+            <Btn tone="danger" className="w-full" onClick={deleteAllProducts}>🗑 HAPUS SEMUA JENIS PRODUK</Btn>
+          </div>
         </div>
       </Card>
 
@@ -840,7 +799,7 @@ function SetupScreen({onDone}){const[n,setN]=useState(''),[u,setU]=useState(''),
 function LoginScreen({onLogin}){const[u,setU]=useState(''),[p,setP]=useState(''),[e,setE]=useState(''),[busy,setB]=useState(false);const go=async()=>{setB(true);setE('');try{const s=await db.ref('users').once('value'),a=toList(s.val()),x=a.find(z=>z.username===u.trim());if(!x||x.active===false)throw Error('Username tidak ditemukan atau nonaktif.');if(await sha256(p)!==x.passwordHash)throw Error('Password salah.');localStorage.setItem('glasires_uid',x.id);onLogin({id:x.id,...x})}catch(z){setE(z.message)}setB(false)};return <div className="min-h-screen flex items-center justify-center p-6"><div className="w-full max-w-md"><div className="text-center mb-7"><div className="font-display font-extrabold text-3xl">GlasirEs</div><p className="text-sm text-slate-500">Sistem distribusi & stok es kristal</p></div><Card><Field label="Username"><input className={inputCls} value={u} onChange={e=>setU(e.target.value)} onKeyDown={e=>e.key==='Enter'&&go()}/></Field><Field label="Password"><input type="password" className={inputCls} value={p} onChange={e=>setP(e.target.value)} onKeyDown={e=>e.key==='Enter'&&go()}/></Field>{e&&<p className="text-rose-600 text-sm mb-3">{e}</p>}<Btn tone="accent" className="w-full" onClick={go} disabled={busy}>{busy?'Memeriksa…':'Masuk'}</Btn></Card></div><div className="login-copyright">Copyright © 2026 | Power by <span className="bait-brand">Syech B@-it</span></div></div>}
 
 function NotificationPanel({user,onClose}){const ns=useNotifications(user);return <div className="absolute right-0 top-14 w-[min(390px,calc(100vw-30px))] max-h-[520px] overflow-hidden rounded-2xl shadow-2xl bg-white border z-[90]"><div className="flex justify-between p-4 border-b font-bold">🔔 Notifikasi <button onClick={onClose}>✕</button></div><div className="overflow-y-auto max-h-[460px]">{ns.length?ns.map(n=><div key={n.id} onClick={()=>markRead(n.id)} className={'p-4 border-b cursor-pointer '+(!n.read?'bg-blue-50':'')}><div className="font-semibold">{n.title}</div><div className="text-sm mt-1">{n.message}</div><div className="text-xs text-slate-400 mt-2">{waktu(n.createdAt)}</div></div>):<div className="p-8 text-center text-slate-400">Tidak ada notifikasi</div>}</div></div>}
-function Shell({user,tabs,active,setActive,onLogout,children}){const[mo,setMo]=useState(false),[sn,setSn]=useState(false);useEffect(()=>{const up=e=>{const t=e.target;if(t&&t.classList&&((t.classList.contains('driver-full-input'))||(t.classList.contains('product-name-input'))))return;if(t&&((t.tagName==='INPUT'&&t.type!=='password'&&t.type!=='date'&&t.type!=='number')||t.tagName==='TEXTAREA')){const v=t.value.toUpperCase();if(t.value!==v)t.value=v}};document.addEventListener('input',up,true);return()=>document.removeEventListener('input',up,true)},[]);const ns=useNotifications(user);useNewNotificationSound(ns);const unread=ns.filter(n=>!n.read).length;return <div className="app-auth min-h-screen flex"><aside className={'print-hide fixed lg:static z-40 inset-y-0 left-0 w-64 bg-glacier-900 text-frost-200 flex flex-col transition-transform '+(mo?'translate-x-0':'-translate-x-full lg:translate-x-0')}><div className="px-5 py-5 border-b border-white/10"><span className="font-display font-extrabold text-xl text-white">GlasirEs</span></div><nav className="flex-1 p-3 space-y-1 overflow-y-auto">{tabs.map(t=><button key={t.key} onClick={()=>{setActive(t.key);setMo(false)}} className={'w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium '+(active===t.key?'bg-frost-400 text-glacier-900':'text-frost-200/80 hover:bg-white/5')}>{t.icon} {t.label}</button>)}</nav><div className="p-4 border-t border-white/10"><div className="text-xs text-frost-200/60">Masuk sebagai</div><div className="font-semibold text-white">{user.name}</div><span className={'inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 '+BADGE[user.role]}>{ROLES[user.role]}</span><Btn tone="ghost" className="w-full mt-3 !bg-white/5 !text-white !border-white/15" onClick={onLogout}>Keluar</Btn></div><footer className="bait-developer-footer"><div className="bait-developer-content"><div className="bait-powered">● Power by</div><div className="bait-name">Syech B@-it</div><div className="bait-copyright">Copyright © 2026</div></div></footer></aside>{mo&&<div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={()=>setMo(false)}/>}<main className="flex-1 min-w-0"><div className="print-hide lg:hidden sticky top-0 z-20 glass flex justify-between p-3"><button onClick={()=>setMo(true)}>☰</button><b>GlasirEs</b><span/></div><div className="p-5 lg:p-8 max-w-7xl mx-auto"><div className="print-hide flex justify-end mb-4 relative"><button onClick={()=>setSn(!sn)} className="bg-white border rounded-full w-11 h-11 shadow">🔔{unread>0&&<span className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full text-[10px] min-w-[18px] h-[18px] flex items-center justify-center">{unread}</span>}</button>{sn&&<NotificationPanel user={user} onClose={()=>setSn(false)}/>}</div>{children}</div></main></div>}
+function Shell({user,tabs,active,setActive,onLogout,children}){const[mo,setMo]=useState(false),[sn,setSn]=useState(false);useEffect(()=>{const up=e=>{const t=e.target;if(t&&t.classList&&t.classList.contains('driver-full-input'))return;if(t&&((t.tagName==='INPUT'&&t.type!=='password'&&t.type!=='date'&&t.type!=='number')||t.tagName==='TEXTAREA')){const v=t.value.toUpperCase();if(t.value!==v)t.value=v}};document.addEventListener('input',up,true);return()=>document.removeEventListener('input',up,true)},[]);const ns=useNotifications(user);useNewNotificationSound(ns);const unread=ns.filter(n=>!n.read).length;return <div className="app-auth min-h-screen flex"><aside className={'print-hide fixed lg:static z-40 inset-y-0 left-0 w-64 bg-glacier-900 text-frost-200 flex flex-col transition-transform '+(mo?'translate-x-0':'-translate-x-full lg:translate-x-0')}><div className="px-5 py-5 border-b border-white/10"><span className="font-display font-extrabold text-xl text-white">GlasirEs</span></div><nav className="flex-1 p-3 space-y-1 overflow-y-auto">{tabs.map(t=><button key={t.key} onClick={()=>{setActive(t.key);setMo(false)}} className={'w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium '+(active===t.key?'bg-frost-400 text-glacier-900':'text-frost-200/80 hover:bg-white/5')}>{t.icon} {t.label}</button>)}</nav><div className="p-4 border-t border-white/10"><div className="text-xs text-frost-200/60">Masuk sebagai</div><div className="font-semibold text-white">{user.name}</div><span className={'inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 '+BADGE[user.role]}>{ROLES[user.role]}</span><Btn tone="ghost" className="w-full mt-3 !bg-white/5 !text-white !border-white/15" onClick={onLogout}>Keluar</Btn></div><footer className="bait-developer-footer"><div className="bait-developer-content"><div className="bait-powered">● Power by</div><div className="bait-name">Syech B@-it</div><div className="bait-copyright">Copyright © 2026</div></div></footer></aside>{mo&&<div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={()=>setMo(false)}/>}<main className="flex-1 min-w-0"><div className="print-hide lg:hidden sticky top-0 z-20 glass flex justify-between p-3"><button onClick={()=>setMo(true)}>☰</button><b>GlasirEs</b><span/></div><div className="p-5 lg:p-8 max-w-7xl mx-auto"><div className="print-hide flex justify-end mb-4 relative"><button onClick={()=>setSn(!sn)} className="bg-white border rounded-full w-11 h-11 shadow">🔔{unread>0&&<span className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full text-[10px] min-w-[18px] h-[18px] flex items-center justify-center">{unread}</span>}</button>{sn&&<NotificationPanel user={user} onClose={()=>setSn(false)}/>}</div>{children}</div></main></div>}
 
 function StockOverview(){const ws=useDbValue('warehouse/stock',0),ds=useDbList('driverStock'),us=toList(useDbList('users')),drivers=us.filter(u=>u.role==='driver'),car=Object.values(ds).reduce((a,b)=>a+(+b||0),0);return <div className="grid md:grid-cols-2 gap-5 mb-6"><Card><div className="text-xs font-mono text-slate-400 mb-3">STOK GUDANG</div><IceGauge label="Sisa es di gudang" value={ws} max={Math.max(ws,car,100)} big/></Card><Card><div className="text-xs font-mono text-slate-400 mb-3">DIBAWA DRIVER</div><IceGauge label="Total sedang dibawa" value={car} max={Math.max(ws,car,100)} big/><div className="mt-4 space-y-2">{drivers.map(d=><div key={d.id} className="flex justify-between text-sm"><span>{d.name}</span><b>{ds[d.username]||0} kantong</b></div>)}</div></Card></div>}
 
