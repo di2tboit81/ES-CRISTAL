@@ -494,12 +494,16 @@ function BigSuperAdmin({me}){
   const driverStocks=toList(useDbList('driverStock'));
   const dataRequests=toList(useDbList('dataRequests')).sort((a,b)=>(b.submittedAt||0)-(a.submittedAt||0));
   const warehouseStock=useDbValue('warehouse/stock',0);
+  const products=toList(useDbList('config/products')).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  const warehouseStockByProduct=useDbList('warehouse/stockByProduct');
   const [tab,setTab]=useState('dashboard');
   const [password,setPassword]=useState('');
   const [newPassword,setNewPassword]=useState('');
   const [confirmPassword,setConfirmPassword]=useState('');
   const [busy,setBusy]=useState(false);
   const [stockEdit,setStockEdit]=useState('');
+  const [deleteStockProductId,setDeleteStockProductId]=useState('');
+  const [deleteProductId,setDeleteProductId]=useState('');
   const [toast,show]=useToast();
 
   const verifyBig=async()=>{
@@ -558,6 +562,20 @@ function BigSuperAdmin({me}){
     catch(e){show('Gagal menghapus: '+e.message,'err')}
   };
 
+  // Menghapus stok driver total (lama) SEKALIGUS stok per jenis produk,
+  // supaya diagram "Total Stok Dibawa" dan "Stok per Jenis Produk" di Beranda
+  // Driver benar-benar kembali ke 0, bukan hanya salah satu node saja.
+  const deleteDriverStock=async()=>{
+    if(!await verifyBig()){show('Password BIG SUPER ADMIN salah.','err');return}
+    if(!confirm('Hapus seluruh Stok Driver (total & per jenis produk)? Tindakan ini tidak dapat dibatalkan.'))return;
+    try{
+      await db.ref('driverStock').remove();
+      await db.ref('driverStockByProduct').remove();
+      await createAudit('big_node_deleted','BIG SUPER ADMIN menghapus node driverStock & driverStockByProduct',me);
+      show('Stok Driver (total & per jenis produk) berhasil dihapus.');
+    }catch(e){show('Gagal menghapus: '+e.message,'err')}
+  };
+
   const deleteDataRequest=async(r)=>{
     if(!await verifyBig()){show('Password BIG SUPER ADMIN salah.','err');return}
     if(!confirm(`Hapus data permintaan ${r.title||'Data Produk & Harga'} dari ${r.submittedByName||'Admin'}?`))return;
@@ -583,22 +601,59 @@ function BigSuperAdmin({me}){
   };
   const clearWarehouseStock=async()=>{
     if(!await verifyBig()){show('Password BIG SUPER ADMIN salah.','err');return}
-    if(!confirm(`Hapus seluruh stok gudang? Stok saat ini ${warehouseStock} kantong akan menjadi 0.`))return;
-    try{await db.ref('warehouse/stock').set(0);show('Stok gudang berhasil dikosongkan oleh BIG SUPER ADMIN. PERUBAHAN INI TIDAK DICATAT DI RIWAYAT GUDANG ATAU AUDIT LOG.')}catch(e){show('Gagal menghapus stok: '+e.message,'err')}
+    if(!confirm(`Hapus seluruh stok gudang (total & per jenis produk)? Stok saat ini ${warehouseStock} kantong akan menjadi 0.`))return;
+    try{
+      await db.ref('warehouse/stock').set(0);
+      await db.ref('warehouse/stockByProduct').remove();
+      show('Stok gudang (total & per jenis produk) berhasil dikosongkan oleh BIG SUPER ADMIN. PERUBAHAN INI TIDAK DICATAT DI RIWAYAT GUDANG ATAU AUDIT LOG.')
+    }catch(e){show('Gagal menghapus stok: '+e.message,'err')}
+  };
+
+  // Hapus data stok gudang HANYA untuk satu jenis produk yang dipilih (tidak semua produk).
+  // Total stok gudang ikut dikurangi sebesar stok produk tersebut supaya angka totalnya tetap sesuai.
+  const deleteWarehouseStockByProductId=async()=>{
+    if(!await verifyBig()){show('Password BIG SUPER ADMIN salah.','err');return}
+    if(!deleteStockProductId)return show('Pilih jenis produk yang stoknya ingin dihapus.','err');
+    const product=products.find(p=>p.id===deleteStockProductId);
+    const current=Number(warehouseStockByProduct[deleteStockProductId]||0);
+    if(!confirm(`Hapus stok gudang untuk jenis produk "${product?.name||deleteStockProductId}"? Stok saat ini ${current} kantong akan menjadi 0.`))return;
+    try{
+      await db.ref('warehouse/stock').transaction(v=>Math.max(0,Number(v||0)-current));
+      await db.ref('warehouse/stockByProduct/'+deleteStockProductId).remove();
+      await createAudit('big_node_deleted',`BIG SUPER ADMIN menghapus stok gudang untuk produk ${product?.name||deleteStockProductId} (${current} kantong)`,me);
+      setDeleteStockProductId('');
+      show(`Stok gudang untuk ${product?.name||'produk'} berhasil dihapus.`);
+    }catch(e){show('Gagal menghapus stok: '+e.message,'err')}
   };
 
   const deleteAllProducts=async()=>{
     if(!await verifyBig()){show('Password BIG SUPER ADMIN salah.','err');return}
     const snap=await db.ref('config/products').once('value');
-    const products=toList(snap.val());
-    if(!products.length)return show('Tidak ada jenis produk untuk dihapus.','err');
-    if(!confirm(`⚠️ HAPUS SEMUA JENIS PRODUK\n\nAkan menghapus langsung ${products.length} jenis produk dari Firebase Database.\n\nData produk aktif/nonaktif di config/products akan dihapus permanen.\n\nLanjutkan?`))return;
+    const allProducts=toList(snap.val());
+    if(!allProducts.length)return show('Tidak ada jenis produk untuk dihapus.','err');
+    if(!confirm(`⚠️ HAPUS SEMUA JENIS PRODUK\n\nAkan menghapus langsung ${allProducts.length} jenis produk dari Firebase Database.\n\nData produk aktif/nonaktif di config/products akan dihapus permanen.\n\nLanjutkan?`))return;
     const ok=prompt('Ketik HAPUS PRODUK untuk konfirmasi:');
     if(ok!=='HAPUS PRODUK'){show('Penghapusan jenis produk dibatalkan.','err');return}
     try{
       await db.ref('config/products').remove();
-      await createAudit('big_products_deleted',`BIG SUPER ADMIN menghapus seluruh jenis produk (${products.length} produk) dari database`,me);
-      show(`${products.length} jenis produk berhasil dihapus langsung dari database.`);
+      await createAudit('big_products_deleted',`BIG SUPER ADMIN menghapus seluruh jenis produk (${allProducts.length} produk) dari database`,me);
+      show(`${allProducts.length} jenis produk berhasil dihapus langsung dari database.`);
+    }catch(e){show('Gagal menghapus jenis produk: '+e.message,'err')}
+  };
+
+  // Hapus HANYA satu jenis produk yang dipilih dari config/products (tidak menghapus semuanya).
+  const deleteSingleProduct=async()=>{
+    if(!await verifyBig()){show('Password BIG SUPER ADMIN salah.','err');return}
+    if(!deleteProductId)return show('Pilih jenis produk yang ingin dihapus.','err');
+    const product=products.find(p=>p.id===deleteProductId);
+    if(!confirm(`⚠️ HAPUS JENIS PRODUK\n\nAkan menghapus langsung "${product?.name||deleteProductId}" dari Firebase Database (config/products).\n\nLanjutkan?`))return;
+    const ok=prompt('Ketik HAPUS PRODUK untuk konfirmasi:');
+    if(ok!=='HAPUS PRODUK'){show('Penghapusan jenis produk dibatalkan.','err');return}
+    try{
+      await db.ref('config/products/'+deleteProductId).remove();
+      await createAudit('big_product_deleted',`BIG SUPER ADMIN menghapus jenis produk ${product?.name||deleteProductId} dari database`,me);
+      setDeleteProductId('');
+      show(`Jenis produk ${product?.name||''} berhasil dihapus langsung dari database.`);
     }catch(e){show('Gagal menghapus jenis produk: '+e.message,'err')}
   };
 
@@ -704,9 +759,9 @@ function BigSuperAdmin({me}){
             ['logs','Log Audit'],
             ['customers','Data Pelanggan'],
             ['warehouse/history','Riwayat Gudang'],
-            ['driverStock','Stok Driver'],
+            ['driverStock','Stok Driver (Total & Per Produk)'],
             ['priceChangeLogs','Laporan Perubahan Produk & Harga']
-          ].map(([node,label])=><button key={node} className="big-action border bg-white hover:bg-rose-50" onClick={()=>deleteNode(node,label)}><div className="font-semibold text-slate-800">🗑 {label}</div><div className="text-xs text-slate-400 mt-1">Node: {node}</div></button>)}
+          ].map(([node,label])=><button key={node} className="big-action border bg-white hover:bg-rose-50" onClick={()=>node==='driverStock'?deleteDriverStock():deleteNode(node,label)}><div className="font-semibold text-slate-800">🗑 {label}</div><div className="text-xs text-slate-400 mt-1">Node: {node}{node==='driverStock'?' + driverStockByProduct':''}</div></button>)}
         </div>
       </Card>
 
@@ -719,6 +774,15 @@ function BigSuperAdmin({me}){
           <div className="w-full lg:w-72">
             <Btn tone="danger" className="w-full" onClick={deleteAllProducts}>🗑 HAPUS SEMUA JENIS PRODUK</Btn>
           </div>
+        </div>
+        <div className="mt-5 pt-5 border-t border-rose-200">
+          <b className="block text-sm text-rose-700 mb-2">Atau hapus satu jenis produk saja</b>
+          <p className="text-xs text-slate-500 mb-3">Pilih satu jenis produk untuk dihapus langsung dari database, tanpa menghapus jenis produk yang lain.</p>
+          <div className="grid sm:grid-cols-[1fr_auto] gap-2">
+            <Field label="Pilih Jenis Produk"><select className={inputCls} value={deleteProductId} onChange={e=>setDeleteProductId(e.target.value)}><option value="">— Pilih jenis produk —</option>{products.map(p=><option key={p.id} value={p.id}>{p.name}{p.active===false?' (nonaktif)':''}</option>)}</select></Field>
+            <Btn tone="danger" onClick={deleteSingleProduct}>🗑 HAPUS PRODUK INI</Btn>
+          </div>
+          {!products.length&&<div className="text-xs text-slate-400 mt-2">Belum ada jenis produk di database.</div>}
         </div>
       </Card>
 
@@ -749,6 +813,15 @@ function BigSuperAdmin({me}){
           <Btn tone="danger" onClick={clearWarehouseStock}>🗑 HAPUS STOK</Btn>
         </div>
         <div className="text-xs text-slate-400 mt-3">SET = mengganti stok menjadi jumlah yang dimasukkan. TAMBAH/KURANGI = menyesuaikan stok saat ini. Perubahan oleh BIG SUPER ADMIN tidak dicatat di riwayat gudang maupun audit log.</div>
+        <div className="mt-5 pt-5 border-t">
+          <b className="block text-sm mb-2">Atau hapus stok satu jenis produk saja</b>
+          <p className="text-xs text-slate-500 mb-3">Pilih satu jenis produk untuk dikosongkan stok gudangnya, tanpa mengganggu stok jenis produk lain. Total stok gudang ikut disesuaikan.</p>
+          <div className="grid sm:grid-cols-[1fr_auto] gap-2">
+            <Field label="Pilih Jenis Produk"><select className={inputCls} value={deleteStockProductId} onChange={e=>setDeleteStockProductId(e.target.value)}><option value="">— Pilih jenis produk —</option>{products.map(p=><option key={p.id} value={p.id}>{p.name} — {Number(warehouseStockByProduct[p.id]||0).toLocaleString('id-ID')} kantong</option>)}</select></Field>
+            <Btn tone="danger" onClick={deleteWarehouseStockByProductId}>🗑 HAPUS STOK PRODUK INI</Btn>
+          </div>
+          {!products.length&&<div className="text-xs text-slate-400 mt-2">Belum ada jenis produk di database.</div>}
+        </div>
       </Card>
     </div>}
 
@@ -837,7 +910,7 @@ function NotificationPanel({user,onClose}){
 }
 function Shell({user,tabs,active,setActive,onLogout,children}){const[mo,setMo]=useState(false),[sn,setSn]=useState(false);useEffect(()=>{const up=e=>{const t=e.target;if(t&&t.classList&&(t.classList.contains('driver-full-input')||t.classList.contains('user-manage-input')))return;if(t&&((t.tagName==='INPUT'&&t.type!=='password'&&t.type!=='date'&&t.type!=='number')||t.tagName==='TEXTAREA')){const v=t.value.toUpperCase();if(t.value!==v)t.value=v}};document.addEventListener('input',up,true);return()=>document.removeEventListener('input',up,true)},[]);const ns=useNotifications(user);useNewNotificationSound(ns);const unread=ns.filter(n=>!n.read).length;const menuBadges=useMemo(()=>{const m={};ns.forEach(n=>{if(!n.read&&n.menu)m[n.menu]=(m[n.menu]||0)+1});return m},[ns]);const openMenu=key=>{setActive(key);setMo(false);const items=ns.filter(n=>n.menu===key&&!n.read);if(items.length)markAllRead(items)};return <div className="app-auth min-h-screen flex"><aside className={'print-hide fixed lg:static z-40 inset-y-0 left-0 w-64 bg-glacier-900 text-frost-200 flex flex-col transition-transform '+(mo?'translate-x-0':'-translate-x-full lg:translate-x-0')}><div className="px-5 py-5 border-b border-white/10"><span className="font-display font-extrabold text-xl text-white">GlasirEs</span></div><nav className="flex-1 p-3 space-y-1 overflow-y-auto">{tabs.map(t=><button key={t.key} onClick={()=>openMenu(t.key)} className={'w-full flex items-center justify-between gap-2 text-left px-3 py-2.5 rounded-xl text-sm font-medium '+(active===t.key?'bg-frost-400 text-glacier-900':'text-frost-200/80 hover:bg-white/5')}><span>{t.icon} {t.label}</span>{menuBadges[t.key]>0&&<span className="notif-badge-pulse bg-red-600 text-white rounded-full text-[10px] font-bold min-w-[19px] h-[19px] px-1 flex items-center justify-center flex-none">{menuBadges[t.key]>99?'99+':menuBadges[t.key]}</span>}</button>)}</nav><div className="p-4 border-t border-white/10"><div className="text-xs text-frost-200/60">Masuk sebagai</div><div className="font-semibold text-white">{user.name}</div><span className={'inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 '+BADGE[user.role]}>{ROLES[user.role]}</span><Btn tone="ghost" className="w-full mt-3 !bg-white/5 !text-white !border-white/15" onClick={onLogout}>Keluar</Btn></div><footer className="bait-developer-footer"><div className="bait-developer-content"><div className="bait-powered">● Power by</div><div className="bait-name">Syech B@-it</div><div className="bait-copyright">Copyright © 2026</div></div></footer></aside>{mo&&<div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={()=>setMo(false)}/>}<main className="flex-1 min-w-0"><div className="print-hide lg:hidden sticky top-0 z-20 glass flex justify-between p-3"><button onClick={()=>setMo(true)}>☰</button><b>GlasirEs</b><span/></div><div className="p-5 lg:p-8 max-w-7xl mx-auto"><div className="print-hide flex justify-end mb-4 relative"><div className="relative inline-block"><button onClick={()=>setSn(!sn)} className="notif-bell-btn bg-white border rounded-full w-11 h-11 shadow flex items-center justify-center"><BellIcon ringing={unread>0}/></button>{unread>0&&<span className="notif-badge-pulse absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full text-[10px] font-bold min-w-[20px] h-[20px] px-1 flex items-center justify-center pointer-events-none">{unread>99?'99+':unread}</span>}</div>{sn&&<NotificationPanel user={user} onClose={()=>setSn(false)}/>}</div>{children}</div></main></div>}
 
-function StockOverview(){const ws=useDbValue('warehouse/stock',0),ds=useDbList('driverStock'),us=toList(useDbList('users')),drivers=us.filter(u=>u.role==='driver'),car=Object.values(ds).reduce((a,b)=>a+(+b||0),0);return <div className="grid md:grid-cols-2 gap-5 mb-6"><Card><div className="text-xs font-mono text-slate-400 mb-3">STOK GUDANG</div><IceGauge label="Sisa es di gudang" value={ws} max={Math.max(ws,car,100)} big/></Card><Card><div className="text-xs font-mono text-slate-400 mb-3">DIBAWA DRIVER</div><IceGauge label="Total sedang dibawa" value={car} max={Math.max(ws,car,100)} big/><div className="mt-4 space-y-2">{drivers.map(d=><div key={d.id} className="flex justify-between text-sm"><span>{d.name}</span><b>{ds[d.username]||0} kantong</b></div>)}</div></Card></div>}
+function StockOverview(){const ws=useDbValue('warehouse/stock',0),ds=useDbList('driverStock'),dsByProduct=useDbList('driverStockByProduct'),us=toList(useDbList('users')),drivers=us.filter(u=>u.role==='driver'),driverCarried=d=>{const byP=dsByProduct[d.id],vals=byP?Object.values(byP).map(v=>Number(v||0)):[];return vals.length?vals.reduce((a,b)=>a+b,0):Number(ds[d.username]||0)},car=drivers.reduce((a,d)=>a+driverCarried(d),0);return <div className="grid md:grid-cols-2 gap-5 mb-6"><Card><div className="text-xs font-mono text-slate-400 mb-3">STOK GUDANG</div><IceGauge label="Sisa es di gudang" value={ws} max={Math.max(ws,car,100)} big/></Card><Card><div className="text-xs font-mono text-slate-400 mb-3">DIBAWA DRIVER</div><IceGauge label="Total sedang dibawa" value={car} max={Math.max(ws,car,100)} big/><div className="mt-4 space-y-2">{drivers.map(d=><div key={d.id} className="flex justify-between text-sm"><span>{d.name}</span><b>{driverCarried(d)} kantong</b></div>)}</div></Card></div>}
 
 function DeliveriesTable({filterUser='',paymentFilter=''}){const ds=toList(useDbList('deliveries')).filter(d=>(!filterUser||d.driverId===filterUser)&&(!paymentFilter||d.paymentMethod===paymentFilter)).sort((a,b)=>b.timestamp-a.timestamp);return <Card><div className="font-semibold mb-4">Riwayat Pengantaran ({ds.length})</div><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="text-left text-slate-400 text-xs border-b"><th className="py-2">Waktu</th><th>Driver</th><th>Pelanggan</th><th>Lokasi</th><th>Qty</th><th>Total</th><th>Pembayaran</th><th>Status</th></tr></thead><tbody>{ds.map(d=><tr key={d.id} className="border-b border-slate-100"><td className="py-2 text-xs">{waktu(d.timestamp)}</td><td>{d.driverName}</td><td>{d.customerNameFull||d.customerName||'-'}</td><td>{d.locationFull||d.location||'-'}</td><td>{d.qty}</td><td>{rupiah(d.total)}</td><td>{d.paymentMethod==='invoice'?'INVOICE':d.paymentMethod==='wait_cash'?'WAIT CASH':'CASH'}</td><td>{d.paymentMethod==='invoice'?(d.paymentStatus==='paid'?'LUNAS':'BELUM LUNAS'):d.paymentMethod==='wait_cash'?(d.paymentStatus==='paid'?'LUNAS':'WAIT CASH'):'LUNAS'}</td></tr>)}</tbody></table></div></Card>}
 
@@ -1055,6 +1128,7 @@ function DriverHome({me}){
         products=toList(useDbList('config/products')).filter(p=>p.active!==false).sort((a,b)=>(a.name||'').localeCompare(b.name||'')),
         invoiceCustomers=toList(useDbList('invoiceCustomers')).filter(b=>b.approvalStatus==='approved'&&b.status!=='rejected').sort((a,b)=>(a.customerName||'').localeCompare(b.customerName||'')),
         ds=toList(useDbList('deliveries')).filter(d=>d.driverId===me.id).sort((a,b)=>(b.timestamp||0)-(a.timestamp||0)),
+        myStockRequests=toList(useDbList('stockRequests')).filter(r=>r.driverId===me.id),
         [productId,setProductId]=useState(''),
         [customer,setCustomer]=useState(''),
         [invoiceId,setInvoiceId]=useState(''),
@@ -1064,6 +1138,22 @@ function DriverHome({me}){
         [saving,setSaving]=useState(false),
         [period,setPeriod]=useState('all'),[periodDate,setPeriodDate]=useState(tanggalLokal()),
         [toast,show]=useToast();
+  // ===== 4 Diagram Beranda Driver =====
+  // Semua nilai dihitung langsung dari data Firebase realtime (stockByProduct,
+  // stockRequests, deliveries) sehingga otomatis ikut berubah setiap ada
+  // penambahan stok (ACC Gudang) maupun pengurangan stok (terjual/dikembalikan).
+  const stockByProductVals=Object.values(stockByProduct||{}).map(v=>Number(v||0));
+  // 1) Jumlah stok yang sedang diminta driver dan masih menunggu (belum dikeluarkan Gudang).
+  const requestedQty=myStockRequests.filter(r=>r.status==='pending'||r.status==='admin_approved').reduce((a,r)=>a+Number(r.qtyRequested||0),0);
+  // 2) Total stok yang sedang dibawa driver, gabungan semua jenis produk.
+  const totalStockAllProducts=stockByProductVals.length?stockByProductVals.reduce((a,b)=>a+b,0):Number(legacyStock||0);
+  // 3) Rincian stok per jenis produk (dipakai untuk diagram batang per produk).
+  const maxProductStock=stockByProductVals.length?Math.max(...stockByProductVals,1):1;
+  // 4) Total kantong yang sudah terjual — ikut filter periode (SEMUA/PERTANGGAL/PERBULAN/PERTAHUN)
+  //    yang sama dengan yang dipakai di daftar Transaksi Terbaru di bawah.
+  const filteredDs=ds.filter(d=>driverPeriodMatch(d.timestamp,period,periodDate));
+  const soldQty=filteredDs.reduce((a,d)=>a+Number(d.qty||0),0);
+
   // Ref dipakai sebagai sumber nilai terakhir input lokasi.
   // Ini mencegah validasi membaca state lama saat tombol Simpan ditekan.
   const locationRef=React.useRef('');
@@ -1297,15 +1387,40 @@ function DriverHome({me}){
     }
   };
 
-  const filteredDs=ds.filter(d=>driverPeriodMatch(d.timestamp,period,periodDate));
-
   return <div>{toast}
     <h2 className="font-display font-bold text-xl mb-5">Halo, {me.name} 👋</h2>
 
-    <div className="grid md:grid-cols-2 gap-5 mb-5">
+    <DriverHistoryFilter period={period} setPeriod={setPeriod} date={periodDate} setDate={setPeriodDate}/>
+
+    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
       <Card>
-        <IceGauge label={selectedProduct?`Stok ${selectedProduct.name} yang dibawa`:'Stok driver'} value={selectedProduct?Number(stockByProduct[selectedProduct.id]||0):Number(legacyStock||0)} max={Math.max(selectedProduct?Number(stockByProduct[selectedProduct.id]||0):Number(legacyStock||0),50)} big/>
+        <div className="text-xs font-mono text-slate-400 mb-3">STOK DIMINTA</div>
+        <IceGauge label="Menunggu diproses Admin/Gudang" value={requestedQty} max={Math.max(requestedQty,50)}/>
       </Card>
+      <Card>
+        <div className="text-xs font-mono text-slate-400 mb-3">TOTAL STOK DIBAWA</div>
+        <IceGauge label="Semua jenis produk" value={totalStockAllProducts} max={Math.max(totalStockAllProducts,50)}/>
+      </Card>
+      <Card>
+        <div className="text-xs font-mono text-slate-400 mb-3">STOK PER JENIS PRODUK</div>
+        <div className="space-y-3">
+          {products.map(p=>{
+            const val=Number(stockByProduct[p.id]||0),pct=Math.max(0,Math.min(100,(val/maxProductStock)*100));
+            return <div key={p.id}>
+              <div className="flex justify-between text-xs mb-1"><span className="text-slate-600">{p.name}</span><b>{val.toLocaleString('id-ID')} kantong</b></div>
+              <div className="h-2 rounded-full bg-slate-100 overflow-hidden"><div className="h-full bg-frost-400" style={{width:pct+'%'}}/></div>
+            </div>
+          })}
+          {!products.length&&<div className="text-xs text-slate-400">Belum ada jenis produk.</div>}
+        </div>
+      </Card>
+      <Card>
+        <div className="text-xs font-mono text-slate-400 mb-3">STOK TERJUAL</div>
+        <IceGauge label={period==='all'?'Total kantong terjual (semua)':period==='day'?'Terjual pada tanggal terpilih':period==='month'?'Terjual pada bulan terpilih':'Terjual pada tahun terpilih'} value={soldQty} max={Math.max(soldQty,50)}/>
+      </Card>
+    </div>
+
+    <div className="mb-5">
       <Card>
         <div className="text-xs text-slate-400">HARGA PRODUK SAAT INI</div>
         <div className="text-3xl font-display font-bold">{rupiah(price)}</div>
@@ -1432,9 +1547,8 @@ function DriverHome({me}){
 
     <Card>
       <div className="flex flex-wrap justify-between items-start gap-3">
-        <div><b>Transaksi Terbaru</b><div className="text-xs text-slate-500">Filter riwayat transaksi driver berdasarkan tanggal, bulan, atau tahun.</div></div>
+        <div><b>Transaksi Terbaru</b><div className="text-xs text-slate-500">Mengikuti filter periode di atas.</div></div>
       </div>
-      <DriverHistoryFilter period={period} setPeriod={setPeriod} date={periodDate} setDate={setPeriodDate}/>
       <div className="overflow-x-auto mt-4">
         <table className="w-full text-sm">
           <thead>
@@ -2082,6 +2196,8 @@ function DriverReturn({me}){
         rs=toList(useDbList('returnRequests')).filter(r=>r.driverId===me.id).sort((a,b)=>(b.requestedAt||0)-(a.requestedAt||0)),
         [productId,setProductId]=useState(''),[q,setQ]=useState(''),[period,setPeriod]=useState('month'),[date,setDate]=useState(tanggalLokal()),[toast,show]=useToast();
   const selectedStock=productId?Number(driverByProduct[productId]||0):0;
+  const stockByProductVals=Object.values(driverByProduct||{}).map(v=>Number(v||0));
+  const totalCarried=stockByProductVals.length?stockByProductVals.reduce((a,b)=>a+b,0):Number(legacyStock||0);
   const send=async()=>{
     const n=+q,product=products.find(p=>p.id===productId);
     if(!product)return show('Pilih jenis produk terlebih dahulu.','err');
@@ -2096,7 +2212,7 @@ function DriverReturn({me}){
   else {start.setMonth(0,0);start.setHours(0,0,0,0);end=new Date(start.getFullYear(),11,31,23,59,59,999)}
   const history=rs.filter(r=>(r.requestedAt||r.receivedAt||0)>=start.getTime()&&(r.requestedAt||r.receivedAt||0)<=end.getTime());
   return <div>{toast}<h2 className="font-display font-bold text-xl mb-5">KEMBALIKAN SISA ES</h2>
-    <Card className="mb-5"><div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"><div><small>DRIVER</small><b className="block">{me.name}</b></div><div><small>STOK LAMA</small><b className="block">{legacyStock} KANTONG</b></div><div><small>PRODUK DIPILIH</small><b className="block">{products.find(p=>p.id===productId)?.name||'-'}</b></div><div><small>STOK PRODUK</small><b className="block">{selectedStock} KANTONG</b></div></div></Card>
+    <Card className="mb-5"><div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"><div><small>DRIVER</small><b className="block">{me.name}</b></div><div><small>STOK LAMA</small><b className="block">{totalCarried} KANTONG</b></div><div><small>PRODUK DIPILIH</small><b className="block">{products.find(p=>p.id===productId)?.name||'-'}</b></div><div><small>STOK PRODUK</small><b className="block">{selectedStock} KANTONG</b></div></div></Card>
     <Card className="mb-5"><div className="grid md:grid-cols-2 gap-3"><Field label="Jenis Produk"><select className={inputCls} value={productId} onChange={e=>setProductId(e.target.value)}><option value="">Pilih jenis produk</option>{products.map(p=><option key={p.id} value={p.id}>{p.name} — {Number(driverByProduct[p.id]||0)} kantong</option>)}</select></Field><Field label="Jumlah yang dikembalikan"><input type="number" min="1" className={inputCls} value={q} onChange={e=>setQ(e.target.value)}/></Field></div><Btn tone="accent" onClick={send}>Kirim ke Gudang</Btn></Card>
     <Card><div className="flex flex-wrap justify-between gap-3 items-end mb-4"><div><b>Riwayat Pengembalian</b><div className="text-xs text-slate-500">Filter harian, bulanan, atau tahunan.</div></div><div className="grid grid-cols-2 gap-2"><Field label="Periode"><select className={inputCls} value={period} onChange={e=>setPeriod(e.target.value)}><option value="day">Harian</option><option value="month">Bulanan</option><option value="year">Tahunan</option></select></Field><Field label="Tanggal"><input type="date" className={inputCls} value={date} onChange={e=>setDate(e.target.value)}/></Field></div></div><div className="space-y-2">{history.map(r=><div key={r.id} className="p-4 rounded-xl border"><div className="flex justify-between gap-3"><div><b>{r.productName||'Es Kristal'} · {r.qty} kantong</b><div className="text-xs">{waktu(r.requestedAt)}</div></div><Pill tone={r.status==='approved'?'done':r.status==='pending'?'pending':'rejected'}>{r.status==='pending'?'MENUNGGU ACC GUDANG':r.status==='approved'?'APPROVE GUDANG / SELESAI':'DITOLAK'}</Pill></div>{r.status==='approved'&&<div className="text-xs text-emerald-700 mt-2">✓ Sudah dikembalikan dan di-ACC Gudang {waktu(r.receivedAt)}.</div>}{r.status==='pending'&&<div className="text-xs text-amber-700 mt-2">Barang sudah dikembalikan, menunggu ACC dari Gudang.</div>}{r.status==='rejected'&&<div className="text-xs text-rose-700 mt-2">✕ Ditolak Gudang {r.rejectedByName?`oleh ${r.rejectedByName}`:''} · Alasan: {r.rejectReason||'Alasan tidak dicatat.'}</div>}</div>)}{!history.length&&<div className="text-center text-slate-400 py-6">Belum ada riwayat pengembalian pada periode ini.</div>}</div></Card>
   </div>
