@@ -1,0 +1,370 @@
+
+@media print{.report-print-area .admin-gudang-hide-print,.admin-gudang-hide-print{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important}}
+*{box-sizing:border-box}body{font-family:Inter,sans-serif;background:radial-gradient(circle at 20% 10%,rgba(127,224,240,.55),transparent 35%),radial-gradient(circle at 80% 0%,rgba(255,255,255,.9),transparent 30%),linear-gradient(135deg,#e9fbff,#c5eff8,#f8fdff);overflow-x:hidden}body:before{content:"";position:fixed;inset:-200px;background:radial-gradient(circle,rgba(255,255,255,.9) 2px,transparent 3px);background-size:90px 90px;animation:waterMove 35s linear infinite;opacity:.35;pointer-events:none;z-index:-1}@keyframes waterMove{to{transform:translateY(-250px)}}.glass{background:linear-gradient(135deg,rgba(255,255,255,.85),rgba(220,250,255,.55));backdrop-filter:blur(25px);border:1px solid rgba(255,255,255,.8);box-shadow:0 25px 60px rgba(0,120,180,.18),inset 0 0 40px rgba(255,255,255,.8);position:relative;overflow:hidden}.glass:before{content:"";position:absolute;width:250%;height:250%;top:-120%;left:-100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.8),transparent);transform:rotate(25deg);animation:iceShine 9s infinite;pointer-events:none}@keyframes iceShine{0%{transform:translateX(-100%) rotate(25deg)}50%,100%{transform:translateX(100%) rotate(25deg)}}button{position:relative;overflow:hidden;transition:.3s}button:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(0,180,220,.25)}.bg-glacier-900{background:linear-gradient(180deg,#031522,#075572,#021522);box-shadow:10px 0 50px rgba(0,150,200,.45)}.icebar-shell{background:linear-gradient(180deg,#001522,#06324b);border-radius:18px;padding:4px;box-shadow:inset 0 0 20px rgba(0,0,0,.4)}.icebar-fill{background:linear-gradient(180deg,#fff,#b9f5ff,#37bddd);box-shadow:0 0 30px rgba(80,220,255,.9);border-radius:14px;min-height:3px}.fade-in{animation:fadeCrystal .45s ease}@keyframes fadeCrystal{from{opacity:0;transform:translateY(15px) scale(.98)}to{opacity:1;transform:none}}::-webkit-scrollbar{width:10px}::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#7fe0f0,#1c4a73);border-radius:20px}.bait-developer-footer{position:relative;margin:12px;padding:10px 14px;border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(83,211,255,.06));border:1px solid rgba(180,240,255,.18);backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 18px rgba(0,190,255,.08);overflow:hidden}.bait-developer-content{position:relative;z-index:2;text-align:center}.bait-powered{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(210,245,255,.5)}.bait-name{margin-top:2px;font-size:12px;font-weight:800;letter-spacing:.08em;background:linear-gradient(90deg,#dffaff,#71e8ff,#fff,#55d9ff,#dffaff);background-size:250% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:baitTextShine 4s linear infinite}.bait-copyright{margin-top:2px;font-size:8px;letter-spacing:.12em;color:rgba(190,235,250,.3)}@keyframes baitTextShine{to{background-position:-250% center}}.login-copyright{position:fixed;left:0;right:0;bottom:14px;text-align:center;font-size:10px;letter-spacing:.08em;color:rgba(30,90,120,.45);z-index:9999}.login-copyright .bait-brand{font-weight:800;color:#1689b5}.report-page{background:#fff;color:#0a1b2e;padding:28px;border-radius:16px}.report-head{display:flex;align-items:center;gap:18px;border-bottom:3px solid var(--report-color,#1c4a73);padding-bottom:14px}.report-logo{width:72px;height:72px;object-fit:contain;border-radius:10px}.report-title{font-family:Sora,sans-serif}.sig{margin-top:35px;display:grid;grid-template-columns:1fr 1fr;gap:80px;text-align:center}.sigline{border-bottom:1px solid #334155;margin:45px 15px 8px}.print-only{display:none}
+@keyframes notifShake{0%,100%{transform:rotate(0)}10%{transform:rotate(-14deg)}20%{transform:rotate(12deg)}30%{transform:rotate(-9deg)}40%{transform:rotate(7deg)}50%{transform:rotate(-4deg)}60%,100%{transform:rotate(0)}}
+.notif-bell-shake{transform-origin:50% 0;animation:notifShake 2.4s ease-in-out infinite}
+@keyframes notifPulseRing{0%{box-shadow:0 0 0 0 rgba(239,68,68,.6)}70%{box-shadow:0 0 0 9px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+.notif-badge-pulse{animation:notifPulseRing 1.8s ease-out infinite}
+.notif-bell-btn{overflow:visible!important}
+@media print{
+html,body{background:#fff!important;margin:0!important;padding:0!important;width:100%!important;min-width:0!important;color:#0a1b2e!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+*{box-sizing:border-box!important}
+.no-print,.print-hide,.print-only-ui,aside,nav,header,.sticky{display:none!important}
+.print-only{display:block!important}
+main{display:block!important;width:100%!important;min-width:0!important;max-width:none!important;margin:0!important;padding:0!important;overflow:visible!important}
+main>div{max-width:none!important;width:100%!important;margin:0!important;padding:0!important;overflow:visible!important}
+.report-print-area,.report-page{display:block!important;position:static!important;float:none!important;clear:both!important;width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:10mm!important;background:#fff!important;box-shadow:none!important;border-radius:0!important;border:0!important;overflow:visible!important;transform:none!important}
+.report-page{break-inside:auto!important;page-break-inside:auto!important}
+.report-print-area *{box-sizing:border-box!important;overflow:visible!important}
+.report-print-area .glass,.report-print-area .bg-white{background:#fff!important;box-shadow:none!important}
+.report-print-area .rounded-2xl,.report-print-area .rounded-xl,.report-print-area .border,.report-print-area .card,.report-print-area .report-block,.report-print-area .chart-card{break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area .grid{display:grid!important;break-inside:auto!important;page-break-inside:auto!important}
+.report-print-area .grid>*,.report-print-area .flex>*,.report-print-area section{break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area table{width:100%!important;max-width:100%!important;border-collapse:collapse!important;border-spacing:0!important;font-size:9.5px!important;table-layout:auto!important}
+.report-print-area thead{display:table-header-group!important}
+.report-print-area tfoot{display:table-footer-group!important}
+.report-print-area tbody{display:table-row-group!important}
+.report-print-area tr{break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area td,.report-print-area th{padding:5px 4px!important;vertical-align:top!important;word-break:normal!important;overflow-wrap:anywhere!important}
+.report-print-area .overflow-x-auto,.report-print-area .overflow-auto,.report-print-area .overflow-hidden{overflow:visible!important}
+.report-print-area .report-head{break-inside:avoid!important;page-break-inside:avoid!important;border-bottom:2px solid var(--report-color,#1c4a73)!important}
+.report-print-area .report-logo{width:58px!important;height:58px!important;object-fit:contain!important}
+.report-page h1,.report-page h2,.report-page h3,.report-page h4{break-after:avoid!important;page-break-after:avoid!important;break-before:auto!important;page-break-before:auto!important}
+.report-page img,canvas,svg{max-width:100%!important}
+.report-print-area .sig{break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area .signature,.report-print-area .signatures{break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area .text-center.text-\[10px\]{margin-top:8mm!important}
+.report-print-area .no-break,.report-print-area .keep-together{break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area .page-break-before{break-before:page!important;page-break-before:always!important}
+.report-print-area .page-break-after{break-after:page!important;page-break-after:always!important}
+/* ===== PRINT FINAL: SEMUA USER / SEMUA JENIS LAPORAN ===== */
+@page{size:A4 landscape;margin:10mm}
+.report-print-area,.report-page{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  margin:0!important;padding:0!important;background:#fff!important;
+  box-shadow:none!important;border:0!important;border-radius:0!important;
+  break-inside:auto!important;page-break-inside:auto!important;
+}
+.report-print-area>div,.report-print-area>section{
+  max-width:100%!important;min-width:0!important;
+}
+/* Saat print, semua grid dibuat satu kolom agar diagram/kartu tidak terpotong. */
+.report-print-area .grid{
+  display:block!important;width:100%!important;
+}
+.report-print-area .grid>*,
+.report-print-area .flex>*,
+.report-print-area .card,
+.report-print-area .rounded-2xl,
+.report-print-area .rounded-xl,
+.report-print-area .report-block,
+.report-print-area .chart-card,
+.report-print-area .sig,
+.report-print-area .signature,
+.report-print-area .signatures{
+  width:100%!important;max-width:100%!important;
+  break-inside:avoid!important;page-break-inside:avoid!important;
+}
+/* Jarak antar blok supaya blok berikutnya boleh pindah ke halaman baru. */
+.report-print-area .grid>*,
+.report-print-area .card,
+.report-print-area .report-block,
+.report-print-area .chart-card{margin-bottom:6mm!important}
+/* Diagram tidak boleh terbelah. */
+.report-print-area canvas,
+.report-print-area svg,
+.report-print-area img{
+  max-width:100%!important;height:auto!important;
+  break-inside:avoid!important;page-break-inside:avoid!important;
+}
+.report-print-area table{
+  width:100%!important;max-width:100%!important;
+  table-layout:fixed!important;border-collapse:collapse!important;
+  break-inside:auto!important;page-break-inside:auto!important;
+}
+.report-print-area thead{display:table-header-group!important}
+.report-print-area tr{break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area td,.report-print-area th{
+  white-space:normal!important;overflow-wrap:anywhere!important;
+  word-break:normal!important;vertical-align:top!important;
+}
+/* Jangan biarkan judul menempel sendirian di dasar halaman. */
+.report-print-area h1,
+.report-print-area h2,
+.report-print-area h3,
+.report-print-area h4{
+  break-after:avoid!important;page-break-after:avoid!important;
+}
+/* ===== TANDA TANGAN OTOMATIS PADA SEMUA LAPORAN CETAK ===== */
+.report-print-area .print-signature{display:grid!important;grid-template-columns:1fr 1fr!important;gap:55mm!important;margin-top:12mm!important;break-inside:avoid!important;page-break-inside:avoid!important;text-align:center!important;width:100%!important}
+.report-print-area .print-signature .sig-box{width:auto!important;max-width:none!important;margin:0!important;break-inside:avoid!important;page-break-inside:avoid!important}
+.report-print-area .print-signature .sig-space{height:22mm!important}
+.report-print-area .print-signature .sig-line{border-bottom:1px solid #111!important;margin:0 12mm 2mm!important;height:0!important}
+.report-print-area .print-signature .sig-name{font-weight:700!important;font-size:10pt!important}
+.report-print-area .print-signature .sig-role{font-size:9pt!important;margin-top:1mm!important}
+/* Tanda tangan/footer tetap utuh; jika tidak cukup ruang, pindah ke halaman berikutnya. */
+.report-print-area .sig,
+.report-print-area .signature,
+.report-print-area .signatures{
+  break-before:auto!important;page-break-before:auto!important;
+  break-inside:avoid!important;page-break-inside:avoid!important;
+}
+} 
+
+.app-auth input:not([type="password"]), .app-auth textarea, .app-auth select, .app-auth button, .app-auth label, .app-auth h1, .app-auth h2, .app-auth h3, .app-auth h4, .app-auth th, .app-auth td, .app-auth p, .app-auth span, .app-auth b, .app-auth small { text-transform: uppercase; }
+.user-manage-input,.user-manage-input *{text-transform:none!important}
+.app-auth input[type="password"] { text-transform:none !important; }
+@media print { .no-print, .print-hide { display:none !important; } .report-print-area { width:100% !important; } }
+
+/* HURUF BESAR UNTUK TAMPILAN DAN PENGISIAN DATA, LOGIN TETAP NORMAL */
+.app-shell input:not([type="password"]):not([type="date"]):not([type="number"]),
+.app-shell textarea,
+.app-shell select { text-transform: uppercase; }
+.app-shell button, .app-shell nav, .app-shell h1, .app-shell h2, .app-shell h3 { text-transform: uppercase; }
+.report-logo-placeholder{width:72px;height:72px;display:flex;align-items:center;justify-content:center;flex:none}.report-logo-fallback{width:62px;height:62px;border-radius:14px;background:linear-gradient(135deg,#073b4c,#1c8ca8);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;box-shadow:0 8px 24px rgba(7,59,76,.22)}.report-subhead{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;border-top:1px solid #e2e8f0;padding-top:16px}.report-summary{grid-template-columns:repeat(3,minmax(0,1fr))}.report-stat{padding:14px 16px;border:1px solid #dbeafe;border-radius:16px;background:linear-gradient(135deg,#f8fdff,#eef9ff);display:flex;flex-direction:column;gap:5px}.report-stat span{font-size:11px;font-weight:700;letter-spacing:.08em;color:#64748b;text-transform:uppercase}.report-stat b{font-size:22px;color:#0f172a}.report-stat-ok{border-color:#bbf7d0;background:linear-gradient(135deg,#f0fdf4,#ecfdf5)}.report-stat-ok b{color:#047857}.report-stat-no{border-color:#fecdd3;background:linear-gradient(135deg,#fff1f2,#fff7f7)}.report-stat-no b{color:#be123c}.report-table{border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid #dbe4ee;border-radius:12px}.report-table th{background:linear-gradient(180deg,#eff9fc,#e6f3f8);color:#0f3d52;font-weight:800;font-size:11px;letter-spacing:.03em;padding:10px 8px;border-bottom:2px solid #9ccbd9;white-space:nowrap}.report-table td{padding:9px 8px;border-bottom:1px solid #e5e7eb;vertical-align:top}.report-table tbody tr:nth-child(even){background:#f8fafc}.report-table tbody tr:last-child td{border-bottom:0}.report-footer-note{margin-top:18px;padding-top:10px;border-top:1px dashed #cbd5e1;font-size:10px;color:#64748b}.report-head{position:relative}.report-head:after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:linear-gradient(90deg,var(--report-color,#1c4a73),#62cfe5,transparent);border-radius:999px}
+
+
+@media print {
+  @page { size: A4 landscape; margin: 9mm 10mm 10mm 10mm; }
+  html, body { width:100% !important; background:#fff !important; }
+  .report-print-area { width:100% !important; max-width:none !important; margin:0 !important; padding:0 !important; }
+  .report-print-area .report-head { width:100% !important; display:flex !important; align-items:center !important; gap:14px !important; padding:0 0 8px !important; margin:0 0 8px !important; border-bottom:2px solid var(--report-color,#1c4a73) !important; }
+  .report-print-area .report-head:after { bottom:-2px !important; height:2px !important; }
+  .report-print-area .report-logo { width:52px !important; height:52px !important; }
+  .report-print-area .report-logo-placeholder { width:52px !important; height:52px !important; }
+  .report-print-area .report-title { font-size:16pt !important; line-height:1.15 !important; }
+  .report-print-area .report-head .text-sm { font-size:8.5pt !important; line-height:1.35 !important; }
+  .report-print-area .report-subhead { border-top:0 !important; padding-top:3px !important; margin-top:4px !important; }
+  .report-print-area .report-subhead h1 { font-size:13pt !important; margin:0 !important; }
+  .report-print-area .report-subhead p { font-size:8.5pt !important; }
+  .report-print-area .report-table { width:100% !important; table-layout:fixed !important; font-size:7.8pt !important; }
+  .report-print-area .report-table th { font-size:7.6pt !important; padding:4px 3px !important; white-space:normal !important; }
+  .report-print-area .report-table td { font-size:7.6pt !important; padding:4px 3px !important; line-height:1.25 !important; word-break:break-word !important; overflow-wrap:anywhere !important; }
+  .report-print-area .report-footer-note { font-size:7.5pt !important; margin-top:7px !important; padding-top:5px !important; }
+  .report-print-area .print-signature { margin-top:8mm !important; gap:45mm !important; }
+  .report-print-area .print-signature .sig-space { height:16mm !important; }
+  .report-print-area .print-signature .sig-name { font-size:8.5pt !important; }
+  .report-print-area .print-signature .sig-role { font-size:7.5pt !important; }
+}
+
+
+
+@media print {
+  .report-print-area .admin-gudang-hide-print { display:none !important; visibility:hidden !important; height:0 !important; min-height:0 !important; margin:0 !important; padding:0 !important; border:0 !important; }
+  @page { size: A4 landscape; margin: 10mm; }
+  html, body { font-size: 12pt !important; line-height: 1.4 !important; }
+  .report-print-area, .report-page { font-size: 12pt !important; line-height: 1.4 !important; width: 100% !important; max-width: none !important; padding: 0 !important; }
+  .report-print-area * { font-size: inherit; }
+  .report-print-area table { font-size: 10.5pt !important; }
+  .report-print-area th { font-size: 10pt !important; font-weight: 700 !important; padding: 7px 6px !important; }
+  .report-print-area td { font-size: 10.5pt !important; padding: 7px 6px !important; }
+  .report-print-area small, .report-print-area .text-xs { font-size: 9pt !important; }
+  .report-print-area .text-sm { font-size: 10.5pt !important; }
+  .report-print-area .text-lg { font-size: 15pt !important; }
+  .report-print-area .text-xl { font-size: 18pt !important; }
+  .report-print-area .text-2xl { font-size: 21pt !important; }
+  .report-print-area h1 { font-size: 20pt !important; line-height: 1.2 !important; }
+  .report-print-area h2 { font-size: 17pt !important; }
+  .report-print-area h3 { font-size: 14pt !important; }
+  .report-print-area .report-title { font-size: 20pt !important; }
+  .report-print-area .report-head { padding-bottom: 8mm !important; margin-bottom: 5mm !important; }
+  .report-print-area .report-logo { width: 20mm !important; height: 20mm !important; }
+  .report-print-area .grid > *, .report-print-area .card, .report-print-area .report-block, .report-print-area .chart-card { margin-bottom: 5mm !important; }
+  .report-print-area canvas, .report-print-area svg, .report-print-area img { max-width: 100% !important; }
+  .report-print-area .sig { margin-top: 18mm !important; }
+  .report-print-area .sigline { margin-top: 25mm !important; }
+  .report-print-area .report-head { display:flex!important; align-items:center!important; }
+  .report-print-area .report-subhead { display:flex!important; }
+  .report-print-area .report-summary { display:grid!important; grid-template-columns:repeat(3,minmax(0,1fr))!important; }
+  .report-print-area .report-stat { width:100%!important; }
+  .report-print-area .report-table th { background:#eef7fa!important; }
+  .report-print-area .report-table td, .report-print-area .report-table th { font-size:9.2pt!important; padding:5px 5px!important; }
+  .report-print-area .report-footer-note { font-size:8pt!important; }
+}
+
+/* ===== BIG SUPER ADMIN ===== */
+.big-admin-card{background:linear-gradient(135deg,rgba(5,11,20,.97),rgba(7,85,114,.96));color:#fff;border:1px solid rgba(127,224,240,.35);box-shadow:0 25px 70px rgba(0,60,90,.30)}
+.big-danger-zone{border:1px solid rgba(244,63,94,.22);background:linear-gradient(135deg,rgba(255,241,242,.96),rgba(255,255,255,.92))}
+.big-action{min-height:78px;text-align:left;border-radius:18px;padding:14px 16px;transition:.25s}
+.big-action:hover{transform:translateY(-2px) scale(1.01)}
+@media(max-width:640px){
+  .big-admin-grid{grid-template-columns:1fr!important}
+  .big-admin-card{padding:18px!important}
+  .big-action{min-height:70px}
+}
+
+
+
+@media print {
+  @page { size: A4 landscape; margin: 8mm; }
+  html, body { width: 100% !important; min-width: 0 !important; background: #fff !important; }
+  .report-print-area { width: 100% !important; max-width: none !important; overflow: visible !important; }
+  .report-print-area table { width: 100% !important; table-layout: auto !important; border-collapse: collapse !important; font-size: 9pt !important; }
+  .report-print-area th, .report-print-area td { padding: 4px 5px !important; vertical-align: top !important; word-break: break-word !important; overflow-wrap: anywhere !important; }
+  .report-print-area th { white-space: nowrap !important; }
+  .report-print-area .overflow-x-auto { overflow: visible !important; }
+  .report-print-area .no-print { display: none !important; }
+}
+
+
+
+@media print {
+  @page { size: A4 landscape; margin: 10mm; }
+  .report-print-area { width:100% !important; max-width:100% !important; }
+  .report-print-area .print-signature { display:grid !important; }
+  .report-print-area .no-print, .report-print-area .print-hide { display:none !important; }
+}
+
+
+
+@media print {
+  /* LAPORAN ADMIN: A4 POTRAIT, DIAGRAM & KOTAK RINGKASAN DISEMBUNYIKAN, SISANYA TETAP TAMPIL DI BAWAH KOP SURAT */
+  .admin-report-print-area { page: adminReportPortrait !important; width:100% !important; max-width:none !important; font-size:11pt !important; line-height:1.45 !important; }
+  .admin-report-hide-print { display:none !important; visibility:hidden !important; height:0 !important; min-height:0 !important; margin:0 !important; padding:0 !important; border:0 !important; }
+  .admin-report-print-area table { width:100% !important; table-layout:auto !important; font-size:10.5pt !important; }
+  .admin-report-print-area th { font-size:10pt !important; font-weight:700 !important; padding:6px 5px !important; }
+  .admin-report-print-area td { font-size:10.5pt !important; padding:6px 5px !important; word-break:break-word !important; overflow-wrap:anywhere !important; }
+  .admin-report-print-area h1 { font-size:18pt !important; }
+  .admin-report-print-area .report-title { font-size:18pt !important; }
+
+  /* LAPORAN SUPER ADMIN: A4 POTRAIT, SEMUA KONTEN TETAP TAMPIL, TULISAN DIPERJELAS */
+  .super-admin-report-print-area { page: superAdminReportPortrait !important; width:100% !important; max-width:none !important; font-size:11pt !important; line-height:1.45 !important; }
+  .super-admin-report-print-area table { width:100% !important; table-layout:auto !important; font-size:10.5pt !important; }
+  .super-admin-report-print-area th { font-size:10pt !important; font-weight:700 !important; padding:6px 5px !important; }
+  .super-admin-report-print-area td { font-size:10.5pt !important; padding:6px 5px !important; word-break:break-word !important; overflow-wrap:anywhere !important; }
+  .super-admin-report-print-area h1 { font-size:18pt !important; }
+  .super-admin-report-print-area .report-title { font-size:18pt !important; }
+
+  /* LAPORAN DRIVER: A4 POTRAIT, KOTAK RINGKASAN DISEMBUNYIKAN, SISANYA TETAP TAMPIL DI BAWAH KOP SURAT */
+  .driver-report-print-area { page: driverReportPortrait !important; width:100% !important; max-width:none !important; font-size:11pt !important; line-height:1.45 !important; }
+  .driver-report-hide-print { display:none !important; visibility:hidden !important; height:0 !important; min-height:0 !important; margin:0 !important; padding:0 !important; border:0 !important; }
+  .driver-report-print-area table { width:100% !important; table-layout:auto !important; font-size:10.5pt !important; }
+  .driver-report-print-area th { font-size:10pt !important; font-weight:700 !important; padding:6px 5px !important; }
+  .driver-report-print-area td { font-size:10.5pt !important; padding:6px 5px !important; word-break:break-word !important; overflow-wrap:anywhere !important; vertical-align:top !important; }
+  .driver-report-print-area h1 { font-size:18pt !important; }
+  .driver-report-print-area .report-title { font-size:18pt !important; }
+}
+@page adminReportPortrait { size:A4 portrait; margin:9mm 8mm 10mm 8mm; }
+@page superAdminReportPortrait { size:A4 portrait; margin:9mm 8mm 10mm 8mm; }
+@page driverReportPortrait { size:A4 portrait; margin:9mm 8mm 10mm 8mm; }
+
+<style id="full-customer-location-fix">
+/* Nama pelanggan & lokasi harus tampil UTUH, boleh turun baris, tidak dipotong */
+.full-customer-location,
+.full-customer-location * {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+  hyphens: none !important;
+}
+.full-customer-location {
+  min-width: 170px !important;
+  max-width: none !important;
+  vertical-align: top !important;
+}
+@media print {
+  .full-customer-location {
+    min-width: 0 !important;
+    max-width: none !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+  /* Jangan gunakan fixed layout untuk laporan transaksi, supaya nama/lokasi
+     mendapat ruang berdasarkan isi dan bisa membungkus ke beberapa baris. */
+  .admin-report-print-area table,
+  .driver-report-print-area table {
+    table-layout: auto !important;
+    width: 100% !important;
+  }
+}
+
+
+
+/* FINAL FIX: nama pelanggan & lokasi laporan HARUS tampil utuh */
+.report-print-area table,
+.admin-report-print-area table,
+.driver-report-print-area table,
+.report-page table {
+  table-layout: auto !important;
+  width: max-content !important;
+  min-width: 100% !important;
+}
+
+.report-print-area th,
+.report-print-area td,
+.admin-report-print-area th,
+.admin-report-print-area td,
+.driver-report-print-area th,
+.driver-report-print-area td {
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+.report-print-area td.full-customer-location,
+.admin-report-print-area td.full-customer-location,
+.driver-report-print-area td.full-customer-location,
+.report-page td.full-customer-location {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+  hyphens: none !important;
+  min-width: 190px !important;
+  width: 190px !important;
+  max-width: none !important;
+  height: auto !important;
+  vertical-align: top !important;
+}
+
+/* Khusus layar: kolom pelanggan/lokasi diberi ruang dan boleh turun baris. */
+@media screen {
+  .report-print-area td.full-customer-location,
+  .admin-report-print-area td.full-customer-location,
+  .driver-report-print-area td.full-customer-location {
+    min-width: 190px !important;
+    width: 190px !important;
+    white-space: normal !important;
+  }
+}
+
+/* Saat cetak/PDF browser: tetap jangan potong teks. */
+@media print {
+  .report-print-area table,
+  .admin-report-print-area table,
+  .driver-report-print-area table {
+    table-layout: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .report-print-area td.full-customer-location,
+  .admin-report-print-area td.full-customer-location,
+  .driver-report-print-area td.full-customer-location {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+}
+
+
+
+/* DRIVER ONLY: never clip text containing spaces. */
+.driver-full-text,
+.driver-full-text * {
+  white-space: pre-wrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+.driver-full-input {
+  white-space: pre-wrap !important;
+}
